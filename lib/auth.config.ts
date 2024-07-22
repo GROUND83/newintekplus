@@ -12,8 +12,9 @@ export const authConfig = {
     signOut: "/",
   },
   callbacks: {
-    async session({ session, user, token }) {
-      return session;
+    authorized({ auth }) {
+      const isAuthenticated = !!auth?.user;
+      return isAuthenticated;
     },
   },
   providers: [],
