@@ -80,6 +80,7 @@ function checkCredential({
     }
   });
 }
+
 export const { handlers, signIn, signOut, auth } = NextAuth({
   ...authConfig,
   providers: [
@@ -93,6 +94,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         let user = null;
         // console.log("credentials", credentials);
         let body = await req.json();
+        console.log("body", body);
         let role: any = body?.role;
         let type: any = body?.type;
         if (!credentials?.email || !credentials?.password) {
