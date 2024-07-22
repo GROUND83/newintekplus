@@ -32,6 +32,7 @@ import {
 // import { getMoreData } from "./actions";
 import { columns } from "./colums";
 import { getMoreData } from "./actions";
+import Link from "next/link";
 
 type ownerType = {
   id: number;
@@ -162,6 +163,7 @@ export default function DataTable() {
             </Button>
           </div>
         ) : null}
+        <Link href={"/admin/group/new"}>만들기</Link>
       </div>
       <div className="p-3">
         <ScrollArea className="rounded-md border bg-white  w-full h-[calc(100vh-160px)] ">

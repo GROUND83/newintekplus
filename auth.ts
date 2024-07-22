@@ -2,9 +2,10 @@ import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcrypt";
 import User from "@/models/user";
 import NextAuth from "next-auth";
-import { authConfig } from "./auth.config";
+
 import Participant from "@/models/participant";
 import Teacher from "@/models/teacher";
+import { authConfig } from "./auth.config";
 function exclude(user: any, keys: any) {
   for (let key of keys) {
     delete user[key];
@@ -80,19 +81,17 @@ function checkCredential({
   });
 }
 export const { handlers, signIn, signOut, auth } = NextAuth({
-  // Configure one or more authentication providers
-  // adapter: PrismaAdapter(db),
   ...authConfig,
   providers: [
     Credentials({
       name: "credentials",
       credentials: {
-        email: { label: "email", type: "text" },
-        password: { label: "password", type: "password" },
+        email: {},
+        password: {},
       },
       authorize: async (credentials: any, req) => {
         let user = null;
-        console.log("credentials", credentials);
+        // console.log("credentials", credentials);
         let body = await req.json();
         let role: any = body?.role;
         let type: any = body?.type;

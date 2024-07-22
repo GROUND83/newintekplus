@@ -2,9 +2,9 @@ import { getToken } from "next-auth/jwt";
 import { getSession } from "next-auth/react";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
-import { auth as middleware } from "./lib/auth";
+import { auth as middleware } from "@/auth";
 import NextAuth from "next-auth";
-import { authConfig } from "./lib/auth.config";
+import { authConfig } from "./auth.config";
 interface Routes {
   [key: string]: boolean;
 }
