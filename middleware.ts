@@ -31,21 +31,21 @@ export default auth((req) => {
   const pathname = nextUrl.pathname;
   console.log("pathname", pathname, req.auth);
   //
-  if (pathname.startsWith("/admin")) {
-    if (req.auth) {
-      console.log("session admin", req.auth);
-      if (req.auth) {
-        console.log("check");
-        return NextResponse.next();
-        //
-      } else {
-        // console.log("session", session);
-        return NextResponse.redirect(new URL("/auth/admin/login", nextUrl));
-      }
-    } else {
-      return NextResponse.redirect(new URL("/auth/admin/login", nextUrl));
-    }
-  }
+  // if (pathname.startsWith("/admin")) {
+  //   if (req.auth) {
+  //     console.log("session admin", req.auth);
+  //     if (req.auth) {
+  //       console.log("check");
+  //       return NextResponse.next();
+  //       //
+  //     } else {
+  //       // console.log("session", session);
+  //       return NextResponse.redirect(new URL("/auth/admin/login", nextUrl));
+  //     }
+  //   } else {
+  //     return NextResponse.redirect(new URL("/auth/admin/login", nextUrl));
+  //   }
+  // }
   if (pathname.startsWith("/student")) {
     if (req.auth) {
       console.log("session participant", req.auth);
