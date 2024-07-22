@@ -6,6 +6,7 @@ import NextAuth from "next-auth";
 import Participant from "@/models/participant";
 import Teacher from "@/models/teacher";
 import { authConfig } from "./auth.config";
+import { connectToMongoDB } from "./lib/db";
 function exclude(user: any, keys: any) {
   for (let key of keys) {
     delete user[key];
@@ -26,6 +27,7 @@ function checkCredential({
   return new Promise(async (resolve, reject) => {
     let user: any = {};
     try {
+      await connectToMongoDB();
       if (role === "admin") {
         console.log(email, password, type, role);
         let findUser = await User.findOne({ email: email });
