@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { use } from "react";
 import { z } from "zod";
 
 import { useForm, useFieldArray } from "react-hook-form";
@@ -48,6 +48,7 @@ import {
   CirclePlus,
   CircleCheck,
   Loader2,
+  SquareArrowOutUpRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Calendar } from "@/components/ui/calendar";
@@ -68,6 +69,7 @@ import { Label } from "@/components/ui/label";
 
 import { toast } from "sonner";
 import Link from "next/link";
+import { useQuery } from "@tanstack/react-query";
 const FormSchema = z.object({
   liveSurvey: z.object({
     _id: z.string(),
@@ -79,55 +81,106 @@ export default function Page({ params }: { params: { groupId: string } }) {
   const [courseProfileArray, setCourseProfile] = React.useState<any>([]);
   const [paricipantArray, setParticipant] = React.useState<any>([]);
   const [courseProfileData, setCourseProfileData] = React.useState<any>();
-  const [groupData, setGroupData] = React.useState<any>();
+  // const [groupData, setGroupData] = React.useState<any>();
   const [liveSurveyData, setLiveSurveyData] = React.useState<any>([]);
   const [loading, setLoading] = React.useState<any>(false);
   const [statusloading, setStatusLoading] = React.useState<any>(false);
 
-  //
-  const reload = async () => {
-    // setLoading(true);
-    let readers = await getSelectInitData();
-    if (readers.data) {
-      let reader = JSON.parse(readers.data.reader);
-      let participants = JSON.parse(readers.data.participants);
-      let courseProfile = JSON.parse(readers.data.courseProfile);
-      console.log("reader", reader, participants, courseProfile);
-      setReaderArray(reader);
-      setCourseProfile(courseProfile);
-      setParticipant(participants);
-    }
-    let data = await initailData();
-    console.log("reloadData", data);
-
-    //   코스프로파일 에서 eduFrom이 집합교육이면
-    //    linveSurvey 세팅
-    let modulesdata = [];
-    let newLiveSurvey = [];
-    let liveSurvey = await getLiveSurvey({
-      groupId: params.groupId,
-    });
-
-    if (liveSurvey.data) {
-      //
-      newLiveSurvey = await JSON.parse(liveSurvey.data);
-      console.log("newLiveSurvey", newLiveSurvey);
-      setLiveSurveyData(newLiveSurvey);
-    }
-    //
-
-    setGroupData(data);
-    console.log("data.liveSurvey", data.liveSurvey);
-    form.reset(
-      {
-        liveSurvey: {
-          _id: data.liveSurvey?._id || "",
-          title: data.liveSurvey?.title || "",
-        },
-      }
-      //   { keepDirtyValues: true }
-    );
+  const fetchDataOptions = {
+    groupId: params.groupId,
   };
+
+  const {
+    data: groupData,
+    isLoading,
+    isError,
+    refetch,
+  } = useQuery({
+    queryKey: ["groupDetail", fetchDataOptions],
+    queryFn: async () => {
+      let readers = await getSelectInitData();
+      if (readers.data) {
+        let reader = JSON.parse(readers.data.reader);
+        let participants = JSON.parse(readers.data.participants);
+        let courseProfile = JSON.parse(readers.data.courseProfile);
+        console.log("reader", reader, participants, courseProfile);
+        setReaderArray(reader);
+        setCourseProfile(courseProfile);
+        setParticipant(participants);
+      }
+      let data = await initailData();
+      let newLiveSurvey = [];
+      let liveSurvey = await getLiveSurvey({
+        groupId: fetchDataOptions.groupId,
+      });
+
+      if (liveSurvey.data) {
+        //
+        newLiveSurvey = await JSON.parse(liveSurvey.data);
+        console.log("newLiveSurvey", newLiveSurvey);
+        setLiveSurveyData(newLiveSurvey);
+      }
+      //
+
+      // setGroupData(data);
+      console.log("data.liveSurvey", data.liveSurvey);
+      form.reset(
+        {
+          liveSurvey: {
+            _id: data.liveSurvey?._id || "",
+            title: data.liveSurvey?.title || "",
+          },
+        }
+        //   { keepDirtyValues: true }
+      );
+      return data;
+    },
+    // staleTime: 6000, // 1분
+    refetchOnMount: true,
+  });
+  //
+  // const reload = async () => {
+  //   // setLoading(true);
+  //   let readers = await getSelectInitData();
+  //   if (readers.data) {
+  //     let reader = JSON.parse(readers.data.reader);
+  //     let participants = JSON.parse(readers.data.participants);
+  //     let courseProfile = JSON.parse(readers.data.courseProfile);
+  //     console.log("reader", reader, participants, courseProfile);
+  //     setReaderArray(reader);
+  //     setCourseProfile(courseProfile);
+  //     setParticipant(participants);
+  //   }
+  //   let data = await initailData();
+
+  //   //   코스프로파일 에서 eduFrom이 집합교육이면
+  //   //    linveSurvey 세팅
+  //   let modulesdata = [];
+  //   let newLiveSurvey = [];
+  //   let liveSurvey = await getLiveSurvey({
+  //     groupId: params.groupId,
+  //   });
+
+  //   if (liveSurvey.data) {
+  //     //
+  //     newLiveSurvey = await JSON.parse(liveSurvey.data);
+  //     console.log("newLiveSurvey", newLiveSurvey);
+  //     setLiveSurveyData(newLiveSurvey);
+  //   }
+  //   //
+
+  //   setGroupData(data);
+  //   console.log("data.liveSurvey", data.liveSurvey);
+  //   form.reset(
+  //     {
+  //       liveSurvey: {
+  //         _id: data.liveSurvey?._id || "",
+  //         title: data.liveSurvey?.title || "",
+  //       },
+  //     }
+  //     //   { keepDirtyValues: true }
+  //   );
+  // };
 
   const initailData = async () => {
     //
@@ -138,10 +191,10 @@ export default function Page({ params }: { params: { groupId: string } }) {
       return result;
     }
   };
-  React.useEffect(() => {
-    // getSelectData();
-    reload();
-  }, []);
+  // React.useEffect(() => {
+  //   // getSelectData();
+  //   reload();
+  // }, []);
 
   //
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -168,7 +221,7 @@ export default function Page({ params }: { params: { groupId: string } }) {
       let res = await updateGroupStatus({ groupId: groupId });
       if (res.data) {
         toast.success("그룹개설이 완료 되었습니다.");
-        reload();
+        refetch();
       }
     } catch (e) {
       toast.error(e);
@@ -200,7 +253,7 @@ export default function Page({ params }: { params: { groupId: string } }) {
         let resData = JSON.parse(res.data);
         console.log(resData);
         toast.success("설문 설정에 성공하였습니다.");
-        reload();
+        refetch();
       }
     } catch (e) {
       toast.error(e);
@@ -208,21 +261,36 @@ export default function Page({ params }: { params: { groupId: string } }) {
       setLoading(false);
     }
   }
+  if (isLoading) {
+    return (
+      <div className="w-full  h-[calc(100vh-70px)]  flex flex-col items-center justify-center">
+        <Loader2 className=" animate-spin size-8 text-primary" />
+      </div>
+    );
+  }
   return (
-    <div className="w-full flex flex-col items-stretch flex-1  ">
-      <div className="p-3 flex-1 flex flex-col  w-full">
-        <div className="bg-white border flex-1 w-full p-6 flex flex-col items-start gap-2">
-          <Card className="w-full">
-            <CardHeader>
-              <CardTitle>
-                1. 그룹상태 변경 <Badge>{groupData?.status}</Badge>
-              </CardTitle>
-              <CardDescription>
-                그룹의 상태를 변경 합니다. 개설 완료 변경시 그룹 데이터는 변경
-                불가 합니다. 개설 완료 시 리더, 교육생에게 노출 됩니다.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="flex flex-col items-start gap-3 w-full">
+    <div className="w-full flex flex-col   ">
+      <ScrollArea className="w-full flex  flex-col gap-3 max-h-[calc(100vh-70px)]">
+        <div className="w-full flex flex-col ">
+          <div className="w-full flex flex-row items-center justify-between p-6 bg-white  border-b ">
+            <div className="flex flex-col items-start ">
+              <div className="flex flex-row gap-2">
+                <p className="text-lg font-bold">그룹상태 변경</p>
+                <Badge>{groupData?.status}</Badge>
+              </div>
+              <p className="w-[500px] text-neutral-500 mt-3">
+                그룹의 상태를 변경 합니다.
+              </p>
+              <p className="w-[500px] text-neutral-500">
+                개설 완료 변경시 그룹 데이터는{" "}
+                <span className="text-red-500">변경 불가</span> 합니다.
+              </p>
+              <p className="w-[500px] text-neutral-500">
+                <span className="text-red-500">개설 완료 시 </span>리더,
+                교육생에게 노출 됩니다.
+              </p>
+            </div>
+            <div className=" ">
               {groupData?.status === "개설중" ? (
                 <Button onClick={() => changeStatus()}>
                   {statusloading ? (
@@ -233,77 +301,111 @@ export default function Page({ params }: { params: { groupId: string } }) {
                 </Button>
               ) : (
                 <Button asChild>
-                  <Link href={`/admin/group/${params.groupId}/detail/notice`}>
-                    그룹 이동
+                  <Link
+                    href={`/admin/group/${params.groupId}/detail/notice`}
+                    className="flex flex-row gap-2"
+                  >
+                    <SquareArrowOutUpRight className="size-4" /> 그룹 이동
                   </Link>
                 </Button>
               )}
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
-          <Card className="w-full">
-            <CardHeader>
-              <CardTitle>2. 그룹 정보</CardTitle>
-            </CardHeader>
-            <CardContent className="flex flex-col items-start gap-3 w-full">
-              <div className="w-full grid grid-cols-2 gap-3">
-                <div>
-                  <Label>그룹명</Label>
-                  <p>{groupData?.name}</p>
-                </div>
-                <div>
-                  <Label>교육기간</Label>
-                  <p>
-                    {dayjs(groupData?.from).format("YYYY-MM-DD")} ~{" "}
-                    {dayjs(groupData?.to).format("YYYY-MM-DD")}
-                  </p>
-                </div>
-                <div>
-                  <Label>리더</Label>
-                  <p>
-                    {groupData?.teacher.username} - {groupData?.teacher.email}
-                  </p>
-                </div>
-                <div>
-                  <Label>참여자</Label>
-                  {groupData?.participants.map((item, index) => {
-                    return (
-                      <p key={item._id}>
-                        {item.jobPosition} {item.username} - {item.email}
-                      </p>
-                    );
-                  })}
-                </div>
-                <div>
-                  <Label>코스프로파일</Label>
+          <div className="w-full flex flex-col items-start  p-6 bg-white  border-b ">
+            <div className=" w-full flex flex-row items-center justify-between">
+              <p className="text-lg font-bold">그룹 정보</p>
+              <div className=" ">
+                {groupData?.status === "개설중" ? (
+                  <Button>그룹 수정</Button>
+                ) : (
+                  <Button disabled>그룹 수정 불가</Button>
+                )}
+              </div>
+            </div>
+
+            <div className="w-full grid grid-cols-12 gap-3">
+              <div className=" col-span-6 pt-4 pb-6 border-b flex flex-col gap-2">
+                <p className="text-neutral-500">그룹명</p>
+                <p className="">{groupData?.name}</p>
+              </div>
+              <div className="col-span-6 pt-4 pb-6 border-b flex flex-col gap-2">
+                <p className="text-neutral-500">교육기간</p>
+                <p>
+                  {dayjs(groupData?.starDate).format("YYYY-MM-DD")} ~{" "}
+                  {dayjs(groupData?.endDate).format("YYYY-MM-DD")}
+                  {/* {dayjs(groupData?.endDate).diff(
+                    dayjs(groupData?.starDate),
+                    "days"
+                  ) / 7} */}
+                </p>
+              </div>
+              <div className=" col-span-6  pt-4 pb-6 border-b flex flex-col gap-2">
+                <p className="text-neutral-500">리더</p>
+                <p>
+                  {groupData?.teacher.username} - {groupData?.teacher.email}
+                </p>
+              </div>
+              <div className=" col-span-6  pt-4 pb-6 border-b flex flex-col gap-2">
+                <p className="text-neutral-500">
+                  참여자 {groupData?.participants.length}명
+                </p>
+                <ScrollArea className="w-full flex flex-col max-h-[200px] ">
+                  <div className="flex flex-col w-full ">
+                    {groupData?.participants.map((item: any, index: any) => {
+                      return (
+                        <div
+                          key={item._id}
+                          className="py-2 w-full border-b px-3 flex flex-row items-center gap-2"
+                        >
+                          <p className="w-[50px] border-r text-center">
+                            {item.jobPosition}
+                          </p>
+                          <p className="w-[70px] border-r text-center">
+                            {item.username}
+                          </p>
+                          <p className="pl-2">{item.email}</p>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </ScrollArea>
+              </div>
+              <div className=" col-span-12 pt-4 pb-6 flex flex-col gap-2">
+                <p className="text-neutral-500">코스프로파일</p>
+
+                <Link
+                  href={`/admin/courseprofile/${groupData?.courseProfile._id}`}
+                  className="flex flex-row items-center gap-2 hover:text-primary"
+                >
+                  <SquareArrowOutUpRight className="size-4" />
                   <p>
                     {groupData?.courseProfile.eduForm} -
                     {groupData?.courseProfile.title}
                   </p>
-                </div>
+                </Link>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
-          <Card className="w-full">
-            <CardHeader>
-              <CardTitle>3. 설문 설정</CardTitle>
-              <CardDescription>
+          <div className="w-full flex flex-col items-start  p-6 bg-white pb-12">
+            <div className="flex flex-col items-start gap-2">
+              <p className="text-lg font-bold">평가/설문</p>
+              <p className="w-[500px] text-neutral-500">
                 각 레슨에 배정할 설문을 선택하세요
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="w-full grid grid-cols-12 gap-3 ">
+              </p>
+            </div>
+            <div className="w-full  mt-3">
               <Form {...form}>
                 <form
-                  className="space-y-8  col-span-12"
+                  className="col-span-12  grid grid-cols-12 gap-3 w-full"
                   onSubmit={form.handleSubmit(onSubmit)}
                 >
                   <FormField
                     control={form.control}
                     name="liveSurvey"
                     render={({ field: { value, onChange } }) => (
-                      <FormItem className="flex flex-col w-full  col-span-6">
-                        <FormLabelWrap title={"설문"} required={true} />
+                      <FormItem className="flex flex-col   col-span-10">
                         <Popover>
                           <PopoverTrigger
                             asChild
@@ -372,22 +474,24 @@ export default function Page({ params }: { params: { groupId: string } }) {
                       </FormItem>
                     )}
                   />
-                  <Button
-                    type="submit"
-                    disabled={groupData?.status === "개설완료" ? true : false}
-                  >
-                    {loading ? (
-                      <Loader2 className=" animate-spin" />
-                    ) : (
-                      <span>설문 설정</span>
-                    )}
-                  </Button>
+                  <div className=" col-span-2">
+                    <Button
+                      type="submit"
+                      disabled={groupData?.status === "개설완료" ? true : false}
+                    >
+                      {loading ? (
+                        <Loader2 className=" animate-spin" />
+                      ) : (
+                        <span>설문 설정</span>
+                      )}
+                    </Button>
+                  </div>
                 </form>
               </Form>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
-      </div>
+      </ScrollArea>
     </div>
   );
 }

@@ -1,18 +1,8 @@
-import {
-  PaginationState,
-  ColumnDef,
-  SortingState,
-  flexRender,
-  getCoreRowModel,
-  getSortedRowModel,
-  useReactTable,
-  createColumnHelper,
-} from "@tanstack/react-table";
-import { TableDataType } from "./table";
+import { ColumnDef } from "@tanstack/react-table";
+
 import { Button } from "@/components/ui/button";
 import { ArrowUpDown } from "lucide-react";
-import { Avatar, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
+
 import Link from "next/link";
 import dayjs from "dayjs";
 import "dayjs/locale/ko";
@@ -78,33 +68,6 @@ export const columns: ColumnDef<any>[] = [
       );
     },
   },
-  // {
-  //   accessorKey: "contents",
-  //   header: ({ column }) => {
-  //     return (
-  //       <div className="flex flex-col items-start">
-  //         <Button
-  //           variant="ghost"
-  //           className=" p-0"
-  //           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-  //         >
-  //           첨부파일
-  //           <ArrowUpDown className="ml-2 h-4 w-4" />
-  //         </Button>
-  //       </div>
-  //     );
-  //   },
-  //   cell: ({ row }) => {
-  //     let contents: any = row.getValue("contents");
-  //     return (
-  //       <div className=" flex flex-row items-center gap-2 justify-start">
-  //         <div className="flex flex-col items-start gap-1">
-  //           <p>{contents?.length > 0 ? "있음" : "없음"}</p>
-  //         </div>
-  //       </div>
-  //     );
-  //   },
-  // },
 
   {
     accessorKey: "created_at",
@@ -130,32 +93,7 @@ export const columns: ColumnDef<any>[] = [
       );
     },
   },
-  // {
-  //   accessorKey: "courseProfile",
-  //   header: ({ column }) => {
-  //     return (
-  //       <div className="flex flex-col items-start justify-center text-left ">
-  //         <Button
-  //           variant="ghost"
-  //           className="  p-0"
-  //           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-  //         >
-  //           모듈/레슨/설문
-  //           <ArrowUpDown className="ml-2 h-4 w-4" />
-  //         </Button>
-  //       </div>
-  //     );
-  //   },
-  //   cell: ({ row }) => {
-  //     console.log(row.original);
-  //     // let liveSurvey = await
-  //     return (
-  //       <div className=" text-left">
-  //         <p>{row.original.courseProfile.modules.length > 0 ? "ok" : "no"}</p>
-  //       </div>
-  //     );
-  //   },
-  // },
+
   {
     id: "actions",
     cell: ({ row }) => {

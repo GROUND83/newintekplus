@@ -5,7 +5,10 @@ import { cn } from "@/lib/utils";
 import AuthProvider from "@/components/authProvider";
 import { connectToMongoDB } from "@/lib/db";
 import { Toaster } from "@/components/ui/sonner";
-
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import React from "react";
+import { ReactQueryClientProvider } from "@/components/reactQuery/queryProvider";
 const notoSansKr = Noto_Sans_KR({
   // preload: true, 기본값
   preload: false,
@@ -23,7 +26,7 @@ export const metadata: Metadata = {
   title: "인재육성교육지원시스템 | SMARTAL Inc",
   description: "인재육성교육지원시스템 by SMARTAL Inc",
 };
-
+const queryClient = new QueryClient({});
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -31,16 +34,18 @@ export default function RootLayout({
 }>) {
   connectToMongoDB();
   return (
-    <html lang="en">
-      <AuthProvider>
-        <body
-          className={cn(notoSansKr.className, roboto.variable)}
-          style={{ fontSize: 14 }}
-        >
-          {children}
-          <Toaster richColors />
-        </body>
-      </AuthProvider>
-    </html>
+    <ReactQueryClientProvider>
+      <html lang="en">
+        <AuthProvider>
+          <body
+            className={cn(notoSansKr.className, roboto.variable)}
+            style={{ fontSize: 14 }}
+          >
+            {children}
+            <Toaster richColors />
+          </body>
+        </AuthProvider>
+      </html>
+    </ReactQueryClientProvider>
   );
 }

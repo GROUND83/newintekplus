@@ -9,7 +9,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ChevronLeft, ChevronRight, MoveLeft } from "lucide-react";
+import { ChevronLeft, ChevronRight, Loader2, MoveLeft } from "lucide-react";
 import {
   PaginationState,
   SortingState,
@@ -79,6 +79,8 @@ export default function DataTable() {
         return { rows: notice, pageCount: reponse.pageCount };
       }
     },
+    // staleTime: 6000, // 1분
+    refetchOnMount: true,
   });
 
   const defaultData = React.useMemo(() => [], []);
@@ -107,7 +109,13 @@ export default function DataTable() {
     manualPagination: true,
     debugTable: true,
   });
-
+  if (isLoading) {
+    return (
+      <div className="w-full  h-[calc(100vh-70px)]  flex flex-col items-center justify-center">
+        <Loader2 className=" animate-spin size-8 text-primary" />
+      </div>
+    );
+  }
   return (
     <div className="w-full ">
       <div className="flex flex-row items-center justify-end space-x-2  h-[70px] bg-white border-b px-3">
@@ -174,8 +182,8 @@ export default function DataTable() {
           </Button>
         </div>
       </div>
-      <div className="p-3">
-        <ScrollArea className="rounded-md border bg-white  w-full h-[calc(100vh-240px)] ">
+      <div className="">
+        <ScrollArea className=" bg-white  w-full max-h-[calc(100vh-210px)] ">
           <Table>
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (

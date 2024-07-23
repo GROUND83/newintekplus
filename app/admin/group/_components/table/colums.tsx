@@ -39,7 +39,15 @@ export const columns: ColumnDef<any>[] = [
     cell: ({ row }) => {
       return (
         <div className=" text-left">
-          <p>{row.getValue("status")}</p>
+          <Badge
+            variant={
+              row.getValue("status") === "개설완료"
+                ? "defaultOutline"
+                : "outline"
+            }
+          >
+            {row.getValue("status")}
+          </Badge>
         </div>
       );
     },

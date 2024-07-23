@@ -9,7 +9,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ChevronLeft, ChevronRight, MoveLeft } from "lucide-react";
+import { ChevronLeft, ChevronRight, Loader2, MoveLeft } from "lucide-react";
 import {
   PaginationState,
   SortingState,
@@ -66,7 +66,7 @@ export default function DataTable() {
     pageIndex,
     pageSize,
   };
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: ["data", fetchDataOptions],
     queryFn: async () => {
       let reponse = await getMoreData(fetchDataOptions);
@@ -104,10 +104,16 @@ export default function DataTable() {
     manualPagination: true,
     debugTable: true,
   });
-
+  if (isLoading) {
+    return (
+      <div className="w-full  h-[calc(100vh-70px)]  flex flex-col items-center justify-center">
+        <Loader2 className=" animate-spin size-8 text-primary" />
+      </div>
+    );
+  }
   return (
     <div className="w-full ">
-      <div className="flex flex-row items-center justify-end space-x-2  h-[70px] bg-white border-b px-3">
+      <div className="flex flex-row items-center justify-end space-x-2  h-[70px] bg-neutral-100 border-b px-3">
         <div className="flex-1 text-sm text-neutral-500  ">
           총 {data?.pageCount}개의 데이터가 있습니다.
         </div>
@@ -142,7 +148,7 @@ export default function DataTable() {
               {/* <MoveLeft /> */}
             </Button>
 
-            <p className="border px-6 py-2 rounded-md text-sm text-neutral-500">
+            <p className="border px-6 py-2 rounded-md text-sm text-neutral-500 bg-white">
               {pagination.pageIndex + 1} /{" "}
               {Math.ceil(
                 data?.pageCount! / table.getState().pagination.pageSize
@@ -163,10 +169,9 @@ export default function DataTable() {
             </Button>
           </div>
         ) : null}
-        <Link href={"/admin/group/new"}>만들기</Link>
       </div>
-      <div className="p-3">
-        <ScrollArea className="rounded-md border bg-white  w-full h-[calc(100vh-160px)] ">
+      <div className="">
+        <ScrollArea className=" bg-white  w-full h-[calc(100vh-140px)] ">
           <Table>
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (

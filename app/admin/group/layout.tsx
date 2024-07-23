@@ -2,7 +2,7 @@
 import { Button } from "@/components/ui/button";
 import React from "react";
 import Link from "next/link";
-import { PlusIcon } from "lucide-react";
+import { ChevronDown, PlusIcon } from "lucide-react";
 import { useParams, usePathname } from "next/navigation";
 import { detailGroup } from "./[groupId]/_components/actions";
 import {
@@ -54,6 +54,7 @@ export default function Layout({
                   <div className="flex flex-row items-center gap-3 border px-3 py-2 ">
                     <p>참가자</p>
                     <p>{group?.participants.length}명</p>
+                    <ChevronDown className="size-3" />
                   </div>
                 }
               </PopoverTrigger>
@@ -65,7 +66,7 @@ export default function Layout({
                         key={item._id}
                         className=" col-span-12 grid grid-cols-12 gap-3 border bg-neutral-100 px-3 py-2"
                       >
-                        <p className=" col-span-3"> {item?.jobPosition}</p>
+                        <p className=" col-span-3 "> {item?.jobPosition}</p>
                         <p className=" col-span-3"> {item?.username}</p>
                         <p className=" col-span-3"> {item?.email}</p>
                       </div>
@@ -82,18 +83,19 @@ export default function Layout({
             </div>
           )}
         </div>
-        {!pathname.includes("/detail") ||
-          (!params.groupId && (
-            <Button asChild size={"sm"}>
-              <Link
-                href={"/admin/group/new"}
-                className="flex flex-row items-center gap-2"
-              >
-                <PlusIcon className="size-4" />
-                학습그룹 생성
-              </Link>
-            </Button>
-          ))}
+        {group
+          ? false
+          : true && (
+              <Button asChild size={"sm"}>
+                <Link
+                  href={"/admin/group/new"}
+                  className="flex flex-row items-center gap-2"
+                >
+                  <PlusIcon className="size-4" />
+                  학습그룹 생성
+                </Link>
+              </Button>
+            )}
       </div>
       <div className="flex flex-col  bg-neutral-100">{children}</div>
     </div>

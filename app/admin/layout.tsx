@@ -28,6 +28,7 @@ import Link from "next/link";
 import { signOut, useSession } from "next-auth/react";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { AvatarFallback } from "@radix-ui/react-avatar";
+import { usePathname } from "next/navigation";
 // JobCompetency
 const queryClient = new QueryClient();
 
@@ -41,7 +42,7 @@ export default function Layout({
 
   const session = useSession();
   console.log("session", session);
-
+  const pathname = usePathname();
   return (
     <QueryClientProvider client={queryClient}>
       <div className=" h-screen w-screen flex flex-row items-stretch ">
@@ -79,7 +80,7 @@ export default function Layout({
             </Button>
           </div>
           <div className="w-full flex-1">
-            <div className="flex flex-row items-center gap-2 py-2 px-6">
+            <div className={`flex flex-row items-center gap-2 py-2 px-6 `}>
               <SquareLibrary strokeWidth={1.25} className="size-6" />
               {menuExpend && (
                 <div className="flex flex-row items-center gap-2">
@@ -90,7 +91,11 @@ export default function Layout({
 
             <Link
               href={"/admin/group"}
-              className="flex flex-row items-center gap-2 w-full bg-[#0C2135] hover:bg-primary  py-3 px-6 text-neutral-400  hover:text-white transition-all"
+              className={`flex flex-row items-center gap-2 w-full ${
+                pathname.includes("/group")
+                  ? "bg-primary hover:bg-primary/50  text-white"
+                  : "bg-[#0C2135] hover:bg-primary hover:text-white"
+              }  py-3 px-6 text-neutral-400   transition-all`}
             >
               <Group strokeWidth={1.25} />
 
@@ -101,8 +106,12 @@ export default function Layout({
               )}
             </Link>
             <Link
-              href={"/admin/education/group"}
-              className="flex flex-row items-center gap-2 w-full bg-[#0C2135] hover:bg-primary  py-3 px-6 text-neutral-400  hover:text-white transition-all"
+              href={"/admin/complete"}
+              className={`flex flex-row items-center gap-2 w-full ${
+                pathname.includes("/complete")
+                  ? "bg-primary hover:bg-primary/50  text-white"
+                  : "bg-[#0C2135] hover:bg-primary hover:text-white"
+              }  py-3 px-6 text-neutral-400   transition-all`}
             >
               <BarChartHorizontalBig strokeWidth={1.25} />
 
@@ -114,7 +123,11 @@ export default function Layout({
             </Link>
             <Link
               href={"/admin/courseprofile"}
-              className="flex flex-row items-center gap-2 w-full bg-[#0C2135] hover:bg-primary  py-3 px-6 text-neutral-400  hover:text-white transition-all"
+              className={`flex flex-row items-center gap-2 w-full ${
+                pathname.includes("/courseprofile")
+                  ? "bg-primary hover:bg-primary/50  text-white"
+                  : "bg-[#0C2135] hover:bg-primary hover:text-white"
+              }  py-3 px-6 text-neutral-400   transition-all`}
             >
               <BookCopy strokeWidth={1.25} />
 
@@ -126,7 +139,11 @@ export default function Layout({
             </Link>
             <Link
               href={"/admin/lessonlibrary"}
-              className="flex flex-row items-center gap-2 w-full bg-[#0C2135] hover:bg-primary  py-3 px-6 text-neutral-400  hover:text-white transition-all"
+              className={`flex flex-row items-center gap-2 w-full ${
+                pathname.includes("/lessonlibrary")
+                  ? "bg-primary hover:bg-primary/50  text-white"
+                  : "bg-[#0C2135] hover:bg-primary hover:text-white"
+              }  py-3 px-6 text-neutral-400   transition-all`}
             >
               <BookCheck strokeWidth={1.25} />
 
@@ -138,7 +155,11 @@ export default function Layout({
             </Link>
             <Link
               href={"/admin/evaluation"}
-              className="flex flex-row items-center gap-2 w-full bg-[#0C2135] hover:bg-primary  py-3 px-6 text-neutral-400  hover:text-white transition-all"
+              className={`flex flex-row items-center gap-2 w-full ${
+                pathname.includes("/evaluation")
+                  ? "bg-primary hover:bg-primary/50  text-white"
+                  : "bg-[#0C2135] hover:bg-primary hover:text-white"
+              }  py-3 px-6 text-neutral-400   transition-all`}
             >
               <ListChecks strokeWidth={1.25} />
 
@@ -159,8 +180,12 @@ export default function Layout({
             </div>
 
             <Link
-              href={"/admin/education/group"}
-              className="flex flex-row items-center gap-2 w-full bg-[#0C2135] hover:bg-primary  py-3 px-6 text-neutral-400  hover:text-white transition-all"
+              href={"/admin/wholenotice"}
+              className={`flex flex-row items-center gap-2 w-full ${
+                pathname.includes("/wholenotice")
+                  ? "bg-primary hover:bg-primary/50  text-white"
+                  : "bg-[#0C2135] hover:bg-primary hover:text-white"
+              }  py-3 px-6 text-neutral-400   transition-all`}
             >
               <Megaphone strokeWidth={1.25} />
               {menuExpend && (
@@ -170,8 +195,12 @@ export default function Layout({
               )}
             </Link>
             <Link
-              href={"/admin/education/group"}
-              className="flex flex-row items-center gap-2 w-full bg-[#0C2135] hover:bg-primary  py-3 px-6 text-neutral-400  hover:text-white transition-all"
+              href={"/admin/account"}
+              className={`flex flex-row items-center gap-2 w-full ${
+                pathname.includes("/account")
+                  ? "bg-primary hover:bg-primary/50  text-white"
+                  : "bg-[#0C2135] hover:bg-primary hover:text-white"
+              }  py-3 px-6 text-neutral-400   transition-all`}
             >
               <CircleUserRound strokeWidth={1.25} />
               {menuExpend && (
