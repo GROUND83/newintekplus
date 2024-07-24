@@ -10,7 +10,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { getLessionLibrary } from "@/app/admin/lessonlibrary/_components/table/actions";
+
 import DataTable from "./lessonLibrary/table/table";
 import { CirclePlus } from "lucide-react";
 

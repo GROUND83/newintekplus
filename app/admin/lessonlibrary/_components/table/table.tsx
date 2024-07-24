@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/table";
 // import { getMoreData } from "./actions";
 import { columns } from "./colums";
-import { getLessionLibrary } from "./actions";
+import { getMoreData } from "./actions";
 import {
   Select,
   SelectContent,
@@ -70,7 +70,7 @@ export default function DataTable() {
   const { data, isLoading } = useQuery({
     queryKey: ["data", fetchDataOptions],
     queryFn: async () => {
-      let reponse = await getLessionLibrary(fetchDataOptions);
+      let reponse = await getMoreData(fetchDataOptions);
       console.log("response", reponse.pageCount);
       if (reponse.rows) {
         let lessonLibrary = JSON.parse(reponse.rows);
@@ -167,7 +167,7 @@ export default function DataTable() {
           </div>
         ) : null}
       </div>
-      <div className="p-3">
+      <div className="">
         <ScrollArea className="rounded-md border bg-white  w-full h-[calc(100vh-160px)] ">
           <Table>
             <TableHeader>

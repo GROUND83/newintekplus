@@ -3,7 +3,7 @@
 import { connectToMongoDB } from "@/lib/db";
 import Lesson from "@/models/lesson";
 
-export const getLessionLibrary = async ({
+export const getMoreData = async ({
   pageIndex,
   pageSize,
 }: {

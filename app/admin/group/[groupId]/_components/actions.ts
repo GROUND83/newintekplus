@@ -4,12 +4,14 @@ import CourseProfile from "@/models/courseProfile";
 import Group from "@/models/group";
 import Lesson from "@/models/lesson";
 import LessonActivity from "@/models/lessonActivity";
+import LessonPerform from "@/models/lessonPerform";
 import LessonResult from "@/models/lessonResult";
 import LiveSurvey from "@/models/liveSurvey";
 import Module from "@/models/module";
 import Participant from "@/models/participant";
 import ResultSurvey from "@/models/resultSurvey";
 import Teacher from "@/models/teacher";
+import mongoose from "mongoose";
 
 export async function detailGroup(groupId: string) {
   //
@@ -41,7 +43,7 @@ export async function detailGroup(groupId: string) {
           },
         },
       });
-    console.log("data", groups);
+    // console.log("data", groups);
     return { data: JSON.stringify(groups) };
   } catch (e) {
     return { message: e };
@@ -64,7 +66,7 @@ export async function updateLiveSurvey({
   surveyId: string;
 }) {
   //
-  console.log(groupId);
+  // console.log(groupId);
   let liveSurvey = await LiveSurvey.findOne({ _id: surveyId });
   let group = await Group.findOneAndUpdate(
     {
@@ -176,5 +178,63 @@ export async function updateGroupStatus({ groupId }: { groupId: string }) {
     return { data: JSON.stringify(groupUpdate) };
   } else {
     return { message: "error" };
+  }
+}
+
+export async function getFeedBackList(groupId: string) {
+  //
+  try {
+    let feedBackList = await LessonResult.find({
+      "perform.downUrl": { $ne: null },
+    });
+    let lessonPerforms = await LessonPerform.find({});
+    // for await (let lessonResult of feedBackList) {
+    //   //
+    //   if (lessonResult.perform.downUrl) {
+    //     //
+    //     console.log("lessonResult", lessonResult.perform.downUrl);
+    //     let perform = await LessonPerform.create({
+    //       courseProfileId: lessonResult.courseProfieId,
+    //       groupId: lessonResult.groupId,
+    //       lessonId: lessonResult.lessonId,
+    //       lessonPerformdownloadURL: lessonResult.perform.downUrl,
+    //       lessonPerformFileName: lessonResult.perform.fileName,
+    //       lessonPerformSize: lessonResult.perform.size,
+    //       onwer: lessonResult.onwer,
+    //     });
+    //     let newRessult = await LessonResult.findOneAndUpdate(
+    //       {
+    //         _id: lessonResult._id,
+    //       },
+    //       {
+    //         newPerform: perform,
+    //       }
+    //     );
+    //   }
+    // }
+
+    //
+    // 직접한거 859
+    // let filter = feedBackList.filter((item) => item.perform.downUrl);
+    // 레슨 퍼폼을 lessson newdp 입력
+    // let newArray = [];
+    // for await (const lessonPerform of lessonPerforms) {
+    //   if (lessonPerform.lessonId) {
+    //     console.log("lessonPerform.lessonId", lessonPerform.lessonId);
+    //     let lessonResultdata = await LessonResult.findOne({
+    //       lessonActivityId: lessonPerform.lessonActivityId,
+    //       onwer: lessonPerform.onwer,
+    //     });
+    //     if (lessonResultdata) {
+    //       console.log("lessonResultdata", lessonResultdata);
+    //       newArray.push(lessonResultdata);
+    //       //
+    //     }
+    //   }
+    // }
+    // let filter = feedBackList.filter((item) => item.perform.downUrl);
+    return { data: JSON.stringify({ feedBackList }) };
+  } catch (e) {
+    return { message: e };
   }
 }

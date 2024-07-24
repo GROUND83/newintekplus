@@ -81,7 +81,6 @@ export default function Layout({
           </div>
           <div className="w-full flex-1">
             <div className={`flex flex-row items-center gap-2 py-2 px-6 `}>
-              <SquareLibrary strokeWidth={1.25} className="size-6" />
               {menuExpend && (
                 <div className="flex flex-row items-center gap-2">
                   <p className="">교육 컴포넌트</p>
@@ -171,7 +170,7 @@ export default function Layout({
             </Link>
 
             <div className="flex flex-row items-center gap-2 py-2 px-6">
-              <Settings strokeWidth={1.25} />
+              {/* <Settings strokeWidth={1.25} /> */}
               {menuExpend && (
                 <div className="flex flex-row items-center gap-2">
                   <p>시스템</p>

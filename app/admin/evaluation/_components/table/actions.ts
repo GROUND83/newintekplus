@@ -7,7 +7,7 @@ import Lesson from "@/models/lesson";
 import LiveSurvey from "@/models/liveSurvey";
 import Survey from "@/models/survey";
 
-export const getLiveSurvey = async ({
+export const getMoreData = async ({
   pageIndex,
   pageSize,
 }: {

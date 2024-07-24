@@ -1,17 +1,7 @@
-import {
-  PaginationState,
-  ColumnDef,
-  SortingState,
-  flexRender,
-  getCoreRowModel,
-  getSortedRowModel,
-  useReactTable,
-  createColumnHelper,
-} from "@tanstack/react-table";
-import { TableDataType } from "./table";
+"use client";
+import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import { ArrowUpDown } from "lucide-react";
-import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import dayjs from "dayjs";
@@ -38,12 +28,13 @@ export const columns: ColumnDef<any>[] = [
     },
     cell: ({ row }) => {
       return (
-        <div className=" text-left">
+        <div className=" text-left ">
           <Badge
+            className="font-normal"
             variant={
               row.getValue("status") === "개설완료"
                 ? "defaultOutline"
-                : "outline"
+                : "secondaryOutline"
             }
           >
             {row.getValue("status")}
@@ -70,8 +61,8 @@ export const columns: ColumnDef<any>[] = [
     },
     cell: ({ row }) => {
       return (
-        <div className=" text-left">
-          <p>{row.getValue("name")}</p>
+        <div className=" text-left ">
+          <p className=" text-sm">{row.getValue("name")}</p>
           <p className="text-neutral-500  text-xs">
             {row.original.courseProfile?.title}
           </p>
@@ -98,10 +89,8 @@ export const columns: ColumnDef<any>[] = [
     cell: ({ row }) => {
       let teacher: any = row.getValue("teacher");
       return (
-        <div className=" flex flex-row items-center gap-2 justify-start">
-          <div className="flex flex-col items-start gap-1">
-            <p>{teacher?.username}</p>
-          </div>
+        <div className=" flex flex-row items-center gap-2 justify-start ">
+          <p className="text-xs">{teacher?.username}</p>
         </div>
       );
     },
@@ -126,7 +115,7 @@ export const columns: ColumnDef<any>[] = [
       let startDate = row.original.startDate;
       let endDate = row.original.endDate;
       return (
-        <div className=" ">
+        <div className=" text-xs">
           {dayjs(startDate).format("YYYY/MM/DD(dd)")} ~
           {dayjs(endDate).format("YYYY/MM/DD(dd)")}
         </div>
@@ -134,7 +123,7 @@ export const columns: ColumnDef<any>[] = [
     },
   },
   {
-    accessorKey: "created_at",
+    accessorKey: "createdAt",
     header: ({ column }) => {
       return (
         <div className="text-center">
@@ -151,8 +140,10 @@ export const columns: ColumnDef<any>[] = [
     },
     cell: ({ row }) => {
       return (
-        <div className="   text-center">
-          <p>{dayjs(row.getValue("created_at")).format("YYYY/MM/DD(dd)")}</p>
+        <div className="text-center">
+          <p className="text-xs">
+            {dayjs(row.getValue("createdAt")).format("YYYY/MM/DD HH:mm(dddd)")}
+          </p>
         </div>
       );
     },

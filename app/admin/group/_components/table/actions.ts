@@ -43,7 +43,7 @@ export async function getMoreData({
       pageCount: groupCount,
     };
   } catch (e) {
-    console.log(e);
+    // console.log(e);
     return { message: "그룹 오류" };
   }
 }

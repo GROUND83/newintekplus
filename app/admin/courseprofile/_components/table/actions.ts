@@ -4,7 +4,7 @@ import { connectToMongoDB } from "@/lib/db";
 import CourseProfile from "@/models/courseProfile";
 import Lesson from "@/models/lesson";
 
-export const getCourseProfiles = async ({
+export const getMoreData = async ({
   pageIndex,
   pageSize,
 }: {

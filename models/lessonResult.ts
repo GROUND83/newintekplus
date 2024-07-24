@@ -1,4 +1,5 @@
-import mongoose, { Document, Model, Types } from "mongoose";
+import mongoose, { Document, Model, now, Types } from "mongoose";
+import { string } from "zod";
 
 export interface ILessonResult {
   groupId: string;
@@ -20,10 +21,17 @@ export interface ILessonResult {
     downUrl: string; //레슨다운로드
     fileName: string; // 레슨파일이름
     size: number; // 레슨 파일 크기
+    createdAt: Date;
+    updatedAt: Date;
   };
   feedBack: {
     type: mongoose.Schema.Types.ObjectId;
     ref: "FeedBack";
+  };
+  newPerform: {
+    type: mongoose.Schema.Types.ObjectId;
+    ref: "LessonPerform";
+    default: null;
   };
   liveSurvey: {
     type: mongoose.Schema.Types.ObjectId;
@@ -74,14 +82,21 @@ const lessonResult = new mongoose.Schema<ILessonResultDocument>(
     onwer: { type: mongoose.Schema.Types.ObjectId, ref: "Participant" },
     isPass: {
       type: String,
-      enum: ["ready", "failed", "passed"], // 과제수행 평가 완료시 또는 라이브 교육 완료시
+      enum: ["ready", "failed", "passed"], // 과제수행 평가 완료시 또는 라이브 교육 완료시 강사가
       default: "ready",
     },
-    isEvaluationDone: { type: Boolean, default: false },
+    isEvaluationDone: { type: Boolean, default: false }, // 평가 완료
     perform: {
       downUrl: { type: String, default: null }, //레슨다운로드
       fileName: { type: String, default: null }, // 레슨파일이름
       size: { type: Number, default: null }, // 레슨 파일 크기
+      createdAt: { type: Date, default: Date.now },
+      updatedAt: { type: Date, default: Date.now },
+    },
+    newPerform: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "LessonPerform",
+      default: null,
     },
     feedBack: {
       type: mongoose.Schema.Types.ObjectId,

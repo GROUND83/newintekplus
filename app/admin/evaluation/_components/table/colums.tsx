@@ -1,14 +1,6 @@
-import {
-  PaginationState,
-  ColumnDef,
-  SortingState,
-  flexRender,
-  getCoreRowModel,
-  getSortedRowModel,
-  useReactTable,
-  createColumnHelper,
-} from "@tanstack/react-table";
-import { TableDataType } from "./table";
+"use clinet";
+import { ColumnDef } from "@tanstack/react-table";
+
 import { Button } from "@/components/ui/button";
 import { ArrowUpDown, Search } from "lucide-react";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";

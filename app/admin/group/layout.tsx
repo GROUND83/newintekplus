@@ -10,6 +10,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { ScrollArea } from "@/components/ui/scroll-area";
 export default function Layout({
   children,
 }: Readonly<{
@@ -23,7 +24,7 @@ export default function Layout({
     let res = await detailGroup(params.groupId);
     if (res.data) {
       let group = JSON.parse(res.data);
-      console.log("group", group);
+      // console.log("group", group);
       setGroup(group);
     }
   };
@@ -58,21 +59,23 @@ export default function Layout({
                   </div>
                 }
               </PopoverTrigger>
-              <PopoverContent className="w-[400px]">
-                <div className=" grid grid-cols-12  gap-2    w-full">
-                  {group?.participants.map((item: any, index: any) => {
-                    return (
-                      <div
-                        key={item._id}
-                        className=" col-span-12 grid grid-cols-12 gap-3 border bg-neutral-100 px-3 py-2"
-                      >
-                        <p className=" col-span-3 "> {item?.jobPosition}</p>
-                        <p className=" col-span-3"> {item?.username}</p>
-                        <p className=" col-span-3"> {item?.email}</p>
-                      </div>
-                    );
-                  })}
-                </div>
+              <PopoverContent className="w-[600px]">
+                <ScrollArea className="max-h-[500px] w-full flex flex-col">
+                  <div className=" grid grid-cols-12  gap-2    w-full">
+                    {group?.participants.map((item: any, index: any) => {
+                      return (
+                        <div
+                          key={item._id}
+                          className=" col-span-12 grid grid-cols-12 gap-3 border bg-neutral-100 px-3 py-2"
+                        >
+                          <p className=" col-span-3 "> {item?.jobPosition}</p>
+                          <p className=" col-span-3"> {item?.username}</p>
+                          <p className=" col-span-3"> {item?.email}</p>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </ScrollArea>
               </PopoverContent>
             </Popover>
           )}

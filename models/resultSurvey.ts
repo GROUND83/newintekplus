@@ -6,7 +6,8 @@ export interface IResultSurvey {
   lessonActivityId: string;
   title: string;
   isDone: boolean;
-  onwer: Array<{ type: mongoose.Schema.Types.ObjectId; ref: "Participant" }>;
+  isSend: boolean;
+  onwer: { type: mongoose.Schema.Types.ObjectId; ref: "Participant" };
   results: Array<{
     surveyId: string;
     point: number;
@@ -23,10 +24,11 @@ const resultSurvey = new mongoose.Schema<IResultSurveyDocument>(
   {
     liveSurveyId: { type: String },
     groupId: { type: String },
-    lessonActivityId: { type: String },
-    title: { type: String },
+    lessonActivityId: { type: String }, //x
+    title: { type: String }, // x
     isDone: { type: Boolean, default: false },
-    onwer: [{ type: mongoose.Schema.Types.ObjectId, ref: "Participant" }],
+    isSend: { type: Boolean, default: false },
+    onwer: { type: mongoose.Schema.Types.ObjectId, ref: "Participant" },
     results: [
       {
         surveyId: { type: String },

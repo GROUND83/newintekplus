@@ -7,6 +7,7 @@ import Link from "next/link";
 import dayjs from "dayjs";
 import "dayjs/locale/ko";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/solid";
+import { Badge } from "@/components/ui/badge";
 dayjs.locale("ko");
 
 export const columns: ColumnDef<any>[] = [
@@ -28,17 +29,19 @@ export const columns: ColumnDef<any>[] = [
     },
     cell: ({ row }) => {
       return (
-        <div className=" text-left flex ">
+        <div className=" text-left flex  p-0">
           {row.getValue("sendTo") === "all" ? (
-            <p className="bg-primary text-white px-3 py-1 rounded-md ">전체</p>
+            <Badge className="font-normal " variant="defaultOutline">
+              전체
+            </Badge>
           ) : row.getValue("sendTo") === "teacher" ? (
-            <p className="bg-yellow-500 text-black px-3 py-1 rounded-md ">
+            <Badge className=" font-normal " variant="colorOutline">
               리더
-            </p>
+            </Badge>
           ) : (
-            <p className="bg-green-500 text-black px-3 py-1 rounded-md  ">
-              참여자
-            </p>
+            <Badge className=" font-normal " variant="colorOutline">
+              참가자
+            </Badge>
           )}
         </div>
       );
@@ -70,7 +73,7 @@ export const columns: ColumnDef<any>[] = [
   },
 
   {
-    accessorKey: "created_at",
+    accessorKey: "createdAt",
     header: ({ column }) => {
       return (
         <div className="text-center">
@@ -88,7 +91,9 @@ export const columns: ColumnDef<any>[] = [
     cell: ({ row }) => {
       return (
         <div className="   text-center">
-          <p>{dayjs(row.getValue("created_at")).format("YYYY/MM/DD(dd)")}</p>
+          <p className=" text-xs">
+            {dayjs(row.getValue("createdAt")).format("YYYY/MM/DD HH:mm(dddd)")}
+          </p>
         </div>
       );
     },
@@ -103,7 +108,7 @@ export const columns: ColumnDef<any>[] = [
           <Link
             href={`/admin/group/${row.original.groupId}/detail/notice/${row.original._id}`}
           >
-            <Button variant="outline" size="icon">
+            <Button variant="outline" size="xs">
               <MagnifyingGlassIcon className="size-4" />
             </Button>
           </Link>

@@ -21,16 +21,13 @@ export interface IGroup {
     type: mongoose.Schema.Types.ObjectId;
     ref: "LiveSurvey";
   };
-  resultSurvey: {
-    type: mongoose.Schema.Types.ObjectId;
-    ref: "ResultSurvey";
-  };
-  // modules: [
-  //   {
-  //     type: mongoose.Schema.Types.ObjectId;
-  //     ref: "Module";
-  //   }
-  // ];
+  resultSurvey: [
+    {
+      type: mongoose.Schema.Types.ObjectId;
+      ref: "ResultSurvey";
+    }
+  ];
+
   lessonResults: [
     {
       type: mongoose.Schema.Types.ObjectId;
@@ -78,7 +75,9 @@ const group = new mongoose.Schema<IGroupDocument>(
     endDate: { type: Date },
     place: { type: String }, // x
     liveSurvey: { type: mongoose.Schema.Types.ObjectId, ref: "LiveSurvey" },
-    resultSurvey: { type: mongoose.Schema.Types.ObjectId, ref: "ResultSurvey" },
+    resultSurvey: [
+      { type: mongoose.Schema.Types.ObjectId, ref: "ResultSurvey" },
+    ],
     // modules: [
     //   {
     //     type: mongoose.Schema.Types.ObjectId,

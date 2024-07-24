@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   title: "인재육성교육지원시스템 | SMARTAL Inc",
   description: "인재육성교육지원시스템 by SMARTAL Inc",
 };
-const queryClient = new QueryClient({});
+
 export default function RootLayout({
   children,
 }: Readonly<{
