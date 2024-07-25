@@ -1,7 +1,6 @@
 "use client";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
-  detailLiveSurvey,
   detailWholeNotice,
   updateLiveSurvey,
 } from "../_components/table/actions";
@@ -113,24 +112,24 @@ export default function Page({
     console.log("values", values);
 
     const formData = new FormData();
-    formData.append("_id", values._id);
+    formData.append("_id", params.wholeNoticeId);
     formData.append("title", values.title);
-    formData.append("surveys", JSON.stringify(values.surveys));
+    // formData.append("surveys", JSON.stringify(values.surveys));
 
-    try {
-      let res = await updateLiveSurvey(formData);
-      console.log("resdta", res);
-      if (res.data) {
-        //
-        toast.success("설문 수정에 성공하였습니다.");
-        reload();
-        // router.push("/admin/courseprofile");
-      }
-    } catch (e) {
-      //
-      console.log("message", e);
-      toast.error(e);
-    }
+    // try {
+    //   let res = await updateLiveSurvey(formData);
+    //   console.log("resdta", res);
+    //   if (res.data) {
+    //     //
+    //     toast.success("설문 수정에 성공하였습니다.");
+    //     reload();
+    //     // router.push("/admin/courseprofile");
+    //   }
+    // } catch (e) {
+    //   //
+    //   console.log("message", e);
+    //   toast.error(e);
+    // }
   }
 
   return (

@@ -28,7 +28,11 @@ export default function Page({ params }: { params: { groupId: string } }) {
   return (
     <div className="w-full flex flex-col items-stretch flex-1  ">
       <div className="">
-        <TableWrap columns={columns} getMoreData={getMoreData} />
+        <TableWrap
+          columns={columns}
+          getMoreData={getMoreData}
+          subMenu={false}
+        />
       </div>
     </div>
   );

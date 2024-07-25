@@ -47,12 +47,6 @@ export default function Page({ params }: { params: { groupId: string } }) {
     getData();
   }, []);
 
-  const checkResult = (userId: string) => {
-    console.log("userId", userId);
-    let findData = resultData.filter((item: any) => item.onwer._id === userId);
-    console.log("findData", findData);
-    return findData[0];
-  };
   return (
     <div className="w-full flex flex-col items-stretch flex-1  ">
       <div className="flex-1 flex flex-col  w-full">
@@ -61,7 +55,7 @@ export default function Page({ params }: { params: { groupId: string } }) {
           <div className="mt-3">
             <p>설문내용</p>
             <div className="mt-3">
-              {livesurvey?.surveys.map((item, index) => {
+              {livesurvey?.surveys.map((item: any, index: any) => {
                 return (
                   <div key={item._id}>
                     <p>

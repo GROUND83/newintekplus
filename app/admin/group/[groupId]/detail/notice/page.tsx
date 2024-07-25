@@ -10,7 +10,11 @@ export default function Page({ params }: { params: { groupId: string } }) {
   return (
     <div className="w-full ">
       <div className="  flex-1 w-full  relative ">
-        <TableWrap columns={columns} getMoreData={getMoreData} />
+        <TableWrap
+          columns={columns}
+          getMoreData={getMoreData}
+          subMenu={false}
+        />
       </div>
     </div>
   );

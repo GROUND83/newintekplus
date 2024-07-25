@@ -1,6 +1,5 @@
 "use server";
-import { UploadFile } from "@/lib/fileUploader";
-import { generatePdf } from "@/lib/generatePdf";
+
 import CourseProfile from "@/models/courseProfile";
 import Group from "@/models/group";
 import Lesson from "@/models/lesson";
@@ -10,9 +9,6 @@ import Participant from "@/models/participant";
 import ResultSurvey from "@/models/resultSurvey";
 import Survey from "@/models/survey";
 import Teacher from "@/models/teacher";
-import { model } from "mongoose";
-import { UploadResponse } from "nodejs-s3-typescript/dist/cjs/types";
-import path from "path";
 
 export async function getGroupDetail(groupId: string) {
   //
