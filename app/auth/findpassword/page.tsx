@@ -18,7 +18,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { findPass } from "./actions";
 import { useRouter, useSearchParams } from "next/navigation";
-import React from "react";
+import React, { Suspense } from "react";
 import { Loader2 } from "lucide-react";
 const FormSchema = z.object({
   email: z
@@ -27,7 +27,7 @@ const FormSchema = z.object({
     })
     .email("이메일 형식이 아닙니다."),
 });
-export default function Page() {
+const PageWrap = () => {
   //
   const [loading, setLoading] = React.useState(false);
   const router = useRouter();
@@ -100,4 +100,13 @@ export default function Page() {
       </div>
     </div>
   );
-}
+};
+
+const Page = () => {
+  return (
+    <Suspense>
+      <PageWrap />
+    </Suspense>
+  );
+};
+export default Page;
