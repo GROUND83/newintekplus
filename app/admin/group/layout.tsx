@@ -25,7 +25,7 @@ export default function Layout({
       let res = await detailGroup(params.groupId);
       if (res.data) {
         let group = JSON.parse(res.data);
-        // console.log("group", group);
+        console.log("group", group);
         setGroup(group);
       }
     } else {
@@ -38,7 +38,14 @@ export default function Layout({
   return (
     <div className="w-full flex flex-col items-stretch flex-1  ">
       <div className="w-full bg-white py-3 border-b px-6 flex flex-row items-center justify-between h-[70px]">
-        <p>학습그룹 </p>
+        {group ? (
+          <div className="flex flex-row items-center gap-2 bg-primary text-white px-3 py-2">
+            <p>{group?.courseProfile?.eduForm}</p>{" "}
+          </div>
+        ) : (
+          <p>학습그룹</p>
+        )}
+
         <div className="flex flex-row items-center gap-3">
           {group && (
             <div className="flex flex-row items-center gap-3 border px-3 py-2 bg-neutral-100">

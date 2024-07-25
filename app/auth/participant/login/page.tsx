@@ -60,7 +60,7 @@ export default function Page() {
       <div className="flex flex-col items-center gap-12  w-[800px]">
         <Logo />
 
-        <p className="text-3xl">관리자 로그인</p>
+        <p className="text-3xl">교육생 로그인</p>
         {/* <div className="flex flex-row items-center gap-6">
           <Button>교육생</Button>
           <Button>리더</Button>
@@ -113,7 +113,7 @@ export default function Page() {
         </Form>
         <section className="flex flex-row items-center gap-3  px-6  mt-24 h-6">
           <Link
-            href={"/auth/findpassword"}
+            href={"/auth/findpassword?type=student"}
             className=" flex flex-row items-center gap-2 text-base"
           >
             <LockClosedIcon className="size-4" />
