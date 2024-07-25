@@ -214,7 +214,7 @@ export default function SendVertification({
             )
           }
           btnText="발급"
-          onClick={() => {}}
+          onClick={handlePrint}
           open={open}
           setOpen={setOpen}
         >
@@ -247,10 +247,6 @@ export default function SendVertification({
                     <p>교육기간</p>
                     <p>{dayjs(group.startDate).format("YYYY.MM.DD")} ~ </p>
                     <p>{dayjs(group.endDate).format("YYYY.MM.DD")}</p>
-                  </div>
-                  <div className="flex flex-row items-center gap-6">
-                    <p>교육시간</p>
-                    <p>{dayjs(group.startDate).format("YYYY.MM.DD")}</p>
                   </div>
                 </div>
                 <div className=" col-span-12 flex flex-col items-center justify-center text-md gap-3 mt-6">

@@ -72,8 +72,8 @@ import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 const FormSchema = z.object({
   liveSurvey: z.object({
-    _id: z.string(),
-    title: z.string(),
+    _id: z.string().optional(),
+    title: z.string().optional(),
   }),
 });
 export default function Page({ params }: { params: { groupId: string } }) {
@@ -139,48 +139,6 @@ export default function Page({ params }: { params: { groupId: string } }) {
     refetchOnMount: true,
   });
   //
-  // const reload = async () => {
-  //   // setLoading(true);
-  //   let readers = await getSelectInitData();
-  //   if (readers.data) {
-  //     let reader = JSON.parse(readers.data.reader);
-  //     let participants = JSON.parse(readers.data.participants);
-  //     let courseProfile = JSON.parse(readers.data.courseProfile);
-  //     console.log("reader", reader, participants, courseProfile);
-  //     setReaderArray(reader);
-  //     setCourseProfile(courseProfile);
-  //     setParticipant(participants);
-  //   }
-  //   let data = await initailData();
-
-  //   //   코스프로파일 에서 eduFrom이 집합교육이면
-  //   //    linveSurvey 세팅
-  //   let modulesdata = [];
-  //   let newLiveSurvey = [];
-  //   let liveSurvey = await getLiveSurvey({
-  //     groupId: params.groupId,
-  //   });
-
-  //   if (liveSurvey.data) {
-  //     //
-  //     newLiveSurvey = await JSON.parse(liveSurvey.data);
-  //     console.log("newLiveSurvey", newLiveSurvey);
-  //     setLiveSurveyData(newLiveSurvey);
-  //   }
-  //   //
-
-  //   setGroupData(data);
-  //   console.log("data.liveSurvey", data.liveSurvey);
-  //   form.reset(
-  //     {
-  //       liveSurvey: {
-  //         _id: data.liveSurvey?._id || "",
-  //         title: data.liveSurvey?.title || "",
-  //       },
-  //     }
-  //     //   { keepDirtyValues: true }
-  //   );
-  // };
 
   const initailData = async () => {
     //
@@ -334,10 +292,6 @@ export default function Page({ params }: { params: { groupId: string } }) {
                 <p>
                   {dayjs(groupData?.starDate).format("YYYY-MM-DD")} ~{" "}
                   {dayjs(groupData?.endDate).format("YYYY-MM-DD")}
-                  {/* {dayjs(groupData?.endDate).diff(
-                    dayjs(groupData?.starDate),
-                    "days"
-                  ) / 7} */}
                 </p>
               </div>
               <div className=" col-span-6  pt-4 pb-6 border-b flex flex-col gap-2">

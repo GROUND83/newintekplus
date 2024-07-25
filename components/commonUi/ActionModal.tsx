@@ -34,9 +34,7 @@ export default function ActionModal({
         <AlertDialogFooter>
           <AlertDialogCancel>취소</AlertDialogCancel>
           {btnText && (
-            <AlertDialogAction onClick={() => onClick}>
-              {btnText}
-            </AlertDialogAction>
+            <AlertDialogAction onClick={onClick}>{btnText}</AlertDialogAction>
           )}
         </AlertDialogFooter>
       </AlertDialogContent>
