@@ -129,14 +129,7 @@ export default function Page({
   const reload = async () => {
     setLoading(true);
     let data = await initailData();
-    // console.log("reloadData", data);
-    // let res = await getJobSubGroup(data.jobGroup);
-    // if (res.data) {
-    //   let resdata = JSON.parse(res.data);
-    //   console.log("getJobSubGroup", resdata.group);
 
-    //   setSublist(resdata.group);
-    // }
     form.reset(
       {
         _id: data._id,
@@ -166,18 +159,6 @@ export default function Page({
     );
     await getjobSubGroup(data.jobGroup);
     form.setValue("jobSubGroup", data.jobSubGroup);
-    // let res1 = await getComPetency(data.competency);
-    // if (res1.data) {
-    //   let data = JSON.parse(res1.data);
-    //   console.log("res", data);
-    //   if (data.competency === "직무 역량") {
-    //     setEduAbilityInputData(data);
-    //   } else if (data.competency === "전체") {
-    //     setEduAbilityInputData(data);
-    //   } else {
-    //     setEduAbilityInputData(data[0].competencys);
-    //   }
-    // setSublist(data.group);
     setLoading(false);
   };
 
@@ -197,10 +178,6 @@ export default function Page({
     control: form.control,
     name: "eduAbilitys",
   });
-  // const { fields, remove, append } = useFieldArray({
-  //   control: form.control,
-  //   name: `eduAbilitys.${nestIndex}.lessons`,
-  // });
 
   async function onSubmit(values: z.infer<typeof FormSchema>) {
     console.log("values", values);
@@ -286,33 +263,44 @@ export default function Page({
   }, [form.watch]);
   return (
     <div className="w-full flex-1 flex ">
-      <ScrollArea className="rounded-md border   w-full h-[calc(100vh-70px)] ">
-        <div className=" w-full p-3 flex flex-col items-start">
+      <ScrollArea className="w-full h-[calc(100vh-70px)] flex">
+        <div className=" w-full  flex flex-col items-start">
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit(onSubmit)}
               className="space-y-8 w-full"
             >
-              <Card className="w-full">
-                <CardHeader>
-                  <CardTitle className="text-xl">코스프로파일 수정</CardTitle>
-                  {editAvaliable.length > 0 ? (
-                    <CardDescription>
-                      <p className="text-red-500">
-                        {editAvaliable.length}개의 그룹에 배정되었습니다.
-                      </p>
-                      <p className="flex flex-row items-center gap-2 text-red-500">
-                        <FillExclamtion className="size-5 text-red-500" />
-                        그룹에 배정된 코스프로파일인 수정이 불가 합니다.
-                      </p>
-                    </CardDescription>
-                  ) : (
-                    <CardDescription>
-                      <p>코스프로파일을 수정하세요.</p>
-                    </CardDescription>
-                  )}
-                </CardHeader>
-                <CardContent className="w-full grid grid-cols-12 gap-5">
+              <div className="w-full p-6 bg-white">
+                <div className="flex flex-row items-center justify-between w-full">
+                  <div>
+                    <p className="text-xl  font-bold">코스프로파일 수정</p>
+                    {editAvaliable.length > 0 ? (
+                      <div>
+                        <p className="text-red-500">
+                          {editAvaliable.length}개의 그룹에 배정되었습니다.
+                        </p>
+                        <p className="flex flex-row items-center gap-2 text-red-500">
+                          <FillExclamtion className="size-5 text-red-500" />
+                          그룹에 배정된 코스프로파일인 수정이 불가 합니다.
+                        </p>
+                      </div>
+                    ) : (
+                      <div>
+                        <p>코스프로파일을 수정하세요.</p>
+                      </div>
+                    )}
+                  </div>
+                  <div className=" col-span-12 flex flex-col items-end">
+                    <Button
+                      type="submit"
+                      className="mt-6"
+                      disabled={editAvaliable.length > 0 ? true : false}
+                    >
+                      코스프로파일 수정
+                    </Button>
+                  </div>
+                </div>
+                <div className="w-full grid grid-cols-12 gap-5 mt-3">
                   <FormField
                     control={form.control}
                     name="title"
@@ -777,23 +765,13 @@ export default function Page({
                       )}
                     />
                   </div>
-                  <div className=" col-span-12 flex flex-col items-end">
-                    <Button
-                      type="submit"
-                      className="mt-6"
-                      disabled={editAvaliable.length > 0 ? true : false}
-                    >
-                      코스프로파일 수정
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             </form>
           </Form>
           <ModulesLessonEdit
             courseProfileId={params.courseProfileId}
             disabled={editAvaliable.length > 0 ? true : false}
-            // disabled={false}
           />
         </div>
       </ScrollArea>

@@ -20,7 +20,6 @@ const noticeContent = new mongoose.Schema<INoticeContentDocument>(
     groupId: { type: String },
     contentdownloadURL: { type: String, required: true }, //레슨다운로드
     contentName: { type: String }, // 자료이름
-
     contentSize: { type: Number, required: true }, // 레슨 파일 크기
   },
   {

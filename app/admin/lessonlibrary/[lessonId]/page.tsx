@@ -2,6 +2,7 @@
 
 import React from "react";
 import {
+  deleteLesson,
   getLessionLibraryDetail,
   updateLessonLibrary,
 } from "./_component/actions";
@@ -28,12 +29,18 @@ import LessonContentsEdit from "./_component/lessonContentsEdit";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "sonner";
 import { ExclamationCircleIcon as FillExclamtion } from "@heroicons/react/24/solid";
+import ActionModal from "@/components/commonUi/ActionModal";
+import DeleteModal from "@/components/commonUi/DeleteModal";
+import { useRouter } from "next/navigation";
 //
 export default function Page({ params }: { params: { lessonId: string } }) {
   const [contentType, setContentType] = React.useState("");
   const [loading, setLoading] = React.useState(false);
   const [updateLoading, setUpdateLoading] = React.useState(false);
   const [editAvaliable, setEditAvaliable] = React.useState([]);
+  const [deleteOpen, setDeleteOpen] = React.useState(false);
+  const [deleteLoading, setdeleteLoading] = React.useState(false);
+  const router = useRouter();
   const initailData = async () => {
     //
     let response = await getLessionLibraryDetail({ lessonId: params.lessonId });
@@ -114,10 +121,31 @@ export default function Page({ params }: { params: { lessonId: string } }) {
     }
   }
 
+  //
+  const clickDelete = async () => {
+    //
+    setdeleteLoading(true);
+    console.log("lessonId", params.lessonId);
+    try {
+      let res = await deleteLesson(params.lessonId);
+      if (res.data) {
+        toast.success("레슨 삭제에 성공하였습니다.");
+        setDeleteOpen(false);
+        router.push("/admin/lessonlibrary");
+      } else {
+        //
+        // toast.error("레슨 삭제에 성공하였습니다.")
+      }
+    } catch (e) {
+      toast.error(e);
+    } finally {
+      setdeleteLoading(false);
+    }
+  };
   return (
     <div className="w-full flex-1 flex ">
-      <ScrollArea className="rounded-md border   w-full h-[calc(100vh-70px)] ">
-        <div className=" w-full p-3 flex flex-col items-start">
+      <ScrollArea className=" w-full h-[calc(100vh-70px)] flex ">
+        <div className=" w-full flex flex-col items-start">
           <div className="w-full bg-white border ">
             <Form {...form}>
               <form
@@ -146,7 +174,30 @@ export default function Page({ params }: { params: { lessonId: string } }) {
                       </div>
                     )}
                   </div>
-                  <Button
+                  <div className="flex flex-row items-center gap-2">
+                    <Button
+                      type="submit"
+                      className=" "
+                      disabled={editAvaliable.length > 0 ? true : false}
+                    >
+                      {updateLoading ? (
+                        <Loader2 className=" animate-spin" />
+                      ) : (
+                        <p>기본 정보 수정</p>
+                      )}
+                    </Button>
+                    <DeleteModal
+                      title="레슨삭제"
+                      desc={"레슨을 삭제합니다."}
+                      btnText={"레슨삭제"}
+                      onClick={clickDelete}
+                      disabled={false}
+                      deleteOpen={deleteOpen}
+                      setDeleteOpen={setDeleteOpen}
+                      deleteLoading={deleteLoading}
+                    />
+                  </div>
+                  {/* <Button
                     type="submit"
                     className=" "
                     disabled={editAvaliable.length > 0 ? true : false}
@@ -154,9 +205,9 @@ export default function Page({ params }: { params: { lessonId: string } }) {
                     {updateLoading ? (
                       <Loader2 className=" animate-spin" />
                     ) : (
-                      <p>기본 정보 수정</p>
+                      <p>레슨삭제</p>
                     )}
-                  </Button>
+                  </Button> */}
                 </div>
                 <div className=" col-span-12 grid grid-cols-12 gap-6 p-6 ">
                   <div className=" col-span-12">

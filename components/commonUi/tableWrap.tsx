@@ -38,9 +38,11 @@ interface fetchDataOptionsType {
 export default function TableWrap({
   columns,
   getMoreData,
+  subMenu = false,
 }: {
   columns: any;
   getMoreData: any;
+  subMenu: boolean;
 }) {
   const params = useParams<{ groupId: string }>();
   const [{ pageIndex, pageSize }, setPagination] =
@@ -95,7 +97,11 @@ export default function TableWrap({
   });
   if (isLoading) {
     return (
-      <div className="w-full  h-[calc(100vh-70px)]  flex flex-col items-center justify-center">
+      <div
+        className={`w-full  ${
+          subMenu ? "h-[calc(100vh-170px)]" : "h-[calc(100vh-120px)]"
+        }  flex flex-col items-center justify-center`}
+      >
         <Loader2 className=" animate-spin size-8 text-primary" />
       </div>
     );
@@ -161,7 +167,11 @@ export default function TableWrap({
         ) : null}
       </div>
       <div className=" ">
-        <ScrollArea className=" bg-white  w-full max-h-[calc(100vh-120px)]">
+        <ScrollArea
+          className={` bg-white  w-full ${
+            subMenu ? "h-[calc(100vh-170px)]" : "h-[calc(100vh-120px)]"
+          } `}
+        >
           <Table className="" wrapperClassName="overflow-clip">
             <TableHeader className="">
               {table.getHeaderGroups().map((headerGroup) => (

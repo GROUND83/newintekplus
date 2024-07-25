@@ -3,10 +3,11 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import { ArrowUpDown } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import Link from "next/link";
+
 import dayjs from "dayjs";
 import "dayjs/locale/ko";
-import { MagnifyingGlassIcon } from "@heroicons/react/24/solid";
+
+import PerformViewer from "./performviewer";
 dayjs.locale("ko");
 
 export const columns: ColumnDef<any>[] = [
@@ -125,7 +126,7 @@ export const columns: ColumnDef<any>[] = [
               </Badge>
               {point === 0 ? (
                 <Badge className="text-xs font-normal" variant="destructive">
-                  failed
+                  FAILED
                 </Badge>
               ) : point === 1 ? (
                 <Badge
@@ -154,7 +155,7 @@ export const columns: ColumnDef<any>[] = [
     },
   },
   {
-    accessorKey: "newPerformUpdatedAt",
+    accessorKey: "newPerformInfo",
     header: ({ column }) => {
       return (
         <div className="text-center">
@@ -170,12 +171,11 @@ export const columns: ColumnDef<any>[] = [
       );
     },
     cell: ({ row }) => {
+      let updatedAt = row.original.newPerformInfo?.updatedAt;
       return (
         <div className="text-center">
           <p className="text-xs">
-            {dayjs(row.getValue("newPerformUpdatedAt")).format(
-              "YYYY/MM/DD HH:mm(dddd)"
-            )}
+            {dayjs(updatedAt).format("YYYY/MM/DD HH:mm(dddd)")}
           </p>
         </div>
       );
@@ -187,10 +187,7 @@ export const columns: ColumnDef<any>[] = [
     cell: ({ row }) => {
       return (
         <div className=" text-right">
-          <Button variant="outline" size="icon">
-            모달
-            <MagnifyingGlassIcon className="size-4" />
-          </Button>
+          <PerformViewer data={row.original} />
         </div>
       );
     },

@@ -78,7 +78,7 @@ export async function createFeedBack(formData: FormData) {
         const mailData: any = {
           to: to,
           subject: "살롱캔버스 피드백 메일입니다.",
-          from: "intekplus@saloncanvas.kr",
+          from: "noreply@saloncanvas.kr",
           html: feedbackTemplate({
             title: title,
             description: description,

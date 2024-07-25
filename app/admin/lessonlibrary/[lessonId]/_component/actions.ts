@@ -302,3 +302,12 @@ export async function editContenWithFile(formData: FormData) {
     return { message: e };
   }
 }
+
+export async function deleteLesson(lessonId: string) {
+  //
+  let res = await Lesson.deleteOne({
+    _id: lessonId,
+  });
+  console.log("res", res);
+  return { data: JSON.stringify(res) };
+}

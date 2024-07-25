@@ -371,20 +371,27 @@ export default function Page({ params }: { params: { groupId: string } }) {
                   </div>
                 </ScrollArea>
               </div>
-              <div className=" col-span-12 pt-4 pb-6 flex flex-col gap-2">
-                <p className="text-neutral-500">코스프로파일</p>
+              {groupData?.courseProfile ? (
+                <div className=" col-span-12 pt-4 pb-6 flex flex-col gap-2">
+                  <p className="text-neutral-500">코스프로파일</p>
 
-                <Link
-                  href={`/admin/courseprofile/${groupData?.courseProfile._id}`}
-                  className="flex flex-row items-center gap-2 hover:text-primary"
-                >
-                  <SquareArrowOutUpRight className="size-4" />
-                  <p>
-                    {groupData?.courseProfile.eduForm} -
-                    {groupData?.courseProfile.title}
-                  </p>
-                </Link>
-              </div>
+                  <Link
+                    href={`/admin/courseprofile/${groupData?.courseProfile?._id}`}
+                    className="flex flex-row items-center gap-2 hover:text-primary"
+                  >
+                    <SquareArrowOutUpRight className="size-4" />
+                    <p>
+                      {groupData?.courseProfile?.eduForm} -
+                      {groupData?.courseProfile?.title}
+                    </p>
+                  </Link>
+                </div>
+              ) : (
+                <div className=" col-span-12 pt-4 pb-6 flex flex-col gap-2">
+                  <p className="text-neutral-500">코스프로파일</p>
+                  <p>코스프로파일이 배정되지 않았습니다.</p>
+                </div>
+              )}
             </div>
           </div>
 

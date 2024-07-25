@@ -96,8 +96,8 @@ export default function Page() {
 
   return (
     <div className="w-full flex-1 flex ">
-      <ScrollArea className="rounded-md border   w-full h-[calc(100vh-70px)] ">
-        <div className=" w-full p-3 flex flex-col items-start">
+      <ScrollArea className="w-full h-[calc(100vh-70px)] ">
+        <div className=" w-full flex flex-col items-start">
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit(onSubmit)}

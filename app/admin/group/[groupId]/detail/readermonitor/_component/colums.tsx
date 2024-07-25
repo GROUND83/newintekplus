@@ -7,6 +7,8 @@ import Link from "next/link";
 import dayjs from "dayjs";
 import "dayjs/locale/ko";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/solid";
+import ActionModal from "@/components/commonUi/ActionModal";
+import FeedBackViewer from "./feedbackviewer";
 dayjs.locale("ko");
 
 export const columns: ColumnDef<any>[] = [
@@ -117,10 +119,7 @@ export const columns: ColumnDef<any>[] = [
     cell: ({ row }) => {
       return (
         <div className=" text-right">
-          <Button variant="outline" size="icon">
-            모달
-            <MagnifyingGlassIcon className="size-4" />
-          </Button>
+          <FeedBackViewer data={row.original} />
         </div>
       );
     },

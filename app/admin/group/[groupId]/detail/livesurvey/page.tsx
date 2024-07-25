@@ -7,6 +7,7 @@ import { CircleCheckIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import ViewResultSurvey from "./_component/viewResultSurvey";
 import SendVertification from "./_component/sendVertification";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default function Page({ params }: { params: { groupId: string } }) {
   console.log("groupId", params.groupId);
@@ -55,11 +56,11 @@ export default function Page({ params }: { params: { groupId: string } }) {
   return (
     <div className="w-full flex flex-col items-stretch flex-1  ">
       <div className="flex-1 flex flex-col  w-full">
-        <div className="bg-white border flex-1 w-full p-6 flex flex-col items-start gap-2">
-          <p>{livesurvey?.title}</p>
-          <div>
+        <div className="bg-white border flex-1 w-full p-6 flex flex-col items-start gap-2 h-[300px]">
+          <p className=" font-bold">{livesurvey?.title}</p>
+          <div className="mt-3">
             <p>설문내용</p>
-            <div>
+            <div className="mt-3">
               {livesurvey?.surveys.map((item, index) => {
                 return (
                   <div key={item._id}>
@@ -73,59 +74,65 @@ export default function Page({ params }: { params: { groupId: string } }) {
           </div>
         </div>
         <div className="bg-white border flex-1 w-full p-6 flex flex-col items-start gap-2">
-          <p>설문 결과</p>
+          <p className=" font-bold">설문 결과</p>
 
-          <div className="w-full flex flex-col gap-1 mt-2">
-            {group?.participants.map((item, index) => {
-              return (
-                <div
-                  key={item._id}
-                  className="w-full flex flex-row items-center gap-2 border px-2 py-1  justify-between"
-                >
-                  <div className="flex flex-row items-center gap-2">
-                    <p>
-                      {index + 1}. {item.username}
-                    </p>
+          <ScrollArea className="w-full max-h-[calc(100vh-500px)]">
+            <div className="w-full flex flex-col gap-1 mt-2">
+              {group?.participants.map((item, index) => {
+                return (
+                  <div
+                    key={item._id}
+                    className="w-full flex flex-row items-center gap-2 border px-2 py-1  justify-between"
+                  >
+                    <div className="flex flex-row items-center gap-2">
+                      <p>
+                        {index + 1}. {item.username}
+                      </p>
 
-                    {item.resultSur ? (
-                      <Badge
-                        className=" text-xs font-normal"
-                        variant="defaultOutline"
-                      >
-                        완료
-                      </Badge>
-                    ) : (
-                      <Badge
-                        className=" text-xs font-normal"
-                        variant="secondaryOutline"
-                      >
-                        미완료
-                      </Badge>
-                    )}
-                  </div>
-                  <div className="flex flex-row items-center gap-2">
-                    {item.resultSur && (
-                      <ViewResultSurvey resultSurvey={item.resultSur} />
-                    )}
-
-                    {item.resultSur?.isSend ? (
-                      <div className="flex flex-row items-center gap-2">
-                        <Button
-                          size="xs"
-                          variant="defaultoutline"
-                          className="flex flex-row items-center gap-2"
+                      {item.resultSur ? (
+                        <Badge
+                          className=" text-xs font-normal"
+                          variant="defaultOutline"
                         >
-                          <CircleCheckIcon className=" size-4" /> 제발급
-                        </Button>
-                      </div>
-                    ) : (
-                      <SendVertification group={group} participants={item} />
-                    )}
+                          완료
+                        </Badge>
+                      ) : (
+                        <Badge
+                          className=" text-xs font-normal"
+                          variant="secondaryOutline"
+                        >
+                          미완료
+                        </Badge>
+                      )}
+                    </div>
+                    <div className="flex flex-row items-center gap-2">
+                      {item.resultSur && (
+                        <ViewResultSurvey resultSurvey={item.resultSur} />
+                      )}
+
+                      {item.resultSur?.isSend ? (
+                        <div className="flex flex-row items-center gap-2">
+                          <SendVertification
+                            group={group}
+                            participants={item}
+                            resultSurveyId={item.resultSur?._id || ""}
+                            isSend={item.resultSur?.isSend}
+                          />
+                        </div>
+                      ) : (
+                        <SendVertification
+                          group={group}
+                          participants={item}
+                          resultSurveyId={item.resultSur?._id || ""}
+                          isSend={item.resultSur?.isSend}
+                        />
+                      )}
+                    </div>
                   </div>
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
+          </ScrollArea>
         </div>
       </div>
     </div>

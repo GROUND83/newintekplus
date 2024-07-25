@@ -21,11 +21,15 @@ export default function Layout({
   const pathname = usePathname();
   const params = useParams<{ groupId: string }>();
   const getGroup = async () => {
-    let res = await detailGroup(params.groupId);
-    if (res.data) {
-      let group = JSON.parse(res.data);
-      // console.log("group", group);
-      setGroup(group);
+    if (params.groupId) {
+      let res = await detailGroup(params.groupId);
+      if (res.data) {
+        let group = JSON.parse(res.data);
+        // console.log("group", group);
+        setGroup(group);
+      }
+    } else {
+      setGroup(null);
     }
   };
   React.useEffect(() => {
@@ -86,19 +90,17 @@ export default function Layout({
             </div>
           )}
         </div>
-        {group
-          ? false
-          : true && (
-              <Button asChild size={"sm"}>
-                <Link
-                  href={"/admin/group/new"}
-                  className="flex flex-row items-center gap-2"
-                >
-                  <PlusIcon className="size-4" />
-                  학습그룹 생성
-                </Link>
-              </Button>
-            )}
+        {pathname === "/admin/group" && (
+          <Button asChild size={"sm"}>
+            <Link
+              href={"/admin/group/new"}
+              className="flex flex-row items-center gap-2"
+            >
+              <PlusIcon className="size-4" />
+              학습그룹 생성
+            </Link>
+          </Button>
+        )}
       </div>
       <div className="flex flex-col  bg-neutral-100">{children}</div>
     </div>

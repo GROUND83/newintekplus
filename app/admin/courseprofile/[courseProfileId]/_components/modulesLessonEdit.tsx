@@ -51,19 +51,19 @@ export default function ModulesLessonEdit({
     getModuleData();
   }, []);
   return (
-    <Card className="w-full mt-3">
-      <CardHeader className="flex flex-row items-center justify-between">
+    <div className="w-full  p-6 bg-white border-t">
+      <div className="flex flex-row items-center justify-between">
         <div>
-          <CardTitle className="text-xl">모듈정보</CardTitle>
-          <CardDescription>모듈/레슨을 세팅하세요.</CardDescription>
+          <p className="text-xl font-bold">모듈정보</p>
+          <p>모듈/레슨을 세팅하세요.</p>
         </div>
         <ModuleAdd
           disabled={disabled}
           courseProfileId={courseProfileId}
           getModuleData={getModuleData}
         />
-      </CardHeader>
-      <CardContent className="w-full grid grid-cols-12 gap-5">
+      </div>
+      <div className="w-full grid grid-cols-12 gap-5 mt-3">
         <div className=" col-span-12">
           {moduleDatas.map((module: any, index: any) => {
             return (
@@ -154,7 +154,7 @@ export default function ModulesLessonEdit({
             );
           })}
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

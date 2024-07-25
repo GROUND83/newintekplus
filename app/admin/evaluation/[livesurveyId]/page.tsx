@@ -130,16 +130,16 @@ export default function Page({ params }: { params: { livesurveyId: string } }) {
 
   return (
     <div className="w-full flex-1 flex ">
-      <ScrollArea className="rounded-md border   w-full h-[calc(100vh-70px)] ">
-        <div className=" w-full p-3 flex flex-col items-start">
+      <ScrollArea className="w-full h-[calc(100vh-70px)] flex bg-white">
+        <div className=" w-full  flex flex-col items-start">
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit(onSubmit)}
               className="space-y-8 w-full"
             >
-              <Card className="w-full">
-                <CardHeader>
-                  <CardTitle className="text-xl">설문수정</CardTitle>
+              <div className="w-full p-6">
+                <div>
+                  <p className="text-xl font-bold">설문수정</p>
 
                   <div>
                     {editAvaliable && editAvaliable.length > 0 ? (
@@ -157,8 +157,8 @@ export default function Page({ params }: { params: { livesurveyId: string } }) {
                       </div>
                     )}
                   </div>
-                </CardHeader>
-                <CardContent className="w-full grid grid-cols-12 gap-5">
+                </div>
+                <div className="w-full grid grid-cols-12 gap-5 mt-3">
                   <FormField
                     control={form.control}
                     name="title"
@@ -235,8 +235,8 @@ export default function Page({ params }: { params: { livesurveyId: string } }) {
                       설문 수정
                     </Button>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             </form>
           </Form>
         </div>

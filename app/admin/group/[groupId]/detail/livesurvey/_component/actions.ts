@@ -70,19 +70,16 @@ export async function getGroupDetail(groupId: string) {
   }
 }
 
-export async function sendCertification(formData: FormData) {
+export async function resultSurveyUpdate(resultSurveyId: string) {
   //
-
-  let file = formData.get("file");
-
-  let newformData = new FormData();
-  newformData.append("file", file);
-  newformData.append("folderName", "certification");
-  let upload = await UploadFile(newformData);
-  let { location } = upload as UploadResponse;
-
-  console.log("location", location);
-  let fileUrl = location;
-  console.log("fileUrl", fileUrl);
+  let res = await ResultSurvey.findOneAndUpdate(
+    {
+      _id: resultSurveyId,
+    },
+    {
+      isSend: true,
+    }
+  );
+  return { data: JSON.stringify(res) };
   //
 }

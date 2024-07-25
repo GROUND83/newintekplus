@@ -203,7 +203,7 @@ export default function Page() {
   }, [form.watch]);
   return (
     <div className="w-full flex flex-col items-stretch flex-1  ">
-      <div className="p-3 flex-1 flex flex-col  w-full">
+      <div className="flex-1 flex flex-col  w-full">
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}

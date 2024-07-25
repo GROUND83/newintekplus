@@ -11,19 +11,22 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { sendCertification } from "./actions";
+import { resultSurveyUpdate } from "./actions";
 import dayjs from "dayjs";
-import html2canvas from "html2canvas";
-import { jsPDF } from "jspdf";
+
+import jsPDF from "jspdf";
 import React from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { fonts } from "@/lib/fonts";
+import { Notosnas, NotoSansBold } from "@/lib/fonts";
 import vertificationTemplate from "@/lib/mailtemplate/vertificationTemplate";
-import { sendCertificatesEmail } from "@/lib/sendMail/sendVertificationMail";
+
 import { UploadFile } from "@/lib/fileUploader";
 import { UploadResponse } from "nodejs-s3-typescript/dist/cjs/types";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
+import { Loader, Loader2, RotateCw, Send } from "lucide-react";
+import sendMail from "@/lib/sendMail/sendMail";
+import { logobinary } from "@/lib/logoBunary";
+import ActionModal from "@/components/commonUi/ActionModal";
 
 const blobToFile = (theBlob: Blob, fileName: string): File => {
   return new File(
@@ -48,9 +51,13 @@ const blobToFile = (theBlob: Blob, fileName: string): File => {
 export default function SendVertification({
   group,
   participants,
+  resultSurveyId,
+  isSend,
 }: {
   group: any;
   participants: any;
+  resultSurveyId: string;
+  isSend: boolean;
 }) {
   const [open, setOpen] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
@@ -59,12 +66,17 @@ export default function SendVertification({
     let end = dayjs(group.endDate).format("YYYY.MM.DD");
     let today = dayjs(group.endDate).format("YYYY.MM.DD");
     const doc = new jsPDF("p", "mm", "a4");
-    doc.addFileToVFS("malgun.ttf", fonts);
-    doc.addFont("malgun.ttf", "malgun", "normal");
-    doc.addFont("malgun.ttf", "malgunbold", "bold");
-    doc.setFont("malgun");
+
+    doc.addFileToVFS("NotoSansKR-Medium.ttf", Notosnas);
+    doc.addFileToVFS("NotoSansKR-Bold.ttf", NotoSansBold);
+    doc.addFont("NotoSansKR-Medium.ttf", "notosans", "normal");
+    doc.addFont("NotoSansKR-Bold.ttf", "notosans", "bold");
+    doc.setFont("notosans", "bold");
     // 297mm
     let position = 0;
+    //
+    console.log(logobinary);
+    doc.addImage(logobinary, "png", 75, 115, 60, 60);
     doc.setFontSize(40);
     doc.text("교육 수료증", 105, 50, { align: "center" });
     doc.setFontSize(16);
@@ -134,15 +146,15 @@ export default function SendVertification({
       let upload = await UploadFile(newformData);
       let { location } = upload as UploadResponse;
 
-      console.log("location", location);
-      let fileUrl = location;
-      console.log("fileUrl", fileUrl, participants.email);
+      // console.log("location", location);
+      // let fileUrl = location;
+      // console.log("fileUrl", fileUrl, participants.email);
       //
       let to = `${participants.email}`;
       const mailData: any = {
         to: to,
         subject: "살롱캔버스 수료증 이메일 입니다.",
-        from: "intekplus@saloncanvas.kr",
+        from: "noreply@saloncanvas.kr",
         html: vertificationTemplate({
           title: "수료증 발송",
           description: "첨부파일을 확인하세요.",
@@ -155,9 +167,11 @@ export default function SendVertification({
           },
         ],
       };
-      let result = await sendCertificatesEmail(mailData);
+      let result = await sendMail(mailData);
       console.log("result", result);
-
+      if (resultSurveyId) {
+        await resultSurveyUpdate(resultSurveyId);
+      }
       toast.success("메일 발송에 성공하였습니다.");
 
       //
@@ -171,26 +185,46 @@ export default function SendVertification({
 
   return (
     <div className="">
-      <Dialog open={open}>
-        <DialogTrigger asChild>
-          <Button size="xs" type="button" onClick={() => setOpen(true)}>
-            수료증 발급
-          </Button>
-        </DialogTrigger>
-        <DialogContent className="w-[70vw] ">
-          <DialogHeader>
-            <DialogTitle>수료증 발급</DialogTitle>
-            <DialogDescription>
-              {participants.username}에게 수료증을 발급합니다.
-            </DialogDescription>
-          </DialogHeader>
-          <ScrollArea className="flex">
-            <div className="flex flex-col w-full gap-2 ">
-              <div className="p-12 w-full gap-3 flex flex-col">
-                <div className="  flex flex-col items-center">
-                  <p className=" font-bold text-4xl">교육 수료증</p>
+      {resultSurveyId ? (
+        <ActionModal
+          title={"수료증 발급"}
+          desc={`${participants.username}(${participants.email})에게 수료증을 발급합니다.`}
+          trigger={
+            isSend ? (
+              <Button
+                size="xs"
+                type="button"
+                onClick={() => setOpen(true)}
+                variant="defaultoutline"
+                className="flex flex-row items-center gap-2"
+              >
+                <RotateCw className="size-3" />
+                <p>수료증 재발급</p>
+              </Button>
+            ) : (
+              <Button
+                size="xs"
+                type="button"
+                onClick={() => setOpen(true)}
+                className="flex flex-row items-center gap-2"
+              >
+                <Send className="size-3" />
+                <p>수료증 발급</p>
+              </Button>
+            )
+          }
+          btnText="발급"
+          onClick={() => {}}
+          open={open}
+          setOpen={setOpen}
+        >
+          <div className="w-full mt-6">
+            <ScrollArea className="flex h-[500px]">
+              <div className="flex flex-col w-full gap-2 border p-6">
+                <div className="flex flex-col items-center">
+                  <p className="font-bold text-2xl">교육 수료증</p>
                 </div>
-                <div className="  flex flex-col items-center justify-center text-md gap-3 mt-6 ">
+                <div className="flex flex-col items-start justify-center text-md gap-3 mt-6 ">
                   <div className="flex flex-row items-center gap-6">
                     <div className="">
                       <p>성명</p>
@@ -230,34 +264,15 @@ export default function SendVertification({
                   <p className="text-md">인텍플러스 교육위원회</p>
                 </div>
               </div>
-            </div>
-            <DialogFooter className="  justify-center">
-              <Button
-                size="lg"
-                type="button"
-                onClick={() => handlePrint()}
-                disabled={loading}
-              >
-                {loading ? (
-                  <Loader2 className=" animate-spin size-4" />
-                ) : (
-                  <p>수료증 발급</p>
-                )}
-              </Button>
-              <DialogClose asChild>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="lg"
-                  onClick={() => setOpen(false)}
-                >
-                  닫기
-                </Button>
-              </DialogClose>
-            </DialogFooter>
-          </ScrollArea>
-        </DialogContent>
-      </Dialog>
+            </ScrollArea>
+          </div>
+        </ActionModal>
+      ) : (
+        <Button size="xs" disabled className="flex flex-row items-center gap-2">
+          <Loader className="size-3" />
+          <p>설문 대기</p>
+        </Button>
+      )}
     </div>
   );
 }

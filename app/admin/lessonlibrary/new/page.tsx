@@ -162,18 +162,25 @@ export default function Page() {
   }
   return (
     <div className="w-full flex flex-col items-stretch flex-1  ">
-      <div className="p-3 flex-1 flex flex-col  w-full">
+      <div className="flex-1 flex flex-col  w-full">
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
-            className="space-y-8 w-full"
+            className="space-y-8 w-full bg-white "
           >
-            <Card className="w-full">
-              <CardHeader>
-                <CardTitle className="text-xl">레슨 라이브러리 생성</CardTitle>
-                <CardDescription>레슨 라이브러리를 생성하세요.</CardDescription>
-              </CardHeader>
-              <CardContent className="w-full grid grid-cols-12 gap-5">
+            <div className="w-full p-6">
+              <div className="w-full flex flex-row items-center justify-between">
+                <div>
+                  <p className="text-xl">레슨 라이브러리 생성</p>
+                  <p>레슨 라이브러리를 생성하세요.</p>
+                </div>
+                <div>
+                  <Button type="submit" className="mt-6">
+                    생성
+                  </Button>
+                </div>
+              </div>
+              <div className="w-full grid grid-cols-12 gap-5">
                 <FormField
                   control={form.control}
                   name="title"
@@ -212,7 +219,7 @@ export default function Page() {
                           {lessonType.map((lessontype, index) => {
                             return (
                               <SelectItem value={lessontype.value} key={index}>
-                                {lessontype.value}
+                                {lessontype.label}
                               </SelectItem>
                             );
                           })}
@@ -469,11 +476,8 @@ export default function Page() {
                     )}
                   </div>
                 </div>
-                <Button type="submit" className="mt-6">
-                  생성
-                </Button>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </form>
         </Form>
       </div>
