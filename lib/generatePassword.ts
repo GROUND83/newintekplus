@@ -1,3 +1,4 @@
+"use server";
 export default function temp_pw_issuance() {
   let ranValue1 = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"];
   let ranValue2 = [
