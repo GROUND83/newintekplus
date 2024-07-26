@@ -27,7 +27,7 @@ const FormSchema = z.object({
     })
     .email("이메일 형식이 아닙니다."),
 });
-export default function Page() {
+const PageWrap = () => {
   //
   const [loading, setLoading] = React.useState(false);
   const router = useRouter();
@@ -44,7 +44,7 @@ export default function Page() {
     console.log("values", values);
     const formData = new FormData();
     formData.append("email", values.email);
-    formData.append("type", "student");
+    formData.append("type", "teacher");
     try {
       let res = await findPass(formData);
       if (res.data) {
@@ -99,4 +99,13 @@ export default function Page() {
       </div>
     </div>
   );
-}
+};
+
+const Page = () => {
+  return (
+    <Suspense>
+      <PageWrap />
+    </Suspense>
+  );
+};
+export default Page;

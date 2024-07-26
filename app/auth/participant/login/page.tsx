@@ -113,7 +113,7 @@ export default function Page() {
         </Form>
         <section className="flex flex-row items-center gap-3  px-6  mt-24 h-6">
           <Link
-            href={"/auth/findpassword?type=student"}
+            href={"/auth/findpassword"}
             className=" flex flex-row items-center gap-2 text-base"
           >
             <LockClosedIcon className="size-4" />
