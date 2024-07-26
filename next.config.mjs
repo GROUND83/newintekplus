@@ -1,4 +1,18 @@
 /** @type {import('next').NextConfig} */
+const cspHeader = `
+    default-src 'self';
+    script-src 'self' 'unsafe-eval' 'unsafe-inline';
+    style-src 'self' 'unsafe-inline';
+    img-src 'self' blob: data:;
+    font-src 'self' data:;
+    object-src 'none';
+    base-uri 'self';
+    form-action 'self';
+    frame-ancestors 'none';
+    upgrade-insecure-requests;
+    connect-src 'self';
+`;
+
 const nextConfig = {
   reactStrictMode: false,
   images: {
@@ -12,7 +26,22 @@ const nextConfig = {
       { hostname: "finefarming-pq31y3od4-wonchangkims-projects.vercel.app" },
       { hostname: "dapi.kakao.com" },
       { hostname: "www.privacy.go.kr" },
+      { hostname: "newintekplus.vercel.app" },
+      { hostname: "mail.google.com" },
     ],
+  },
+  async headers() {
+    return [
+      {
+        source: "/(.*)",
+        headers: [
+          {
+            key: "Content-Security-Policy",
+            value: cspHeader.replace(/\n/g, ""),
+          },
+        ],
+      },
+    ];
   },
   webpack: (config) => {
     config.module.rules.push({
