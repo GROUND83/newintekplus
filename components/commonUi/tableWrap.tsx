@@ -8,7 +8,17 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ChevronLeft, ChevronRight, Loader2, MoveLeft } from "lucide-react";
+import ReactPaginate from "react-paginate";
+import { useDebouncedCallback } from "use-debounce";
+
+import {
+  ArrowLeft,
+  ArrowRight,
+  ChevronLeft,
+  ChevronRight,
+  Loader2,
+  MoveLeft,
+} from "lucide-react";
 import {
   PaginationState,
   SortingState,
@@ -28,37 +38,77 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useParams } from "next/navigation";
+import {
+  useParams,
+  usePathname,
+  useRouter,
+  useSearchParams,
+} from "next/navigation";
+import { Input } from "../ui/input";
+import Search from "./Search";
 
-interface fetchDataOptionsType {
-  pageIndex: number;
-  pageSize: number;
-  groupId: string | undefined;
-}
-export default function TableWrap({
+function TableWrapData({
   columns,
   getMoreData,
   subMenu = false,
+  placeHolder,
+  searchShow,
 }: {
   columns: any;
   getMoreData: any;
   subMenu: boolean;
+  placeHolder: string;
+  searchShow: boolean;
 }) {
+  const router = useRouter();
+  const pathname = usePathname();
   const params = useParams<{ groupId: string }>();
-  const [{ pageIndex, pageSize }, setPagination] =
-    React.useState<PaginationState>({
-      pageIndex: 0, //initial page index
-      pageSize: 10, //default page size
-    });
+  const searchParams = useSearchParams();
+  const [heightSize, setHeightSize] = React.useState("100vh");
+  const [pageCount, setPageCount] = React.useState(1);
+
+  const [total, setTotal] = React.useState(1);
+  const [pageSize, setPageSize] = React.useState(100);
+  const [pageNumber, setPageNumber] = React.useState(1);
+  //
+  const currentPage = React.useRef(1);
+  //
+  // const search = searchParams.get("search") || "";
+
+  //
+  React.useEffect(() => {
+    let defaultHeight = "h-[calc(100vh-220px)]";
+    if (subMenu) {
+      defaultHeight = "h-[calc(100vh-220px)]";
+      if (searchShow) {
+        defaultHeight = "h-[calc(100vh-220px)]";
+      } else {
+        //
+      }
+    } else if (!subMenu) {
+      defaultHeight = "h-[calc(100vh-170px)]";
+      if (searchShow) {
+        defaultHeight = "h-[calc(100vh-170px)]";
+      } else {
+        //
+      }
+    }
+    setHeightSize(defaultHeight);
+  }, [searchShow, subMenu]);
+
+  const pageIndex = searchParams.get("page") || "";
+  const search = searchParams.get("search") || "";
 
   const [sorting, setSorting] = React.useState<SortingState>([]);
   //
   const fetchDataOptions = {
-    pageIndex,
     pageSize,
+    pageIndex: pageNumber,
     groupId: params.groupId,
+    parmas: params,
+    search,
   };
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading, isError, refetch } = useQuery({
     //
     queryKey: ["data", fetchDataOptions],
     queryFn: async () => {
@@ -66,41 +116,81 @@ export default function TableWrap({
       if (reponse.rows) {
         let groups = JSON.parse(reponse.rows);
         console.log("groups", groups);
-        return { rows: groups, pageCount: reponse.pageCount };
+        setPageCount(reponse.pageCount);
+        setTotal(reponse.totaCount);
+        return { rows: groups, pageCount: reponse.totalCount };
       }
     },
   });
   const defaultData = React.useMemo(() => [], []);
-  const pagination = React.useMemo(
-    () => ({
-      pageIndex,
-      pageSize,
-    }),
-    [pageIndex, pageSize]
-  );
+
   const table = useReactTable({
     data: data?.rows ?? defaultData,
     columns: columns,
-    pageCount: data?.pageCount ?? 10,
     onSortingChange: setSorting,
     state: {
       sorting,
-      pagination,
     },
-    onPaginationChange: setPagination,
     getSortedRowModel: getSortedRowModel(),
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    manualPagination: true,
     debugTable: true,
-    rowCount: data?.pageCount ?? 10,
   });
+
+  React.useEffect(() => {
+    console.log("pageIndex", pageIndex);
+    if (pageIndex) {
+      setPageNumber(Number(pageIndex));
+    }
+  }, [pageIndex]);
+  //\
+  const setSearchDAta = () => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (currentPage.current) {
+      params.set("page", "1");
+    }
+    // currentPage.current = e.selected + 1;
+    router.replace(`${pathname}?${params.toString()}`);
+  };
+  React.useEffect(() => {
+    if (search) {
+      setSearchDAta();
+    }
+  }, [search]);
+  //
+  const clickPrev = () => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (currentPage.current) {
+      params.set("page", (pageNumber - 1).toString());
+    }
+    // currentPage.current = e.selected + 1;
+    router.replace(`${pathname}?${params.toString()}`);
+  };
+  const clickNext = () => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (currentPage.current) {
+      params.set("page", (pageNumber + 1).toString());
+    }
+    // currentPage.current = e.selected + 1;
+    router.replace(`${pathname}?${params.toString()}`);
+  };
+
+  const selectPageSize = (value: number) => {
+    setPageSize(value);
+    const params = new URLSearchParams(searchParams.toString());
+    if (currentPage.current) {
+      params.set("page", "1");
+    }
+    // currentPage.current = e.selected + 1;
+    router.replace(`${pathname}?${params.toString()}`);
+  };
+
+  //
+
+  //
   if (isLoading) {
     return (
       <div
-        className={`w-full  ${
-          subMenu ? "h-[calc(100vh-170px)]" : "h-[calc(100vh-120px)]"
-        }  flex flex-col items-center justify-center`}
+        className={`w-full  ${heightSize}  flex flex-col items-center justify-center`}
       >
         <Loader2 className=" animate-spin size-8 text-primary" />
       </div>
@@ -109,119 +199,154 @@ export default function TableWrap({
 
   return (
     <div className="w-full ">
-      <div className="flex flex-row items-center justify-end space-x-2  h-[50px] bg-neutral-100 border-b px-3">
-        <div className="flex-1 text-sm text-neutral-500  ">
+      {searchShow && <Search placeHolder={placeHolder} />}
+
+      <ScrollArea className={` bg-white  w-full ${heightSize} `}>
+        <Table className="" wrapperClassName="overflow-clip">
+          <TableHeader className="">
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => {
+                  return (
+                    <TableHead key={header.id}>
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                    </TableHead>
+                  );
+                })}
+              </TableRow>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {table.getRowModel().rows?.length ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && "selected"}
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id}>
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center"
+                >
+                  데이터가 없습니다.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </ScrollArea>
+
+      <div className="flex flex-row items-center justify-between space-x-2  h-[50px] bg-neutral-100 border-b px-3 border-t">
+        <div className=" text-sm text-neutral-500   flex-1">
           <p className="text-xs">총 {data?.pageCount}개의 데이터가 있습니다.</p>
         </div>
-        <div className="flex flex-row items-center">
+        {data?.pageCount && data?.pageCount > 10 ? (
+          <div className="space-x-2 flex flex-row items-center justify-center gap-2 flex-1">
+            <Button
+              variant={pageNumber <= 1 ? "outline" : "default"}
+              size="sm"
+              onClick={() => clickPrev()}
+              disabled={pageNumber <= 1 ? true : false}
+            >
+              <ChevronLeft />
+            </Button>
+
+            <p className="border px-6 py-2 rounded-md text-sm text-neutral-500 bg-white">
+              {pageNumber} / {pageCount}
+            </p>
+
+            <Button
+              variant={pageNumber >= pageCount ? `outline` : "default"}
+              size="sm"
+              onClick={() => clickNext()}
+              disabled={pageNumber >= pageCount ? true : false}
+            >
+              <ChevronRight />
+            </Button>
+          </div>
+        ) : null}
+        {/* <div>
+          <ReactPaginate
+            // breakLabel="..."
+            onPageChange={handlePageClick}
+            pageRangeDisplayed={5}
+            pageCount={pageCount}
+            previousLabel={<ChevronLeft />}
+            nextLabel={<ChevronRight />}
+            // renderOnZeroPageCount={null}
+            currentPage={currentPage}
+            containerClassName={"pagination"}
+            pageLinkClassName={"pagination__link"}
+            activeLinkClassName={"pagination__link__active"}
+          />
+        </div> */}
+        <div className="flex flex-row items-center justify-center flex-1 gap-2">
+          <p>테이블 출력</p>
           <Select
-            value={table.getState().pagination.pageSize.toString()}
+            value={pageSize.toString()}
             onValueChange={(value) => {
-              table.setPageSize(Number(value));
+              selectPageSize(Number(value));
             }}
           >
             <SelectTrigger className="w-[80px]">
               <SelectValue placeholder="테이블 출력" />
             </SelectTrigger>
             <SelectContent>
-              {[10, 20, 30, 40, 50].map((pageSize) => (
-                <SelectItem key={pageSize} value={pageSize.toString()}>
-                  {pageSize}
+              {[10, 20, 30, 40, 50, 100, 200, 300, 400].map((pageSizevalue) => (
+                <SelectItem
+                  key={pageSizevalue}
+                  value={pageSizevalue.toString()}
+                >
+                  {pageSizevalue}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
         </div>
-        {data?.pageCount && data?.pageCount > 10 ? (
-          <div className="space-x-2 flex flex-row items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => table.previousPage()}
-              disabled={!table.getCanPreviousPage()}
-            >
-              <ChevronLeft />
-            </Button>
-
-            <p className="border px-6 py-2 rounded-md text-sm text-neutral-500 bg-white">
-              {Number(table.getState().pagination.pageIndex) + 1} /{" "}
-              {Math.ceil(
-                table.getPageCount() / table.getState().pagination.pageSize
-              )}
-            </p>
-
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => table.nextPage()}
-              disabled={
-                Math.round(
-                  table.getPageCount() / table.getState().pagination.pageSize
-                ) <=
-                table.getState().pagination.pageIndex + 1
-              }
-            >
-              <ChevronRight />
-            </Button>
-          </div>
-        ) : null}
-      </div>
-      <div className=" ">
-        <ScrollArea
-          className={` bg-white  w-full ${
-            subMenu ? "h-[calc(100vh-170px)]" : "h-[calc(100vh-120px)]"
-          } `}
-        >
-          <Table className="" wrapperClassName="overflow-clip">
-            <TableHeader className="">
-              {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => {
-                    return (
-                      <TableHead key={header.id} className="">
-                        {header.isPlaceholder
-                          ? null
-                          : flexRender(
-                              header.column.columnDef.header,
-                              header.getContext()
-                            )}
-                      </TableHead>
-                    );
-                  })}
-                </TableRow>
-              ))}
-            </TableHeader>
-            <TableBody>
-              {table.getRowModel().rows?.length ? (
-                table.getRowModel().rows.map((row) => (
-                  <TableRow
-                    key={row.id}
-                    data-state={row.getIsSelected() && "selected"}
-                  >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell
-                    colSpan={columns.length}
-                    className="h-24 text-center"
-                  >
-                    데이터가 없습니다.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </ScrollArea>
       </div>
     </div>
   );
 }
+
+const TableWrap = ({
+  columns,
+  getMoreData,
+  subMenu,
+  placeHolder,
+  searchShow,
+}: {
+  columns: any;
+  getMoreData: any;
+  subMenu: boolean;
+  placeHolder: string;
+  searchShow: boolean;
+}) => {
+  return (
+    <React.Suspense>
+      <TableWrapData
+        columns={columns}
+        getMoreData={getMoreData}
+        subMenu={subMenu}
+        placeHolder={placeHolder}
+        searchShow={searchShow}
+      />
+    </React.Suspense>
+  );
+};
+export default TableWrap;

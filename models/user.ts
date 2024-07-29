@@ -1,5 +1,5 @@
 import mongoose, { Document, Model } from "mongoose";
-import passportLocalMongoose from "passport-local-mongoose";
+// import passportLocalMongoose from "passport-local-mongoose";
 export interface IUser {
   role: string;
   perMit: number;
@@ -70,9 +70,9 @@ const user = new mongoose.Schema<IUserDocument>(
   }
 );
 // passportLocalMongoose 적용함.
-user.plugin(passportLocalMongoose, {
-  usernameField: "email",
-});
+// user.plugin(passportLocalMongoose, {
+//   usernameField: "email",
+// });
 
 // Create Model & Export
 const User: Model<IUserDocument> =

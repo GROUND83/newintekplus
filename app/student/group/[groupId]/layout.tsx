@@ -17,10 +17,10 @@ export default function Layout({
 
   return (
     <div className="w-full flex flex-col items-stretch flex-1  ">
-      <div className="w-full bg-white py-3 border-b px-6 flex flex-row items-center gap-6 h-[70px]">
+      <div className="w-full bg-white py-3 border-b px-6 flex flex-row items-center gap-2 h-[50px]">
         <Link
           href={`/student/group/${params.groupId}/notice`}
-          className={`px-3 py-2 ${
+          className={`px-3 py-2 text-xs ${
             pathname.includes("/notice")
               ? "bg-primary text-white"
               : "bg-neutral-100 text-black border"
@@ -30,7 +30,7 @@ export default function Layout({
         </Link>
         <Link
           href={`/student/group/${params.groupId}/module`}
-          className={`px-3 py-2 ${
+          className={`px-3 py-2 text-xs ${
             pathname.includes("/module")
               ? "bg-primary text-white"
               : "bg-neutral-100 text-black border"
@@ -40,7 +40,7 @@ export default function Layout({
         </Link>
         <Link
           href={`/student/group/${params.groupId}/message`}
-          className={`px-3 py-2 ${
+          className={`px-3 py-2 text-xs ${
             pathname.includes("/message")
               ? "bg-primary text-white"
               : "bg-neutral-100 text-black border"
@@ -50,7 +50,7 @@ export default function Layout({
         </Link>
         <Link
           href={`/student/group/${params.groupId}/livesurvey`}
-          className={`px-3 py-2 ${
+          className={`px-3 py-2 text-xs ${
             pathname.includes("/livesurvey")
               ? "bg-primary text-white"
               : "bg-neutral-100 text-black border"

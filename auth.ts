@@ -30,7 +30,9 @@ function checkCredential({
       await connectToMongoDB();
       if (role === "admin") {
         console.log(email, password, type, role);
-        let findUser = await User.findOne({ email: email });
+        let findUser = await User.findOne({ email: email })
+          .select("username email  role _id password")
+          .lean();
         console.log("findUser", findUser);
         if (findUser) {
           user = findUser;
@@ -38,9 +40,11 @@ function checkCredential({
           reject("계정이 없습니다.");
         }
       }
-      if (role === "student") {
+      if (role === "participant") {
         console.log(email, password, type, role);
-        let findUser = await Participant.findOne({ email: email });
+        let findUser = await Participant.findOne({ email: email })
+          .select("username email  role _id password")
+          .lean();
         console.log("findUser", findUser);
         if (findUser) {
           user = findUser;
@@ -50,7 +54,9 @@ function checkCredential({
       }
       if (role === "teacher") {
         console.log(email, password, type, role);
-        let findUser = await Teacher.findOne({ email: email });
+        let findUser = await Teacher.findOne({ email: email })
+          .select("username email role _id password")
+          .lean();
         console.log("findUser", findUser);
         if (findUser) {
           user = findUser;
@@ -65,6 +71,7 @@ function checkCredential({
         console.log("ok", ok);
         if (ok) {
           let userdata = exclude(user, ["password"]);
+          console.log("userdata", userdata);
           if (userdata) {
             resolve(userdata);
           }
@@ -127,13 +134,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 type,
                 role,
               });
+              // console.log("result", result);
               return result;
             } catch (e: any) {
               //
               console.log(e);
               throw new Error(e);
             }
-          } else if (role === "student") {
+          } else if (role === "participant") {
             try {
               let result: any = await checkCredential({
                 email: credentials.email!,

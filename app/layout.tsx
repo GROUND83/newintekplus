@@ -9,6 +9,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import React from "react";
 import { ReactQueryClientProvider } from "@/components/reactQuery/queryProvider";
+import Head from "next/head";
 const notoSansKr = Noto_Sans_KR({
   // preload: true, 기본값
   preload: false,
@@ -32,10 +33,16 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  connectToMongoDB();
+  // connectToMongoDB();
   return (
     <ReactQueryClientProvider>
       <html lang="en">
+        <Head>
+          <meta
+            http-equiv="Content-Security-Policy"
+            content="default-src 'self';script-src 'self';"
+          />
+        </Head>
         <AuthProvider>
           <body
             className={cn(notoSansKr.className, roboto.variable)}

@@ -1,7 +1,7 @@
 "use client";
 
 import TableWrap from "@/components/commonUi/tableWrap";
-import DataTable from "./_components/table/table";
+
 import { columns } from "./_components/table/colums";
 import { getMoreData } from "./_components/table/actions";
 
@@ -13,7 +13,9 @@ export default function Page({ params }: { params: { groupId: string } }) {
         <TableWrap
           columns={columns}
           getMoreData={getMoreData}
-          subMenu={false}
+          subMenu={true}
+          searchShow={true}
+          placeHolder="제목을 검색하세요."
         />
       </div>
     </div>

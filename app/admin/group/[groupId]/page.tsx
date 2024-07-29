@@ -59,6 +59,7 @@ import Participant from "@/models/participant";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { getSelectInitData } from "../new/actions";
 import {
+  deleteGroup,
   detailGroup,
   getLiveSurvey,
   updateGroupStatus,
@@ -70,6 +71,17 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
+import {
+  CourseProfileDataWrap,
+  GroupTitle,
+  LeaderWrap,
+  PeriodWrap,
+  StudentWrap,
+} from "@/components/commonUi/aboutGroup";
+import ActionModal from "@/components/commonUi/ActionModal";
+import DeleteModal from "@/components/commonUi/DeleteModal";
+import { notFound, useRouter } from "next/navigation";
+
 const FormSchema = z.object({
   liveSurvey: z.object({
     _id: z.string().optional(),
@@ -77,15 +89,14 @@ const FormSchema = z.object({
   }),
 });
 export default function Page({ params }: { params: { groupId: string } }) {
-  const [readerArray, setReaderArray] = React.useState<any>([]);
-  const [courseProfileArray, setCourseProfile] = React.useState<any>([]);
-  const [paricipantArray, setParticipant] = React.useState<any>([]);
-  const [courseProfileData, setCourseProfileData] = React.useState<any>();
+  // const [courseProfileArray, setCourseProfile] = React.useState<any>([]);
+  const router = useRouter();
   // const [groupData, setGroupData] = React.useState<any>();
   const [liveSurveyData, setLiveSurveyData] = React.useState<any>([]);
   const [loading, setLoading] = React.useState<any>(false);
   const [statusloading, setStatusLoading] = React.useState<any>(false);
-
+  const [deleteOpen, setDeleteOpen] = React.useState(false);
+  const [deleteLoading, setDeleteLoading] = React.useState(false);
   const fetchDataOptions = {
     groupId: params.groupId,
   };
@@ -98,16 +109,6 @@ export default function Page({ params }: { params: { groupId: string } }) {
   } = useQuery({
     queryKey: ["groupDetail", fetchDataOptions],
     queryFn: async () => {
-      let readers = await getSelectInitData();
-      if (readers.data) {
-        let reader = JSON.parse(readers.data.reader);
-        let participants = JSON.parse(readers.data.participants);
-        let courseProfile = JSON.parse(readers.data.courseProfile);
-        console.log("reader", reader, participants, courseProfile);
-        setReaderArray(reader);
-        setCourseProfile(courseProfile);
-        setParticipant(participants);
-      }
       let data = await initailData();
       let newLiveSurvey = [];
       let liveSurvey = await getLiveSurvey({
@@ -120,9 +121,7 @@ export default function Page({ params }: { params: { groupId: string } }) {
         console.log("newLiveSurvey", newLiveSurvey);
         setLiveSurveyData(newLiveSurvey);
       }
-      //
 
-      // setGroupData(data);
       console.log("data.liveSurvey", data.liveSurvey);
       form.reset(
         {
@@ -133,7 +132,12 @@ export default function Page({ params }: { params: { groupId: string } }) {
         }
         //   { keepDirtyValues: true }
       );
-      return data;
+      if (data) {
+        return data;
+      }
+      // else {
+      //   notFound();
+      // }
     },
     // staleTime: 6000, // 1분
     refetchOnMount: true,
@@ -146,14 +150,10 @@ export default function Page({ params }: { params: { groupId: string } }) {
     if (response.data) {
       let result = JSON.parse(response.data);
       console.log("data", result);
+
       return result;
     }
   };
-  // React.useEffect(() => {
-  //   // getSelectData();
-  //   reload();
-  // }, []);
-
   //
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -161,16 +161,6 @@ export default function Page({ params }: { params: { groupId: string } }) {
       liveSurvey: { _id: "", title: "" },
     },
   });
-
-  React.useEffect(() => {
-    const subscription = form.watch((value, { name, type }) => {
-      console.log(value, name, type);
-      if (name === "liveSurvey") {
-        console.log("result", value);
-      }
-    });
-    return () => subscription.unsubscribe();
-  }, [form.watch, courseProfileArray]);
 
   const changeStatus = async () => {
     let groupId = params.groupId;
@@ -180,6 +170,8 @@ export default function Page({ params }: { params: { groupId: string } }) {
       if (res.data) {
         toast.success("그룹개설이 완료 되었습니다.");
         refetch();
+      } else {
+        console.log(res.message);
       }
     } catch (e) {
       toast.error(e);
@@ -219,6 +211,25 @@ export default function Page({ params }: { params: { groupId: string } }) {
       setLoading(false);
     }
   }
+  const clickDeleteGroup = async () => {
+    setDeleteLoading(true);
+    try {
+      let res = await deleteGroup(params.groupId);
+      if (res.data) {
+        console.log("ok");
+        toast.success("그룹 삭제에 성공하였습니다.");
+        router.push(`/admin/group`);
+      }
+      if (res.message) {
+        toast.error(res.message);
+      }
+    } catch (e) {
+      toast.error(e);
+    } finally {
+      setDeleteOpen(false);
+      setDeleteLoading(false);
+    }
+  };
   if (isLoading) {
     return (
       <div className="w-full  h-[calc(100vh-70px)]  flex flex-col items-center justify-center">
@@ -226,11 +237,14 @@ export default function Page({ params }: { params: { groupId: string } }) {
       </div>
     );
   }
+  if (isError) {
+    notFound();
+  }
   return (
-    <div className="w-full flex flex-col   ">
-      <ScrollArea className="w-full flex  flex-col gap-3 max-h-[calc(100vh-70px)]">
+    <div className="w-full flex flex-col  bg-white  ">
+      <ScrollArea className="w-full flex  flex-col gap-3 h-[calc(100vh-70px)] bg-white ">
         <div className="w-full flex flex-col ">
-          <div className="w-full flex flex-row items-center justify-between p-6 bg-white  border-b ">
+          <div className="w-full flex flex-row items-center justify-between p-6  border-b ">
             <div className="flex flex-col items-start ">
               <div className="flex flex-row gap-2">
                 <p className="text-lg font-bold">그룹상태 변경</p>
@@ -248,7 +262,7 @@ export default function Page({ params }: { params: { groupId: string } }) {
                 교육생에게 노출 됩니다.
               </p>
             </div>
-            <div className=" ">
+            <div className=" flex flex-row items-center gap-2 ">
               {groupData?.status === "개설중" ? (
                 <Button onClick={() => changeStatus()}>
                   {statusloading ? (
@@ -267,6 +281,16 @@ export default function Page({ params }: { params: { groupId: string } }) {
                   </Link>
                 </Button>
               )}
+              <DeleteModal
+                title="그룹삭제"
+                desc="그룹 삭제시 복구 되지 않습니다."
+                btnText="그룹 삭제"
+                onClick={clickDeleteGroup}
+                disabled={deleteLoading}
+                deleteOpen={deleteOpen}
+                setDeleteOpen={setDeleteOpen}
+                deleteLoading={deleteLoading}
+              />
             </div>
           </div>
 
@@ -284,68 +308,28 @@ export default function Page({ params }: { params: { groupId: string } }) {
 
             <div className="w-full grid grid-cols-12 gap-3">
               <div className=" col-span-6 pt-4 pb-6 border-b flex flex-col gap-2">
-                <p className="text-neutral-500">그룹명</p>
-                <p className="">{groupData?.name}</p>
+                <GroupTitle name={groupData?.name} />
               </div>
               <div className="col-span-6 pt-4 pb-6 border-b flex flex-col gap-2">
-                <p className="text-neutral-500">교육기간</p>
-                <p>
-                  {dayjs(groupData?.starDate).format("YYYY-MM-DD")} ~{" "}
-                  {dayjs(groupData?.endDate).format("YYYY-MM-DD")}
-                </p>
+                <PeriodWrap
+                  startDate={groupData?.startDate}
+                  endDate={groupData?.endDate}
+                />
               </div>
               <div className=" col-span-6  pt-4 pb-6 border-b flex flex-col gap-2">
-                <p className="text-neutral-500">리더</p>
-                <p>
-                  {groupData?.teacher.username} - {groupData?.teacher.email}
-                </p>
+                <LeaderWrap teacher={groupData?.teacher} />
               </div>
               <div className=" col-span-6  pt-4 pb-6 border-b flex flex-col gap-2">
-                <p className="text-neutral-500">
-                  참여자 {groupData?.participants.length}명
-                </p>
-                <ScrollArea className="w-full flex flex-col max-h-[200px] ">
-                  <div className="flex flex-col w-full ">
-                    {groupData?.participants.map((item: any, index: any) => {
-                      return (
-                        <div
-                          key={item._id}
-                          className="py-2 w-full border-b px-3 flex flex-row items-center gap-2"
-                        >
-                          <p className="w-[50px] border-r text-center">
-                            {item.jobPosition}
-                          </p>
-                          <p className="w-[70px] border-r text-center">
-                            {item.username}
-                          </p>
-                          <p className="pl-2">{item.email}</p>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </ScrollArea>
+                <StudentWrap
+                  participants={groupData?.participants}
+                  height="h-[300px]"
+                />
               </div>
-              {groupData?.courseProfile ? (
-                <div className=" col-span-12 pt-4 pb-6 flex flex-col gap-2">
-                  <p className="text-neutral-500">코스프로파일</p>
-
-                  <Link
-                    href={`/admin/courseprofile/${groupData?.courseProfile?._id}`}
-                    className="flex flex-row items-center gap-2 hover:text-primary"
-                  >
-                    <SquareArrowOutUpRight className="size-4" />
-                    <p>
-                      {groupData?.courseProfile?.eduForm} -
-                      {groupData?.courseProfile?.title}
-                    </p>
-                  </Link>
-                </div>
-              ) : (
-                <div className=" col-span-12 pt-4 pb-6 flex flex-col gap-2">
-                  <p className="text-neutral-500">코스프로파일</p>
-                  <p>코스프로파일이 배정되지 않았습니다.</p>
-                </div>
-              )}
+              <div className=" col-span-12 pt-4 pb-6 flex flex-col gap-2">
+                <CourseProfileDataWrap
+                  courseProfile={groupData?.courseProfile}
+                />
+              </div>
             </div>
           </div>
 

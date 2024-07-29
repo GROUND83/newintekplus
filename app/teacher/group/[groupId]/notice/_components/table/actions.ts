@@ -12,10 +12,16 @@ import Teacher from "@/models/teacher";
 export async function getMoreData({
   pageIndex,
   pageSize,
+  params,
+  page,
+  search,
   groupId,
 }: {
   pageIndex: number;
   pageSize: number;
+  params: any;
+  page: string;
+  search: string;
   groupId: string;
 }) {
   await connectToMongoDB();
@@ -30,13 +36,14 @@ export async function getMoreData({
       sendTo: { $in: ["all", "teacher"] },
     })
       .limit(pageSize)
-      .skip(pageSize * pageIndex)
+      .skip(pageSize * (pageIndex - 1))
       .sort({
         createdAt: -1,
       });
     return {
       rows: JSON.stringify(notice),
-      pageCount: noticeCount,
+      pageCount: Math.ceil(noticeCount / pageSize),
+      totalCount: noticeCount,
     };
   } catch (e) {
     console.log(e);

@@ -1,38 +1,48 @@
 "use server";
 
+import { auth } from "@/auth";
 import { connectToMongoDB } from "@/lib/db";
 import CourseProfile from "@/models/courseProfile";
 import Group from "@/models/group";
 import Lesson from "@/models/lesson";
+import LiveSurvey from "@/models/liveSurvey";
+import Module from "@/models/module";
 import Participant from "@/models/participant";
 import Teacher from "@/models/teacher";
 import { useSession } from "next-auth/react";
 
-export const getGroupList = async ({
+export const getMoreData = async ({
   pageIndex,
   pageSize,
-  user,
+  params,
+  page,
+  search,
 }: {
   pageIndex: number;
   pageSize: number;
-  user: any;
+  params: any;
+  page: string;
+  search: string;
 }) => {
   await connectToMongoDB();
   try {
     // let session = useSession();
-    console.log("user", user);
-    let teacher = await Teacher.findOne({ email: user.email });
-    const groupCount = await Group.find({
-      teacher: teacher,
-      status: "개설완료",
-    }).countDocuments();
-    const group = await Group.find({
-      teacher: teacher,
-      status: "개설완료",
-    })
+    let session = await auth();
+    // console.log("sessionuser", session.user);
+    let teacher = await Teacher.findOne({ email: session?.user.email });
+    const query = search
+      ? {
+          $or: [{ title: { $regex: search, $options: "i" } }],
+          teacher: teacher,
+          status: "개설완료",
+        }
+      : { teacher: teacher, status: "개설완료" };
+    const groupCount = await Group.find(query).countDocuments();
+    const group = await Group.find(query)
       .populate({ path: "teacher", model: Teacher, select: "username" })
+      .populate({ path: "courseProfile", model: CourseProfile })
       .limit(pageSize)
-      .skip(pageSize * pageIndex)
+      .skip(pageSize * (pageIndex - 1))
       .sort({
         createdAt: -1,
       });
@@ -40,47 +50,48 @@ export const getGroupList = async ({
     // console.log("courseProfile", courseProfile);
     return {
       rows: JSON.stringify(group),
-      pageCount: groupCount,
+      pageCount: Math.ceil(groupCount / pageSize),
+      totalCount: groupCount,
     };
   } catch (e) {
     console.log(e);
     return { message: "그룹 오류" };
   }
 };
-// import db from "@/lib/db";
 
-// export async function getMoreData(options: {
-//   pageIndex: number;
-//   pageSize: number;
-// }) {
-//   const response = await db.$transaction([
-//     db.farm.count(),
-//     db.farm.findMany({
-//       select: {
-//         id: true,
-//         initail: true,
-//         name: true,
-//         visible: true,
-//         address: true,
-//         created_at: true,
-//         owner: {
-//           select: {
-//             id: true,
-//             username: true,
-//             phone: true,
-//             avatar: true,
-//           },
-//         },
-//       },
-//       skip: options.pageSize * options.pageIndex,
-//       take: options.pageSize,
-//       orderBy: {
-//         created_at: "desc", // 내림차순 최신순
-//       },
-//     }),
-//   ]);
-//   const pageCount = response[0];
-//   const rows = response[1];
-//   console.log({ pageCount, rows });
-//   return { pageCount, rows };
-// }
+export async function detailGroup(groupId: string) {
+  //
+  await connectToMongoDB();
+  try {
+    let groups = await Group.findOne({ _id: groupId })
+      .populate({
+        path: "teacher",
+        model: Teacher,
+      })
+      .populate({
+        path: "liveSurvey",
+        model: LiveSurvey,
+      })
+
+      .populate({
+        path: "participants",
+        model: Participant,
+      })
+      .populate({
+        path: "courseProfile",
+        model: CourseProfile,
+        populate: {
+          path: "modules",
+          model: Module,
+          populate: {
+            path: "lessons",
+            model: Lesson,
+          },
+        },
+      });
+    // console.log("data", groups);
+    return { data: JSON.stringify(groups) };
+  } catch (e) {
+    return { message: e };
+  }
+}

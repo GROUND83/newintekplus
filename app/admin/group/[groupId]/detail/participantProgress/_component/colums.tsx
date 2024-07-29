@@ -45,7 +45,7 @@ export const columns: ColumnDef<any>[] = [
             className="p-0"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
-            레슨 진행률 (총레슨수 대비 과제제출수 )
+            레슨 진행률 (과제제출 또는 집합교육완료 )
             <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
         </div>
@@ -61,8 +61,8 @@ export const columns: ColumnDef<any>[] = [
       console.log("process", process);
       return (
         <div className="flex flex-row items-center gap-2 ">
-          <Progress value={process} />
-          <div className="w-[100px] flex flex-row items-center gap-2">
+          <Progress value={process} indicatorColor="bg-primary" />
+          <div className="w-[200px] flex flex-row items-center gap-2">
             <p className="text-xs">
               {complete} / {lessontotalSize}
             </p>
@@ -98,7 +98,7 @@ export const columns: ColumnDef<any>[] = [
 
       return (
         <div className="flex flex-row items-center gap-2 ">
-          <Progress value={process} />
+          <Progress value={process} indicatorColor="bg-primary" />
           <div className="w-[100px] flex flex-row items-center gap-2">
             <p className="text-xs">
               {passCount} / {lessontotalSize}
@@ -135,7 +135,7 @@ export const columns: ColumnDef<any>[] = [
       console.log("process", process);
       return (
         <div className="flex flex-row items-center gap-2 ">
-          <Progress value={process} />
+          <Progress value={process} indicatorColor="bg-primary" />
           <div className="w-[100px] flex flex-row items-center gap-2">
             <p className="text-xs">
               {totalPoint} / {lessontotalSize}

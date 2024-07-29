@@ -18,7 +18,7 @@ export const columns: ColumnDef<any>[] = [
         <div className="flex flex-col items-start justify-center text-left ">
           <Button
             variant="ghost"
-            className="  p-0"
+            className="  p-0 text-xs"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
             이름
@@ -42,7 +42,7 @@ export const columns: ColumnDef<any>[] = [
         <div className="flex flex-col items-start justify-center text-left ">
           <Button
             variant="ghost"
-            className="  p-0"
+            className="  p-0 text-xs"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
             이메일
@@ -66,7 +66,7 @@ export const columns: ColumnDef<any>[] = [
         <div className="flex flex-col items-start justify-center text-left ">
           <Button
             variant="ghost"
-            className="  p-0"
+            className="  p-0 text-xs"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
             본부
@@ -91,7 +91,7 @@ export const columns: ColumnDef<any>[] = [
         <div className="flex flex-col items-start justify-center text-left ">
           <Button
             variant="ghost"
-            className="  p-0"
+            className="  p-0 text-xs"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
             직위
@@ -115,7 +115,7 @@ export const columns: ColumnDef<any>[] = [
         <div className="flex flex-col items-start justify-center text-left ">
           <Button
             variant="ghost"
-            className="  p-0"
+            className="  p-0 text-xs"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
             직군
@@ -139,7 +139,7 @@ export const columns: ColumnDef<any>[] = [
         <div className="flex flex-col items-start justify-center text-left ">
           <Button
             variant="ghost"
-            className="  p-0"
+            className="  p-0 text-xs"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
             그룹
@@ -164,7 +164,7 @@ export const columns: ColumnDef<any>[] = [
         <div className="text-center">
           <Button
             variant="ghost"
-            className=" p-0"
+            className=" p-0 text-xs"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
             생성일

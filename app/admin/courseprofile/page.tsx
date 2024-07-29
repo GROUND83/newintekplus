@@ -11,6 +11,8 @@ export default function Page() {
           columns={columns}
           getMoreData={getMoreData}
           subMenu={false}
+          placeHolder="교육형태, 코스프로파일 명을 검색하세요."
+          searchShow={true}
         />
       </div>
     </div>

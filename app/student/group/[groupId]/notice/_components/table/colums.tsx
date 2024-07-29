@@ -40,13 +40,15 @@ export const columns: ColumnDef<any>[] = [
       return (
         <div className=" text-left flex ">
           {row.getValue("sendTo") === "all" ? (
-            <p className="bg-primary text-white px-3 py-1 rounded-md ">전체</p>
+            <p className="bg-primary text-white px-3 py-1 rounded-md  text-xs">
+              전체
+            </p>
           ) : row.getValue("sendTo") === "teacher" ? (
-            <p className="bg-yellow-500 text-black px-3 py-1 rounded-md ">
+            <p className="bg-yellow-500 text-black px-3 py-1 rounded-mdtext-xs">
               리더
             </p>
           ) : (
-            <p className="bg-green-500 text-black px-3 py-1 rounded-md  ">
+            <p className="bg-green-500 text-black px-3 py-1 rounded-md  text-xs">
               참여자
             </p>
           )}

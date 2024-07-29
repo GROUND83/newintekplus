@@ -30,6 +30,7 @@ export interface IGroup {
 
   lessonResults: [
     {
+      [x: string]: any;
       type: mongoose.Schema.Types.ObjectId;
       ref: "LessonResult";
     }

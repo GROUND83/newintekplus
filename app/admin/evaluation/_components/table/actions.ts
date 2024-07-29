@@ -10,17 +10,32 @@ import Survey from "@/models/survey";
 export const getMoreData = async ({
   pageIndex,
   pageSize,
+  params,
+  page,
+  search,
 }: {
   pageIndex: number;
   pageSize: number;
+  params: any;
+  page: string;
+  search: string;
 }) => {
   await connectToMongoDB();
   try {
-    const liveSurveyCount = await LiveSurvey.find().countDocuments();
-    const liveSurvey = await LiveSurvey.find()
+    const query = search
+      ? {
+          $or: [
+            { title: { $regex: search, $options: "i" } },
+            // { "teacher.username": { $in: search } },
+            // { "courseProfile.title": { $regex: search, $options: "i" } },
+          ],
+        }
+      : {};
+    const liveSurveyCount = await LiveSurvey.find(query).countDocuments();
+    const liveSurvey = await LiveSurvey.find(query)
       // .select("property title createdAt lessonHour evaluation")
       .limit(pageSize)
-      .skip(pageSize * pageIndex)
+      .skip(pageSize * (pageIndex - 1))
       .sort({
         createdAt: -1,
       });
@@ -28,7 +43,8 @@ export const getMoreData = async ({
     // console.log("liveSurvey", liveSurvey);
     return {
       rows: JSON.stringify(liveSurvey),
-      pageCount: liveSurveyCount,
+      pageCount: Math.ceil(liveSurveyCount / pageSize),
+      totalCount: liveSurveyCount,
     };
   } catch (e) {
     console.log(e);

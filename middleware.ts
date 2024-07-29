@@ -1,42 +1,56 @@
-import { getToken } from "next-auth/jwt";
-import { getSession } from "next-auth/react";
-import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
-import { auth as middleware } from "@/auth";
+
 import NextAuth from "next-auth";
 import { authConfig } from "./auth.config";
-interface Routes {
-  [key: string]: boolean;
-}
-const publicOnlyUrls: Routes = {
-  "/": true,
-  "/auth/login": true,
-  "/auth/naver/start": true,
-  "/auth/naver/complete": true,
-  "/auth/kakao/start": true,
-  "/auth/kakao/complete": true,
-  "/login": true,
-  "/sms": true,
-  "/register": true,
-  "/github/start": true,
-  "/github/complete": true,
-  "/auth/error": true,
-};
 
 const { auth } = NextAuth(authConfig);
 
 export default auth((req) => {
+  const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
+  const cspHeader = `
+      default-src 'self';
+      script-src 'self' 'nonce-${nonce}' 'strict-dynamic' https: http: 'unsafe-inline' 'unsafe-eval';
+      style-src 'self' 'unsafe-inline';
+      img-src 'self' blob: data:;
+      font-src 'self';
+      object-src 'none';
+      base-uri 'self';
+      form-action 'self';
+      frame-ancestors 'none';
+      upgrade-insecure-requests;
+  `;
+  // Replace newline characters and spaces
+  const contentSecurityPolicyHeaderValue = cspHeader
+    .replace(/\s{2,}/g, " ")
+    .trim();
+  const requestHeaders = new Headers(req.headers);
+  requestHeaders.set("x-nonce", nonce);
+  requestHeaders.set(
+    "Content-Security-Policy",
+    contentSecurityPolicyHeaderValue
+  );
+
   const { nextUrl } = req;
   const isAuthenticated = !!req.auth;
   const pathname = nextUrl.pathname;
-  console.log("pathname", pathname, req.auth);
+  // console.log("pathname", pathname, req.auth);
 
   if (pathname.startsWith("/admin")) {
-    if (req.auth) {
-      console.log("session admin", req.auth);
-      if (req.auth) {
+    if (isAuthenticated) {
+      if (req.auth.user.role === "admin") {
+        console.log("session admin", req.auth);
         console.log("check");
-        return NextResponse.next();
+        // const response = NextResponse.next();
+        const response = NextResponse.next({
+          request: {
+            headers: requestHeaders,
+          },
+        });
+        response.headers.set(
+          "Content-Security-Policy",
+          contentSecurityPolicyHeaderValue
+        );
+        return response;
         //
       } else {
         // console.log("session", session);
@@ -47,11 +61,21 @@ export default auth((req) => {
     }
   }
   if (pathname.startsWith("/student")) {
-    if (req.auth) {
-      console.log("session participant", req.auth);
-      if (req.auth) {
+    if (isAuthenticated) {
+      if (req.auth.user.role === "participant") {
+        console.log("session participant", req.auth);
         console.log("check");
-        return NextResponse.next();
+        // const response = NextResponse.next();
+        const response = NextResponse.next({
+          request: {
+            headers: requestHeaders,
+          },
+        });
+        response.headers.set(
+          "Content-Security-Policy",
+          contentSecurityPolicyHeaderValue
+        );
+        return response;
         //
       } else {
         // console.log("session", session);
@@ -64,11 +88,21 @@ export default auth((req) => {
     }
   }
   if (pathname.startsWith("/teacher")) {
-    if (req.auth) {
-      console.log("session teacher", req.auth);
-      if (req.auth) {
+    if (isAuthenticated) {
+      // console.log("session teacher", req.auth);
+      if (req.auth.user.role === "teacher") {
         console.log("check");
-        return NextResponse.next();
+        // const response = NextResponse.next();
+        const response = NextResponse.next({
+          request: {
+            headers: requestHeaders,
+          },
+        });
+        response.headers.set(
+          "Content-Security-Policy",
+          contentSecurityPolicyHeaderValue
+        );
+        return response;
         //
       } else {
         // console.log("session", session);
@@ -79,114 +113,19 @@ export default auth((req) => {
     }
   }
 });
-//   //
-//   if (pathname.startsWith("/othersAuth")) {
-//     if (session) {
-//       console.log("session writer", session, session.role, session.id);
-//       if (session) {
-//         console.log("check");
-//         return NextResponse.redirect(new URL("/", req.url));
-//         //
-//       } else {
-//         // console.log("session", session);
-//         return NextResponse.next();
-//       }
-//     } else {
-//       return NextResponse.next();
-//     }
-//   }
-//   if (pathname.startsWith("/profile")) {
-//     console.log("session", session);
-//     if (session?.role === "user") {
-//       return NextResponse.next();
-//     } else {
-//       return NextResponse.redirect(new URL("/auth/login", req.url));
-//     }
-//   }
-//   if (pathname.startsWith("/admin")) {
-//     console.log("session", session);
-//     if (session) {
-//       if (session.id && session.role) {
-//         if (session.role === "manager") {
-//           console.log("session", session);
-//           return NextResponse.next();
-//         } else if (session.role === "superAdmin") {
-//           return NextResponse.next();
-//         } else {
-//           return NextResponse.redirect(
-//             new URL("/othersAuth/manager/login", req.url)
-//           );
-//         }
-//         //
-//       } else {
-//         // console.log("session", session);
-//         return NextResponse.redirect(
-//           new URL("/othersAuth/manager/login", req.url)
-//         );
-//       }
-//     } else {
-//       return NextResponse.redirect(
-//         new URL("/othersAuth/manager/login", req.url)
-//       );
-//     }
-//   }
-//   if (pathname.startsWith("/dashwriter")) {
-//     if (session) {
-//       console.log("session writer", session, session.role, session.id);
-//       if (session.id && session.role) {
-//         console.log("check");
-//         if (session.role === "writer") {
-//           console.log("check");
-//           return NextResponse.next();
-//         } else {
-//           return NextResponse.redirect(
-//             new URL("/othersAuth/writer/login", req.url)
-//           );
-//         }
-//         //
-//       } else {
-//         // console.log("session", session);
-//         return NextResponse.redirect(
-//           new URL("/othersAuth/writer/login", req.url)
-//         );
-//       }
-//     } else {
-//       return NextResponse.redirect(
-//         new URL("/othersAuth/writer/login", req.url)
-//       );
-//     }
-//   }
-//   if (pathname.startsWith("/dashfarmer")) {
-//     if (session) {
-//       console.log("session writer", session, session.role, session.id);
-//       if (session.id && session.role) {
-//         console.log("check");
-//         if (session.role === "farmer") {
-//           console.log("check");
-//           return NextResponse.next();
-//         } else {
-//           return NextResponse.redirect(
-//             new URL("/othersAuth/farmer/login", req.url)
-//           );
-//         }
-//         //
-//       } else {
-//         // console.log("session", session);
-//         return NextResponse.redirect(
-//           new URL("/othersAuth/farmer/login", req.url)
-//         );
-//       }
-//     } else {
-//       return NextResponse.redirect(
-//         new URL("/othersAuth/farmer/login", req.url)
-//       );
-//     }
-//   }
 
 export const config = {
   //   matcher: ["/", "/profile", "auth/:path*"], // 미들웨어 실행할 path
   matcher: [
     // "/reservaton/:path*",
-    "/((?!api|_next/static|_next/image|favicon.ico|.*\\.png$|.*\\.svg$|.*\\.jpg$|.*\\.svg$).*)", //제외
+    {
+      source:
+        "/((?!api|_next/static|_next/image|favicon.ico|.*\\.png$|.*\\.svg$|.*\\.jpg$|.*\\.svg$).*)", //제외
+
+      missing: [
+        { type: "header", key: "next-router-prefetch" },
+        { type: "header", key: "purpose", value: "prefetch" },
+      ],
+    },
   ], // 미들웨어 실행할 path
 };

@@ -36,6 +36,7 @@ import {
   QueryClientProvider,
   useQuery,
 } from "@tanstack/react-query";
+import { usePathname } from "next/navigation";
 const queryClient = new QueryClient();
 
 export default function Layout({
@@ -46,6 +47,7 @@ export default function Layout({
   //
   const session = useSession();
   const [menuExpend, setMenuExpend] = React.useState(true);
+  const pathname = usePathname();
   return (
     <QueryClientProvider client={queryClient}>
       <div className=" h-screen w-screen flex flex-row items-stretch ">
@@ -87,7 +89,7 @@ export default function Layout({
               <AccordionItem value="item-1" className="border-none">
                 <AccordionTrigger className="px-6">
                   <div className="flex flex-row items-center gap-2">
-                    <SquareLibrary strokeWidth={1.25} className="size-6" />
+                    {/* <SquareLibrary strokeWidth={1.25} className="size-6" /> */}
                     {menuExpend && (
                       <div className="flex flex-row items-center gap-2">
                         <p className="">교육 컴포넌트</p>
@@ -97,26 +99,34 @@ export default function Layout({
                 </AccordionTrigger>
                 <AccordionContent className="w-full  flex flex-col items-start justify-center  gap-1">
                   <Link
+                    href={"/teacher/board"}
+                    className={`flex flex-row items-center gap-2 w-full ${
+                      pathname.includes("/board")
+                        ? "bg-primary hover:bg-primary/50  text-white"
+                        : "bg-[#0C2135] hover:bg-primary hover:text-white"
+                    }  py-3 px-6 text-neutral-400   transition-all`}
+                  >
+                    <BookCheck strokeWidth={1.25} />
+
+                    {menuExpend && (
+                      <div className="flex flex-row items-center gap-2">
+                        <p>전체 공지</p>
+                      </div>
+                    )}
+                  </Link>
+                  <Link
                     href={"/teacher/group"}
-                    className="flex flex-row items-center gap-2 w-full bg-[#0C2135] hover:bg-primary  py-3 px-6 text-neutral-400  hover:text-white transition-all"
+                    className={`flex flex-row items-center gap-2 w-full ${
+                      pathname.includes("/group")
+                        ? "bg-primary hover:bg-primary/50  text-white"
+                        : "bg-[#0C2135] hover:bg-primary hover:text-white"
+                    }  py-3 px-6 text-neutral-400   transition-all`}
                   >
                     <Group strokeWidth={1.25} />
 
                     {menuExpend && (
                       <div className="flex flex-row items-center gap-2">
                         <p>학습 그룹</p>
-                      </div>
-                    )}
-                  </Link>
-                  <Link
-                    href={"/teacher/borad"}
-                    className="flex flex-row items-center gap-2 w-full bg-[#0C2135] hover:bg-primary  py-3 px-6 text-neutral-400  hover:text-white transition-all"
-                  >
-                    <BookCheck strokeWidth={1.25} />
-
-                    {menuExpend && (
-                      <div className="flex flex-row items-center gap-2">
-                        <p>자료</p>
                       </div>
                     )}
                   </Link>

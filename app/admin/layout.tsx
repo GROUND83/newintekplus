@@ -155,7 +155,7 @@ export default function Layout({
             <Link
               href={"/admin/evaluation"}
               className={`flex flex-row items-center gap-2 w-full ${
-                pathname.includes("/evaluation")
+                pathname.includes("admin/evaluation")
                   ? "bg-primary hover:bg-primary/50  text-white"
                   : "bg-[#0C2135] hover:bg-primary hover:text-white"
               }  py-3 px-6 text-neutral-400   transition-all`}

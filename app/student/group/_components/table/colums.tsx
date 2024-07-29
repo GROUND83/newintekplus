@@ -1,3 +1,4 @@
+"use client";
 import {
   PaginationState,
   ColumnDef,
@@ -8,7 +9,7 @@ import {
   useReactTable,
   createColumnHelper,
 } from "@tanstack/react-table";
-import { TableDataType } from "./table";
+
 import { Button } from "@/components/ui/button";
 import { ArrowUpDown, Search } from "lucide-react";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
@@ -18,7 +19,7 @@ import dayjs from "dayjs";
 import "dayjs/locale/ko";
 dayjs.locale("ko");
 
-export const columns: ColumnDef<TableDataType>[] = [
+export const columns: ColumnDef<any>[] = [
   {
     accessorKey: "name",
     header: ({ column }) => {

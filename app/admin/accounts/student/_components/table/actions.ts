@@ -15,28 +15,46 @@ import { UploadResponse } from "nodejs-s3-typescript/dist/cjs/types";
 export const getMoreData = async ({
   pageIndex,
   pageSize,
+  params,
+  page,
+  search,
 }: {
   pageIndex: number;
   pageSize: number;
+  params: any;
+  page: string;
+  search: string;
 }) => {
   await connectToMongoDB();
   try {
-    const wholeNoticeCount = await Participant.find().countDocuments();
-    const wholeNotice = await Participant.find()
+    const query = search
+      ? {
+          $or: [
+            { email: { $regex: search, $options: "i" } },
+            { username: { $regex: search, $options: "i" } },
+
+            // { "teacher.username": { $in: search } },
+            // { "courseProfile.title": { $regex: search, $options: "i" } },
+          ],
+        }
+      : {};
+    const studentCount = await Participant.find(query).countDocuments();
+    const student = await Participant.find(query)
       .select(
         "_id username email phone department  jobSubGroup  jobGroup jobPosition  aproved "
       )
       // .select("property title createdAt lessonHour evaluation")
       .limit(pageSize)
-      .skip(pageSize * pageIndex)
+      .skip(pageSize * (pageIndex - 1))
       .sort({
         createdAt: -1,
       });
     console.log(pageIndex, pageSize);
     // console.log("liveSurvey", liveSurvey);
     return {
-      rows: JSON.stringify(wholeNotice),
-      pageCount: wholeNoticeCount,
+      rows: JSON.stringify(student),
+      pageCount: Math.ceil(studentCount / pageSize),
+      totalCount: studentCount,
     };
   } catch (e) {
     console.log(e);

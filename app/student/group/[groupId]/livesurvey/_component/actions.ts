@@ -1,15 +1,15 @@
 "use server";
+import { auth } from "@/auth";
 import CourseProfile from "@/models/courseProfile";
 import Group from "@/models/group";
 import Lesson from "@/models/lesson";
+import LessonResult from "@/models/lessonResult";
 import LiveSurvey from "@/models/liveSurvey";
 import Module from "@/models/module";
 import Participant from "@/models/participant";
 import ResultSurvey from "@/models/resultSurvey";
 import Survey from "@/models/survey";
 import Teacher from "@/models/teacher";
-import { model } from "mongoose";
-import path from "path";
 
 export async function getGroupDetail({
   groupId,
@@ -57,7 +57,7 @@ export async function getGroupDetail({
         model: ResultSurvey,
       });
     let onwer = await Participant.findOne({ email: userEmail });
-    let resultSurvey = await ResultSurvey.find({
+    let resultSurvey = await ResultSurvey.findOne({
       groupId: groupId,
       liveSurveyId: groupData.liveSurvey._id,
       onwer,
@@ -96,6 +96,17 @@ export async function createResultSurvey(formData: FormData) {
         onwer,
         isDone: true,
       });
+      // let lessonResult = await LessonResult.findOneAndUpdate(
+      //   {
+      //     groupId,
+      //     lessonActivityId: resultSurveyfind.lessonActivityId,
+      //     onwer,
+      //   },
+      //   {
+      //     isPass: "passed",
+      //     isEvaluationDone: true,
+      //   }
+      // );
       let group = await Group.findOneAndUpdate(
         {
           _id: groupId,
@@ -108,6 +119,57 @@ export async function createResultSurvey(formData: FormData) {
       );
       return { data: JSON.stringify(group) };
     }
+  } catch (e) {
+    return { message: e };
+  }
+}
+export async function getResultSurveyData(groupId: string) {
+  //
+  // console.log(groupId);
+  //
+  let session = await auth();
+  let userEmail = session?.user.email;
+  try {
+    let onwer = await Participant.findOne({
+      email: userEmail,
+    });
+    let group = await Group.findOne({ _id: groupId });
+    let resultSurvey = await ResultSurvey.findOne({
+      groupId: groupId,
+      onwer,
+      liveSurveyId: group.liveSurvey,
+    }).populate({ path: "results", model: Survey });
+
+    return {
+      data: JSON.stringify(group),
+      resultSurvey: JSON.stringify(resultSurvey),
+    };
+  } catch (e) {
+    return { message: e };
+  }
+}
+export async function updateResultSurvey(formData: FormData) {
+  //
+  let resultSurverId = formData.get("resultSurverId") as string;
+
+  let resultsString = formData.get("results") as string;
+  let result = JSON.parse(resultsString);
+  let session = await auth();
+  //
+  try {
+    let user = await Participant.findOne({
+      email: session.user.email,
+    });
+    let resultSurvey = await ResultSurvey.findOneAndUpdate(
+      {
+        _id: resultSurverId,
+      },
+      {
+        results: result,
+        onwer: user,
+      }
+    );
+    return { data: JSON.stringify(resultSurvey) };
   } catch (e) {
     return { message: e };
   }

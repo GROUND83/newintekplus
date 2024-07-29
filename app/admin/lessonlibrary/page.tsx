@@ -1,6 +1,6 @@
 "use client";
 import TableWrap from "@/components/commonUi/tableWrap";
-import DataTable from "./_components/table/table";
+
 import { columns } from "./_components/table/colums";
 import { getMoreData } from "./_components/table/actions";
 
@@ -12,6 +12,8 @@ export default function Page() {
           columns={columns}
           getMoreData={getMoreData}
           subMenu={false}
+          placeHolder="교육 형태, 레슨명을 검섹하세요."
+          searchShow={true}
         />
       </div>
     </div>

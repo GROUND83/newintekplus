@@ -2,7 +2,8 @@
 
 import TableWrap from "@/components/commonUi/tableWrap";
 import { columns } from "./_components/table/colums";
-import { getMoreData } from "./_components/table/actions";
+import { getMoreData, getTestData } from "./_components/table/actions";
+import React from "react";
 
 export default function Page() {
   return (
@@ -12,6 +13,8 @@ export default function Page() {
           columns={columns}
           getMoreData={getMoreData}
           subMenu={false}
+          placeHolder="상태, 그룹 명을 검색하세요."
+          searchShow={true}
         />
       </div>
     </div>

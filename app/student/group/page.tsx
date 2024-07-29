@@ -1,11 +1,18 @@
-import { Button } from "@/components/ui/button";
-import DataTable from "./_components/table/table";
+import TableWrap from "@/components/commonUi/tableWrap";
+import { columns } from "./_components/table/colums";
+import { getMoreData } from "./_components/table/actions";
 
 export default function Page() {
   return (
     <div className="w-full ">
-      <div className="  flex-1 w-full  relative ">
-        <DataTable />
+      <div className="   w-full   ">
+        <TableWrap
+          columns={columns}
+          getMoreData={getMoreData}
+          subMenu={false}
+          placeHolder="그룹명을 입력하세요."
+          searchShow={true}
+        />
       </div>
     </div>
   );

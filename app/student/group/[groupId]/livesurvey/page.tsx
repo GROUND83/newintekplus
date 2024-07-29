@@ -34,9 +34,14 @@ import {
 } from "@/components/ui/card";
 import FormLabelWrap from "@/components/formLabel";
 import { Textarea } from "@/components/ui/textarea";
-import { XIcon } from "lucide-react";
+import { Loader2, XIcon } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
+import { ScrollArea } from "@/components/ui/scroll-area";
+
+import ViewResultSurveyStudent from "./_component/viewResultSurveyStudent";
+import { useRouter } from "next/navigation";
+import EditSurveyStudent from "./_component/editSurveyStudent";
 //
 
 const FormSchema = z.object({
@@ -52,9 +57,11 @@ const FormSchema = z.object({
 export default function Page({ params }: { params: { groupId: string } }) {
   console.log("groupId", params.groupId);
   // console.log("groupId", params.groupId);
+  const router = useRouter();
   const [livesurvey, setLiveSurvey] = React.useState<any>();
   //
-  const [resultSurvey, setResultSurvey] = React.useState<any>([]);
+  const [resultSurveyData, setResultSurvey] = React.useState<any>();
+  const [updataLoading, setUpdateLoading] = React.useState<any>(false);
   //
   //
   const session = useSession();
@@ -108,6 +115,7 @@ export default function Page({ params }: { params: { groupId: string } }) {
   });
 
   async function onSubmit(values: z.infer<typeof FormSchema>) {
+    setUpdateLoading(true);
     console.log("session", session);
     console.log("values", values);
     const formData = new FormData();
@@ -123,7 +131,7 @@ export default function Page({ params }: { params: { groupId: string } }) {
         //
         console.log(JSON.parse(res.data));
         toast.success("레슨 생성에 성공하였습니다.");
-        // router.push("/admin/courseprofile");
+        router.push(`/student/group/${params.groupId}/notice`);
       } else {
         console.log("res.data", res.message);
         toast.success("레슨 생성에 성공하였습니다.");
@@ -132,22 +140,23 @@ export default function Page({ params }: { params: { groupId: string } }) {
       //
       console.log("message", e);
       toast.error(e);
+    } finally {
+      setUpdateLoading(false);
     }
   }
   return (
     <div className="w-full flex flex-col items-stretch flex-1  ">
-      {resultSurvey.length <= 0 ? (
-        <div className="flex-1 flex flex-col  w-full">
+      {!resultSurveyData ? (
+        <ScrollArea className="flex flex-col  w-full h-[calc(100vh-120px)]">
           <div className="bg-white border flex-1 w-full p-6 flex flex-col items-start gap-2">
-            <p>{livesurvey?.title}</p>
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(onSubmit)}
                 className="space-y-8 w-full"
               >
                 <div className="flex flex-row  items-center gap-2 flex-wrap  w-full">
+                  <p>{livesurvey?.title}</p>
                   {resultsFields.map((resultSurvey, resultSurveyIndex) => {
-                    // console.log("resultSurvey", resultSurvey);
                     return (
                       <div
                         className=" border px-3 py-3 rounded-md bg-neutral-100 w-full"
@@ -230,16 +239,29 @@ export default function Page({ params }: { params: { groupId: string } }) {
                   })}
                 </div>
                 <div>
-                  <Button type="submit">제출</Button>
+                  <Button type="submit">
+                    {updataLoading ? (
+                      <Loader2 className=" animate-spin" />
+                    ) : (
+                      <p>제출</p>
+                    )}
+                  </Button>
                 </div>
               </form>
             </Form>
           </div>
-        </div>
+        </ScrollArea>
       ) : (
-        <div className="flex-1 flex flex-col  w-full">
+        <div className="flex-1 flex flex-col  w-full h-[calc(100vh-120px)] items-center justify-center">
           <div className="bg-white border  w-full p-6 flex flex-col items-center justify-center gap-2 h-[calc(100vh-140px)]">
             <p>설문을 완료 하였습니다.</p>
+
+            <ViewResultSurveyStudent resultSurvey={resultSurveyData} />
+            <EditSurveyStudent
+              livesurveytitle={livesurvey.title}
+              resultSurvey={resultSurveyData}
+              getData={getData}
+            />
           </div>
         </div>
       )}

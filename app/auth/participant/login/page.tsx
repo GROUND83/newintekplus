@@ -10,6 +10,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { connectToMongoDB } from "@/lib/db";
 import { LockClosedIcon } from "@heroicons/react/24/outline";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
@@ -41,10 +42,11 @@ export default function Page() {
     // console.log("data", data);
     try {
       setLoading(true);
+
       let result = await signIn("credentials", {
         email: data.email,
         password: data.password,
-        role: "student",
+        role: "participant",
         type: "email",
         callbackUrl: "/student",
         redirect: true,

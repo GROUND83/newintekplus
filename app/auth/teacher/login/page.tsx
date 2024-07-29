@@ -18,6 +18,7 @@ import Link from "next/link";
 
 import React from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod";
 
 const formSchema = z.object({
@@ -49,8 +50,10 @@ export default function Page() {
         callbackUrl: "/teacher",
         redirect: true,
       });
+      console.log("result", result);
     } catch (e) {
       console.log(e);
+      toast.error(e);
     } finally {
       setLoading(false);
     }

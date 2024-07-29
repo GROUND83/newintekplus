@@ -3,6 +3,16 @@ import passportLocalMongoose from "passport-local-mongoose";
 
 export interface IFeedBack {
   groupId: string;
+  lessonId: { type: mongoose.Schema.Types.ObjectId; ref: "Lesson" };
+  newGroup: { type: mongoose.Schema.Types.ObjectId; ref: "Group" };
+  newLessonResult: {
+    type: mongoose.Schema.Types.ObjectId;
+    ref: "LessonResult";
+  };
+  newLesson: {
+    type: mongoose.Schema.Types.ObjectId;
+    ref: "Lesson";
+  };
   title: string; // 레슨명
   description: string;
   lessonResultId: string;
@@ -29,6 +39,16 @@ export interface IFeedBackDocument extends IFeedBack, Document {
 const feedBack = new mongoose.Schema<IFeedBackDocument>(
   {
     groupId: { type: String },
+    lessonId: { type: mongoose.Schema.Types.ObjectId, ref: "Lesson" },
+    newGroup: { type: mongoose.Schema.Types.ObjectId, ref: "Group" },
+    newLesson: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Lesson",
+    },
+    newLessonResult: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "LessonResult",
+    },
     title: { type: String, require: true }, // 레슨명
     description: { type: String },
     lessonResultId: { type: String },

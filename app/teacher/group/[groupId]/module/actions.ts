@@ -8,25 +8,33 @@ import Participant from "@/models/participant";
 
 export async function getModuleList(groupId: string) {
   //
-  let res = await Group.findOne({
-    _id: groupId,
-  })
-    .populate({
-      path: "courseProfile",
-      model: CourseProfile,
-      populate: {
-        path: "modules",
-        model: Module,
-        populate: {
-          path: "lessons",
-          model: Lesson,
-        },
-      },
+  try {
+    let res = await Group.findOne({
+      _id: groupId,
     })
-    .populate({
-      path: "lessonResults",
-      model: LessonResult,
-      populate: { path: "onwer", model: Participant, select: "_id email" },
-    });
-  return { data: JSON.stringify(res) };
+      .populate({
+        path: "courseProfile",
+        model: CourseProfile,
+        populate: {
+          path: "modules",
+          model: Module,
+          populate: {
+            path: "lessons",
+            model: Lesson,
+          },
+        },
+      })
+      .populate({
+        path: "lessonResults",
+        model: LessonResult,
+        populate: { path: "onwer", model: Participant, select: "_id email" },
+      });
+    if (res) {
+      return { data: JSON.stringify(res) };
+    } else {
+      return { message: "nothing" };
+    }
+  } catch (e) {
+    return { message: e };
+  }
 }

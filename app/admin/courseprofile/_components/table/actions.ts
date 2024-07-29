@@ -7,17 +7,33 @@ import Lesson from "@/models/lesson";
 export const getMoreData = async ({
   pageIndex,
   pageSize,
+  params,
+  page,
+  search,
 }: {
   pageIndex: number;
   pageSize: number;
+  params: any;
+  page: string;
+  search: string;
 }) => {
   await connectToMongoDB();
   try {
-    const courseProfileCount = await CourseProfile.find().countDocuments();
-    const courseProfile = await CourseProfile.find()
+    const query = search
+      ? {
+          $or: [
+            { title: { $regex: search, $options: "i" } },
+            { eduForm: { $regex: search, $options: "i" } },
+            // { "teacher.username": { $in: search } },
+            // { "courseProfile.title": { $regex: search, $options: "i" } },
+          ],
+        }
+      : {};
+    const courseProfileCount = await CourseProfile.find(query).countDocuments();
+    const courseProfile = await CourseProfile.find(query)
       // .select("property title createdAt lessonHour evaluation")
       .limit(pageSize)
-      .skip(pageSize * pageIndex)
+      .skip(pageSize * (pageIndex - 1))
       .sort({
         createdAt: -1,
       });
@@ -25,7 +41,8 @@ export const getMoreData = async ({
     // console.log("courseProfile", courseProfile);
     return {
       rows: JSON.stringify(courseProfile),
-      pageCount: courseProfileCount,
+      pageCount: Math.ceil(courseProfileCount / pageSize),
+      totalCount: courseProfileCount,
     };
   } catch (e) {
     console.log(e);

@@ -17,7 +17,7 @@ export const columns: ColumnDef<any>[] = [
         <div className="flex flex-col items-start justify-center text-left ">
           <Button
             variant="ghost"
-            className="  p-0"
+            className="  p-0 text-xs"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
             상태
@@ -50,7 +50,7 @@ export const columns: ColumnDef<any>[] = [
         <div className="flex flex-col items-start justify-center text-left ">
           <Button
             variant="ghost"
-            className="  p-0"
+            className="  p-0 text-xs"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
             그룹명
@@ -77,7 +77,7 @@ export const columns: ColumnDef<any>[] = [
         <div className="flex flex-col items-start">
           <Button
             variant="ghost"
-            className=" p-0"
+            className=" p-0 text-xs"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
             리더
@@ -102,7 +102,7 @@ export const columns: ColumnDef<any>[] = [
         <div>
           <Button
             variant="ghost"
-            className=" p-0"
+            className=" p-0 text-xs"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
             교육기간
@@ -129,7 +129,7 @@ export const columns: ColumnDef<any>[] = [
         <div className="text-center">
           <Button
             variant="ghost"
-            className=" p-0"
+            className=" p-0 text-xs"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
             생성일
@@ -148,39 +148,14 @@ export const columns: ColumnDef<any>[] = [
       );
     },
   },
-  // {
-  //   accessorKey: "courseProfile",
-  //   header: ({ column }) => {
-  //     return (
-  //       <div className="flex flex-col items-start justify-center text-left ">
-  //         <Button
-  //           variant="ghost"
-  //           className="  p-0"
-  //           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-  //         >
-  //           모듈/레슨/설문
-  //           <ArrowUpDown className="ml-2 h-4 w-4" />
-  //         </Button>
-  //       </div>
-  //     );
-  //   },
-  //   cell: ({ row }) => {
-  //     console.log(row.original);
-  //     // let liveSurvey = await
-  //     return (
-  //       <div className=" text-left">
-  //         <p>{row.original.courseProfile.modules.length > 0 ? "ok" : "no"}</p>
-  //       </div>
-  //     );
-  //   },
-  // },
+
   {
     id: "actions",
     cell: ({ row }) => {
       return (
         <div className=" text-right">
           <Link href={`/admin/group/${row.original._id}`}>
-            <Button variant="outline" size="icon">
+            <Button variant="outline" size="xs">
               <MagnifyingGlassIcon className="size-4" />
             </Button>
           </Link>

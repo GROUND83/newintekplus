@@ -6,6 +6,9 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useSession } from "next-auth/react";
+import { useQuery } from "@tanstack/react-query";
+import { Loader2 } from "lucide-react";
+import FeedBackView from "@/app/student/feedback/_components/feedBackView";
 
 export default function Page({ params }: { params: { groupId: string } }) {
   console.log("groupId", params.groupId);
@@ -23,36 +26,51 @@ export default function Page({ params }: { params: { groupId: string } }) {
     getModuleListdata();
   }, [params.groupId]);
   //
-  const checkIsDone = ({ lessonId }: { lessonId: string }) => {
-    //
-    let findarrya = group.lessonResults.find(
-      (item: any) =>
-        item.lessonId === lessonId &&
-        item.onwer.email === session.data.user.email
-    );
-    // console.log("lessonResults", findarrya);
-    if (findarrya.isLessonDone) {
-      return true;
-    } else {
-      return false;
-    }
+
+  const fetchDataOptions = {
+    groupId: params.groupId,
   };
+  const {
+    data: groupData,
+    isLoading,
+    isError,
+    refetch,
+  } = useQuery({
+    queryKey: ["groupDetail", fetchDataOptions],
+    queryFn: async () => {
+      let res = await getModuleList(params.groupId);
+      if (res.data) {
+        let group = JSON.parse(res.data);
+        console.log("group", group);
+        // setGroup(group);
+        return group;
+      }
+    },
+  });
+
+  if (isLoading) {
+    return (
+      <div className="w-full  h-[calc(100vh-70px)]  flex flex-col items-center justify-center">
+        <Loader2 className=" animate-spin size-8 text-primary" />
+      </div>
+    );
+  }
   return (
     <div className="w-full flex flex-col items-stretch flex-1  ">
-      <div className="p-3 flex-1 flex flex-col  w-full">
-        <ScrollArea className="  flex-1 w-full flex flex-col items-start max-h-[calc(100vh-170px)]">
+      <div className="flex-1 flex flex-col  w-full">
+        <ScrollArea className="w-full flex flex-col items-start h-[calc(100vh-120px)] bg-white">
           <div className="w-full">
-            {group && (
-              <div className="w-full flex flex-col gap-2">
-                {group.courseProfile.modules.map(
+            {groupData && (
+              <div className="w-full flex flex-col gap-2 p-3 py-3  rounded-sm">
+                {groupData.courseProfile.modules.map(
                   (moduledata: any, moduleIndex: any) => {
                     return (
                       <div
                         key={moduledata._id}
-                        className="w-full p-3 flex gap-2 flex-col border bg-white"
+                        className="w-full p-3 px-6 flex  flex-col  bg-white border"
                       >
-                        <div className="w-full border-b py-2">
-                          <p>{moduledata.title}</p>
+                        <div className="w-full  py-2">
+                          <p className="font-bold">{moduledata.title}</p>
                         </div>
                         <div className="pl-2">
                           {moduledata.lessons.map(
@@ -60,24 +78,38 @@ export default function Page({ params }: { params: { groupId: string } }) {
                               return (
                                 <div
                                   key={lesson._id}
-                                  className="border-b px-3 py-1 flex flex-row items-center justify-between"
+                                  className=" px-3 py-2 flex flex-row items-center justify-between border rounded-sm"
                                 >
                                   <p>{lesson.title}</p>
                                   <div className="flex flex-row items-center gap-3">
                                     <div>
-                                      {checkIsDone({ lessonId: lesson._id }) ? (
-                                        <p className="border-primary text-primary px-2 py-1 rounded-md border text-xs">
-                                          제출 완료
-                                        </p>
+                                      {lesson.finishedPerform ? (
+                                        <div className="flex flex-row items-center gap-2">
+                                          <p className="border-primary text-primary px-2 py-1 rounded-md border text-xs">
+                                            제출 완료
+                                          </p>
+                                          <FeedBackView
+                                            feedBack={
+                                              lesson.lessonResult.feedBack
+                                            }
+                                          />
+                                        </div>
                                       ) : (
                                         <p className="border border-neutral-500 text-neutral-500 px-2 py-1 rounded-md text-xs">
                                           미제출
                                         </p>
                                       )}
                                     </div>
-                                    {group.courseProfile.eduForm ===
+                                    {groupData.courseProfile.eduForm ===
                                     "집합교육" ? (
-                                      <Button size="xs">레슨입장</Button>
+                                      <Button size="xs">
+                                        {" "}
+                                        <Link
+                                          href={`/student/group/${params.groupId}/module/live/${lesson._id}`}
+                                        >
+                                          레슨입장
+                                        </Link>
+                                      </Button>
                                     ) : (
                                       <Button size="xs">
                                         <Link

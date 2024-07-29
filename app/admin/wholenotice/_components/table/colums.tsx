@@ -18,10 +18,10 @@ export const columns: ColumnDef<any>[] = [
         <div className="flex flex-col items-start justify-center text-left ">
           <Button
             variant="ghost"
-            className="  p-0"
+            className="  p-0 text-xs"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
-            설문명
+            제목
             <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
         </div>
@@ -43,7 +43,7 @@ export const columns: ColumnDef<any>[] = [
         <div className="text-center">
           <Button
             variant="ghost"
-            className=" p-0"
+            className=" p-0 text-xs"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
             생성일

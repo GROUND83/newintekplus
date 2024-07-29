@@ -6,33 +6,42 @@ import Group from "@/models/group";
 import Lesson from "@/models/lesson";
 import Participant from "@/models/participant";
 import Teacher from "@/models/teacher";
-import { useSession } from "next-auth/react";
-
-export const getGroupList = async ({
+import { getSession, useSession } from "next-auth/react";
+import { auth } from "@/auth";
+export const getMoreData = async ({
   pageIndex,
   pageSize,
-  user,
+  params,
+  page,
+  search,
 }: {
   pageIndex: number;
   pageSize: number;
-  user: any;
+  params: any;
+  page: string;
+  search: string;
 }) => {
   await connectToMongoDB();
   try {
-    // let session = useSession();
-    console.log("user", user);
-    let participant = await Participant.findOne({ email: user.email });
-    const groupCount = await Group.find({
-      participants: { $in: [{ _id: participant._id }] },
-      status: "개설완료",
-    }).countDocuments();
-    const group = await Group.find({
-      participants: { $in: [{ _id: participant._id }] },
-      status: "개설완료",
-    })
+    const session = await auth();
+    let participant = await Participant.findOne({ email: session?.user.email });
+    const query = search
+      ? {
+          participants: { $in: [{ _id: participant._id }] },
+          status: "개설완료",
+          $or: [{ name: { $regex: search, $options: "i" } }],
+        }
+      : {
+          participants: { $in: [{ _id: participant._id }] },
+          status: "개설완료",
+        };
+
+    console.log("sessionuser", session);
+    const groupCount = await Group.find(query).countDocuments();
+    const group = await Group.find(query)
       .populate({ path: "teacher", model: Teacher, select: "username" })
       .limit(pageSize)
-      .skip(pageSize * pageIndex)
+      .skip(pageSize * (pageIndex - 1))
       .sort({
         createdAt: -1,
       });
@@ -40,7 +49,8 @@ export const getGroupList = async ({
     // console.log("courseProfile", courseProfile);
     return {
       rows: JSON.stringify(group),
-      pageCount: groupCount,
+      pageCount: Math.ceil(groupCount / pageSize),
+      totalCount: groupCount,
     };
   } catch (e) {
     console.log(e);

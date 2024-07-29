@@ -39,7 +39,7 @@ export default function Page({ params }: { params: { groupId: string } }) {
   // };
   return (
     <div className="w-full flex flex-col items-stretch flex-1  ">
-      <div className="p-3 flex-1 flex flex-col  w-full">
+      <div className="flex-1 flex flex-col  w-full">
         <ScrollArea className="  flex-1 w-full flex flex-col items-start max-h-[calc(100vh-170px)]">
           <div className="w-full">
             {group && (
@@ -51,7 +51,8 @@ export default function Page({ params }: { params: { groupId: string } }) {
                         key={moduledata._id}
                         className="w-full p-3 flex gap-2 flex-col border bg-white"
                       >
-                        <div className="w-full border-b py-2">
+                        <div className="w-full border-b py-2 flex flex-row items-center gap-2">
+                          <p>모듈</p>
                           <p>{moduledata.title}</p>
                         </div>
                         <div className="pl-2">
@@ -62,26 +63,24 @@ export default function Page({ params }: { params: { groupId: string } }) {
                                   key={lesson._id}
                                   className="border-b px-3 py-1 flex flex-row items-center justify-between"
                                 >
-                                  <p>{lesson.title}</p>
+                                  <div className="flex flex-row items-center gap-2">
+                                    <p>레슨</p>
+                                    <p>{lesson.title}</p>
+                                  </div>
                                   <div className="flex flex-row items-center gap-3">
-                                    {/* <div>
-                                      {checkIsDone({ lessonId: lesson._id }) ? (
-                                        <p className="border-primary text-primary px-2 py-1 rounded-md border text-xs">
-                                          제출 완료
-                                        </p>
-                                      ) : (
-                                        <p className="border border-neutral-500 text-neutral-500 px-2 py-1 rounded-md text-xs">
-                                          미제출
-                                        </p>
-                                      )}
-                                    </div> */}
                                     {group.courseProfile.eduForm ===
                                     "집합교육" ? (
-                                      <Button size="xs">레슨입장</Button>
+                                      <Button size="xs">
+                                        <Link
+                                          href={`/teacher/group/${params.groupId}/module/${moduledata._id}/live/${lesson._id}/info`}
+                                        >
+                                          레슨입장
+                                        </Link>
+                                      </Button>
                                     ) : (
                                       <Button size="xs">
                                         <Link
-                                          href={`/teacher/group/${params.groupId}/module/self/${lesson._id}`}
+                                          href={`/teacher/group/${params.groupId}/module/${moduledata._id}/self/${lesson._id}/info`}
                                         >
                                           레슨입장
                                         </Link>

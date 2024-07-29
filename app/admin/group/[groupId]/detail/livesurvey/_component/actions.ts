@@ -9,6 +9,7 @@ import Participant from "@/models/participant";
 import ResultSurvey from "@/models/resultSurvey";
 import Survey from "@/models/survey";
 import Teacher from "@/models/teacher";
+import mongoose from "mongoose";
 
 export async function getGroupDetail(groupId: string) {
   //
@@ -78,4 +79,73 @@ export async function resultSurveyUpdate(resultSurveyId: string) {
   );
   return { data: JSON.stringify(res) };
   //
+}
+
+export async function getTotalResultSurvey(groupId: string) {
+  let res = await Group.aggregate([
+    {
+      $match: {
+        _id: new mongoose.Types.ObjectId(groupId),
+      },
+    },
+
+    {
+      $lookup: {
+        from: "resultsurveys",
+        localField: "resultSurvey",
+        foreignField: "_id",
+        as: "resultsurveys",
+      },
+    },
+    {
+      $unwind: {
+        path: "$resultsurveys",
+      },
+    },
+    {
+      $unwind: {
+        path: "$resultsurveys.results",
+      },
+    },
+    {
+      $group: {
+        _id: "$resultsurveys.results.surveyId",
+        name: { $first: "$name" },
+        title: {
+          $first: "$resultsurveys.results.title",
+        },
+        resultsurveyslength: {
+          $first: { $size: "$resultSurvey" },
+        },
+        totalPoint: {
+          $sum: "$resultsurveys.results.point",
+        },
+        participantsLength: {
+          $first: { $size: "$participants" },
+        },
+
+        // $count: "sum",
+      },
+    },
+    {
+      $project: {
+        _id: 1,
+        title: 1,
+        name: 1,
+        totalPoint: 1,
+        resultsurveyslength: 1,
+        participantsLength: 1,
+        total: {
+          $multiply: ["$participantsLength", 5],
+        },
+      },
+    },
+    {
+      $sort: {
+        _id: 1,
+      },
+    },
+  ]);
+
+  return { data: JSON.stringify(res) };
 }

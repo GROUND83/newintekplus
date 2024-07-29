@@ -1,5 +1,5 @@
 import mongoose, { Document, Model, Types } from "mongoose";
-import passportLocalMongoose from "passport-local-mongoose";
+
 export interface ITeacher {
   status: number; // 0 === "이메일인증중", 1 == 인증완료 => 인증완료 링크 클릭시 1로변환
   authCode: string;
@@ -13,8 +13,8 @@ export interface ITeacher {
   jobPosition: string;
   // 직책
   phone: string;
-  // department 본부
   department: string;
+  // department 본부
   // part 파트명
   entryDate: Date;
   email: string;
@@ -61,7 +61,11 @@ const teacher = new mongoose.Schema<ITeacherDocument>(
     jobPosition: {
       type: String,
     },
+    phone: {
+      type: String,
+    },
     // 입사일
+    department: { type: String }, //소속
     entryDate: { type: Date },
     email: {
       type: String,
@@ -76,10 +80,10 @@ const teacher = new mongoose.Schema<ITeacherDocument>(
     companyNumber: {
       type: String,
     },
+    part: { type: String }, //소속
+    train: { type: String }, //소속
     username: { type: String },
-    createdAt: { type: Date, default: Date.now },
     loginKeep: { type: Boolean, default: false },
-    department: { type: String }, //소속
     aproved: { type: Boolean, default: false }, //승인
   },
   {

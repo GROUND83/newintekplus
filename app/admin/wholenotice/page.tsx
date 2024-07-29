@@ -12,6 +12,8 @@ export default function Page() {
           columns={columns}
           getMoreData={getMoreData}
           subMenu={false}
+          placeHolder="제목을 검색하세요."
+          searchShow={true}
         />
       </div>
     </div>

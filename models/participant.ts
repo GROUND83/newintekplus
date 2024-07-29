@@ -99,9 +99,9 @@ const participant = new mongoose.Schema<IParticipantDocument>(
   }
 );
 // passportLocalMongoose 적용함.
-participant.plugin(passportLocalMongoose, {
-  usernameField: "email",
-});
+// participant.plugin(passportLocalMongoose, {
+//   usernameField: "email",
+// });
 
 // Create Model & Export
 const Participant: Model<IParticipantDocument> =

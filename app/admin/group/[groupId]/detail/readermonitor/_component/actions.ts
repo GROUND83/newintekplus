@@ -10,22 +10,9 @@ import Module from "@/models/module";
 import Participant from "@/models/participant";
 import Teacher from "@/models/teacher";
 
-export async function getMoreData({
-  pageIndex,
-  pageSize,
-  groupId,
-}: {
-  pageIndex: number;
-  pageSize: number;
-  groupId: string;
-}) {
+export async function getMoreData(groupId: string) {
   await connectToMongoDB();
   try {
-    const feedBackListCount = await LessonResult.find({
-      groupId: groupId,
-      isEvaluationDone: true,
-      feedBack: { $ne: null },
-    }).countDocuments();
     const feedBackList = await LessonResult.aggregate([
       {
         $match: {
@@ -33,12 +20,6 @@ export async function getMoreData({
           isEvaluationDone: true,
           feedBack: { $ne: null },
         },
-      },
-      {
-        $limit: pageSize,
-      },
-      {
-        $skip: pageSize * pageIndex,
       },
       {
         $lookup: {
@@ -93,21 +74,13 @@ export async function getMoreData({
         },
       },
     ]);
-    // let feedBackList = await LessonResult.find({
-    //   groupId: groupId,
-    //   isEvaluationDone: true,
-    //   feedBack: { $ne: null },
-    // })
-    //   .populate({ path: "onwer", model: Participant, select: "username _id" })
-    //   .limit(pageSize)
-    //   .skip(pageSize * pageIndex)
-    //   .sort({
-    //     createdAt: -1,
-    //   });
 
+    // const feedBackList = await LessonResult.find({
+    //   groupId: groupId,
+    // }).populate({ path: "onwer", model: Participant });
     return {
       rows: JSON.stringify(feedBackList),
-      pageCount: feedBackListCount,
+      totalCount: feedBackList.length,
     };
   } catch (e) {
     console.log(e);

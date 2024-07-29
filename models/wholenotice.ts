@@ -7,7 +7,7 @@ export interface IWholeNotice {
   description: string;
   contents: Array<{
     type: mongoose.Schema.Types.ObjectId;
-    ref: "WholeNoticeContent";
+    ref: "NoticeContent";
   }>;
   studentIsRead: Array<{
     type: mongoose.Schema.Types.ObjectId;

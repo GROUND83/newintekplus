@@ -1,24 +1,15 @@
-import {
-  PaginationState,
-  ColumnDef,
-  SortingState,
-  flexRender,
-  getCoreRowModel,
-  getSortedRowModel,
-  useReactTable,
-  createColumnHelper,
-} from "@tanstack/react-table";
-import { TableDataType } from "./table";
+"use client";
+import { ColumnDef } from "@tanstack/react-table";
+
 import { Button } from "@/components/ui/button";
 import { ArrowUpDown, Search } from "lucide-react";
-import { Avatar, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
+
 import Link from "next/link";
 import dayjs from "dayjs";
 import "dayjs/locale/ko";
 dayjs.locale("ko");
 
-export const columns: ColumnDef<TableDataType>[] = [
+export const columns: ColumnDef<any>[] = [
   {
     accessorKey: "name",
     header: ({ column }) => {
@@ -39,6 +30,9 @@ export const columns: ColumnDef<TableDataType>[] = [
       return (
         <div className=" text-left">
           <p>{row.getValue("name")}</p>
+          <p className="text-neutral-500  text-xs">
+            {row.original?.courseProfile?.title}
+          </p>
         </div>
       );
     },
@@ -61,8 +55,35 @@ export const columns: ColumnDef<TableDataType>[] = [
     },
     cell: ({ row }) => {
       return (
-        <div className=" text-left">
+        <div className=" text-left text-xs">
           <p>{row.original.teacher?.username}</p>
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "startDate",
+    header: ({ column }) => {
+      return (
+        <div>
+          <Button
+            variant="ghost"
+            className=" p-0 text-xs"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            교육기간
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+        </div>
+      );
+    },
+    cell: ({ row }) => {
+      let startDate = row.original.startDate;
+      let endDate = row.original.endDate;
+      return (
+        <div className=" text-xs">
+          {dayjs(startDate).format("YYYY/MM/DD(dd)")} ~
+          {dayjs(endDate).format("YYYY/MM/DD(dd)")}
         </div>
       );
     },
@@ -86,7 +107,7 @@ export const columns: ColumnDef<TableDataType>[] = [
     cell: ({ row }) => {
       return (
         <div className="   text-center">
-          <p>
+          <p className="text-xs">
             {dayjs(row.getValue("createdAt")).format("YYYY/MM/DD HH:mm(dddd)")}
           </p>
         </div>
@@ -99,7 +120,7 @@ export const columns: ColumnDef<TableDataType>[] = [
       console.log(row);
       return (
         <div className=" text-right">
-          <Button asChild size="sm" variant="outline">
+          <Button asChild size="xs" variant="outline">
             <Link href={`/teacher/group/${row.original._id}/notice`}>
               <Search className="size-4" />
             </Link>
