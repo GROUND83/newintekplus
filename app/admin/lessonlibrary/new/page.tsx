@@ -150,6 +150,7 @@ export default function Page() {
     }
     formData.append("lessonContent", JSON.stringify(newContentFile));
     let res = await createLessonLibrary(formData);
+    console.log(res);
     if (res.data) {
       let lesson = JSON.parse(res.data);
       console.log("up", lesson);
