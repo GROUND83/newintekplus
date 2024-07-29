@@ -15,11 +15,11 @@ export const getMoreData = async ({
   page,
   search,
 }: {
-  pageIndex;
-  pageSize;
-  params;
-  page;
-  search;
+  pageIndex: number;
+  pageSize: number;
+  params: any;
+  page: number;
+  search: string;
 }) => {
   await connectToMongoDB();
   try {

@@ -7,30 +7,39 @@ import Lesson from "@/models/lesson";
 import LiveSurvey from "@/models/liveSurvey";
 import Module from "@/models/module";
 import Notice from "@/models/notice";
+import NoticeContent from "@/models/noticeContent";
 import Teacher from "@/models/teacher";
 
 export async function getMoreData({
   pageIndex,
   pageSize,
+  params,
+  page,
+  search,
   groupId,
 }: {
   pageIndex: number;
   pageSize: number;
+  params: any;
+  page: string;
+  search: string;
   groupId: string;
 }) {
   await connectToMongoDB();
+  const query = search
+    ? {
+        $or: [{ title: { $regex: search, $options: "i" } }],
+        groupId: groupId,
+        sendTo: { $ne: "teacher" },
+      }
+    : { groupId: groupId, sendTo: { $ne: "teacher" } };
   try {
     console.log("groupId", groupId);
-    const noticeCount = await Notice.find({
-      groupId,
-      sendTo: { $in: ["all", "student"] },
-    }).countDocuments();
-    const notice = await Notice.find({
-      groupId,
-      sendTo: { $in: ["all", "student"] },
-    })
+    const noticeCount = await Notice.find(query).countDocuments();
+    const notice = await Notice.find(query)
+      .populate({ path: "contents", model: NoticeContent })
       .limit(pageSize)
-      .skip(pageSize * pageIndex)
+      .skip(pageSize * (pageIndex - 1))
       .sort({
         createdAt: -1,
       });

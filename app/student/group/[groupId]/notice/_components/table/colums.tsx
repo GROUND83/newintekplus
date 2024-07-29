@@ -17,6 +17,7 @@ import Link from "next/link";
 import dayjs from "dayjs";
 import "dayjs/locale/ko";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/solid";
+import ViewWholeNotice from "@/components/commonUi/viewWholeNotice";
 dayjs.locale("ko");
 
 export const columns: ColumnDef<any>[] = [
@@ -40,17 +41,17 @@ export const columns: ColumnDef<any>[] = [
       return (
         <div className=" text-left flex ">
           {row.getValue("sendTo") === "all" ? (
-            <p className="bg-primary text-white px-3 py-1 rounded-md  text-xs">
+            <Badge className="font-normal " variant="defaultOutline">
               전체
-            </p>
+            </Badge>
           ) : row.getValue("sendTo") === "teacher" ? (
-            <p className="bg-yellow-500 text-black px-3 py-1 rounded-mdtext-xs">
+            <Badge className=" font-normal " variant="colorOutline">
               리더
-            </p>
+            </Badge>
           ) : (
-            <p className="bg-green-500 text-black px-3 py-1 rounded-md  text-xs">
-              참여자
-            </p>
+            <Badge className=" font-normal " variant="colorOutline">
+              참가자
+            </Badge>
           )}
         </div>
       );
@@ -164,13 +165,7 @@ export const columns: ColumnDef<any>[] = [
       console.log(row);
       return (
         <div className=" text-right">
-          <Link
-            href={`/student/group/${row.original.groupId}/notice/${row.original._id}`}
-          >
-            <Button variant="outline" size="icon">
-              <MagnifyingGlassIcon className="size-4" />
-            </Button>
-          </Link>
+          <ViewWholeNotice notice={row.original} />
         </div>
       );
     },

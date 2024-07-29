@@ -11,7 +11,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { useParams, usePathname } from "next/navigation";
-import { getModuleDetail } from "./_component/actions";
+import { getModuleDetail } from "@/components/commonActions/commonActions";
 
 export default function Layout({
   children,
@@ -19,8 +19,8 @@ export default function Layout({
   children: React.ReactNode;
 }>) {
   //
-  const [moduleData, setModuleData] = React.useState<any>();
-  const [lesson, setLesson] = React.useState<any>();
+  // const [moduleData, setModuleData] = React.useState<any>();
+  // const [lesson, setLesson] = React.useState<any>();
 
   const params = useParams<{
     groupId: string;
@@ -29,49 +29,9 @@ export default function Layout({
   }>();
   const pathname = usePathname();
 
-  const getModuleDetaildata = async () => {
-    //
-    console.log(" params.lessonId", params.lessonId);
-    let res = await getModuleDetail({
-      lessonId: params.lessonId,
-      moduleId: params.moduleId,
-    });
-    if (res.data) {
-      let data = JSON.parse(res.data);
-      console.log("data", data);
-      setModuleData(data.module);
-      setLesson(data.lesson);
-    }
-  };
-  React.useEffect(() => {
-    getModuleDetaildata();
-  }, [params.moduleId]);
   return (
     <div className="w-full flex flex-col items-stretch flex-1  ">
       <div className="w-full bg-white py-3 border-b px-6 flex flex-row items-center gap-2 h-[50px] justify-between">
-        {moduleData && (
-          <div>
-            <Breadcrumb>
-              <BreadcrumbList>
-                <BreadcrumbItem>
-                  <BreadcrumbLink
-                    href={`/admin/group/${params.groupId}/detail/module`}
-                  >
-                    학습리스트
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator />
-                <BreadcrumbItem>
-                  <BreadcrumbPage>{moduleData.title}</BreadcrumbPage>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator />
-                <BreadcrumbItem>
-                  <BreadcrumbPage>{lesson.title}</BreadcrumbPage>
-                </BreadcrumbItem>
-              </BreadcrumbList>
-            </Breadcrumb>
-          </div>
-        )}
         <div className="flex flex-row items-center gap-2">
           <Link
             href={`/teacher/group/${params.groupId}/module/${params.moduleId}/self/${params.lessonId}/info`}

@@ -8,6 +8,8 @@ import Participant from "@/models/participant";
 import Teacher from "@/models/teacher";
 import { getSession, useSession } from "next-auth/react";
 import { auth } from "@/auth";
+import LiveSurvey from "@/models/liveSurvey";
+import Module from "@/models/module";
 export const getMoreData = async ({
   pageIndex,
   pageSize,
@@ -57,40 +59,39 @@ export const getMoreData = async ({
     return { message: "그룹 오류" };
   }
 };
-// import db from "@/lib/db";
+export async function detailGroup(groupId: string) {
+  //
+  await connectToMongoDB();
+  try {
+    let groups = await Group.findOne({ _id: groupId })
+      .populate({
+        path: "teacher",
+        model: Teacher,
+      })
+      .populate({
+        path: "liveSurvey",
+        model: LiveSurvey,
+      })
 
-// export async function getMoreData(options: {
-//   pageIndex: number;
-//   pageSize: number;
-// }) {
-//   const response = await db.$transaction([
-//     db.farm.count(),
-//     db.farm.findMany({
-//       select: {
-//         id: true,
-//         initail: true,
-//         name: true,
-//         visible: true,
-//         address: true,
-//         created_at: true,
-//         owner: {
-//           select: {
-//             id: true,
-//             username: true,
-//             phone: true,
-//             avatar: true,
-//           },
-//         },
-//       },
-//       skip: options.pageSize * options.pageIndex,
-//       take: options.pageSize,
-//       orderBy: {
-//         created_at: "desc", // 내림차순 최신순
-//       },
-//     }),
-//   ]);
-//   const pageCount = response[0];
-//   const rows = response[1];
-//   console.log({ pageCount, rows });
-//   return { pageCount, rows };
-// }
+      .populate({
+        path: "participants",
+        model: Participant,
+      })
+      .populate({
+        path: "courseProfile",
+        model: CourseProfile,
+        populate: {
+          path: "modules",
+          model: Module,
+          populate: {
+            path: "lessons",
+            model: Lesson,
+          },
+        },
+      });
+    console.log("data", groups);
+    return { data: JSON.stringify(groups) };
+  } catch (e) {
+    return { message: e };
+  }
+}

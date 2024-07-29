@@ -4,6 +4,8 @@ import React from "react";
 import Link from "next/link";
 import { PlusIcon } from "lucide-react";
 import { useParams, usePathname } from "next/navigation";
+import { detailGroup } from "./_components/actions";
+import GroupData from "@/components/commonUi/groupData";
 
 export default function Layout({
   children,

@@ -24,11 +24,11 @@ export interface ILessonPerformDocument extends ILessonPerform, Document {
 // admin
 const lessonPerform = new mongoose.Schema<ILessonPerformDocument>(
   {
-    courseProfileId: { type: String },
+    courseProfileId: { type: String }, //x
     groupId: { type: String },
-    moduleId: { type: String },
+    moduleId: { type: String }, //x
     lessonId: { type: String },
-    lessonActivityId: { type: String },
+    lessonActivityId: { type: String }, //x
     lessonResultId: { type: String },
     lessonPerformdownloadURL: { type: String, required: true }, //레슨다운로드
     lessonPerformFileName: { type: String, required: true }, // 레슨파일이름

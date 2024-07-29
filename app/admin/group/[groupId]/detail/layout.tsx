@@ -70,13 +70,6 @@ export default function Layout({
           size="sm"
         />
 
-        {/* {group && group.courseProfile.eduForm !== "집합교육" && (
-          <Submenu
-            link={`/admin/group/${params.groupId}/detail/module/`}
-            pathname={pathname}
-            title="학습리스트"
-          />
-        )} */}
         <Submenu
           link={`/admin/group/${params.groupId}/detail/livesurvey`}
           pathname={pathname}

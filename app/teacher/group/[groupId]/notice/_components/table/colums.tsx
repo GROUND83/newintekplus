@@ -46,11 +46,17 @@ export const columns: ColumnDef<any>[] = [
       return (
         <div className=" text-left flex ">
           {row.getValue("sendTo") === "all" ? (
-            <AllBadge />
+            <Badge className="font-normal " variant="defaultOutline">
+              전체
+            </Badge>
           ) : row.getValue("sendTo") === "teacher" ? (
-            <LeaderBadge />
+            <Badge className=" font-normal " variant="colorOutline">
+              리더
+            </Badge>
           ) : (
-            <StudentBadge />
+            <Badge className=" font-normal " variant="colorOutline">
+              참가자
+            </Badge>
           )}
         </div>
       );

@@ -8,35 +8,18 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useSession } from "next-auth/react";
 
 export default function Page({ params }: { params: { groupId: string } }) {
-  console.log("groupId", params.groupId);
-  const [group, setGroup] = React.useState<any>();
-  const session = useSession();
-  const getModuleListdata = async () => {
-    let res = await getModuleList({ groupId: params.groupId });
-    if (res.data) {
-      let group = JSON.parse(res.data);
-      console.log("group", group);
-      setGroup(group);
-    }
-  };
-  React.useEffect(() => {
-    getModuleListdata();
-  }, [params.groupId]);
-  //
-  // const checkIsDone = ({ lessonId }: { lessonId: string }) => {
-  //   //
-  //   let findarrya = group.lessonResults.find(
-  //     (item: any) =>
-  //       item.lessonId === lessonId &&
-  //       item.onwer.email === session.data.user.email
-  //   );
-  //   // console.log("lessonResults", findarrya);
-  //   if (findarrya.isLessonDone) {
-  //     return true;
-  //   } else {
-  //     return false;
+  // const getModuleListdata = async () => {
+  //   let res = await getModuleList({ groupId: params.groupId });
+  //   if (res.data) {
+  //     let group = JSON.parse(res.data);
+  //     console.log("group", group);
   //   }
   // };
+  // React.useEffect(() => {
+  //   getModuleListdata();
+  // }, [params.groupId]);
+  //
+
   return (
     <div className="w-full flex flex-col items-stretch flex-1  ">
       <div className="flex-1 flex flex-col  w-full h-full items-center justify-center">

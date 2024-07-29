@@ -7,6 +7,7 @@ import Lesson from "@/models/lesson";
 import LiveSurvey from "@/models/liveSurvey";
 import Module from "@/models/module";
 import Notice from "@/models/notice";
+import NoticeContent from "@/models/noticeContent";
 import Teacher from "@/models/teacher";
 
 export async function getMoreData({
@@ -35,6 +36,7 @@ export async function getMoreData({
     console.log("groupId", groupId);
     const noticeCount = await Notice.find(query).countDocuments();
     const notice = await Notice.find(query)
+      .populate({ path: "contents", model: NoticeContent })
       .limit(pageSize)
       .skip(pageSize * (pageIndex - 1))
       .sort({

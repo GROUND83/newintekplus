@@ -48,7 +48,6 @@ export default function Layout({
   //
   const session = useSession();
   const pathname = usePathname();
-  console.log("session", session);
 
   const [menuExpend, setMenuExpend] = React.useState(true);
   return (
@@ -148,22 +147,6 @@ export default function Layout({
                       </div>
                     )}
                   </Link>
-                  {/* <Link
-                    href={"/student/evaluation"}
-                    className={`flex flex-row items-center gap-2 w-full ${
-                      pathname.includes("/student/evaluation")
-                        ? "bg-primary hover:bg-primary/50  text-white"
-                        : "bg-[#0C2135] hover:bg-primary hover:text-white"
-                    }  py-3 px-6 text-neutral-400   transition-all`}
-                  >
-                    <ListChecks strokeWidth={1.25} />
-
-                    {menuExpend && (
-                      <div className="flex flex-row items-center gap-2">
-                        <p>평가/설문</p>
-                      </div>
-                    )}
-                  </Link> */}
                 </AccordionContent>
               </AccordionItem>
             </Accordion>
@@ -177,8 +160,8 @@ export default function Layout({
                 {menuExpend ? (
                   <p>{session?.data?.user.email}</p>
                 ) : (
-                  <Avatar className="bg-white flex flex-col items-center justify-center">
-                    <AvatarFallback>AM</AvatarFallback>
+                  <Avatar className="bg-neutral-800 flex flex-col items-center justify-center">
+                    <AvatarFallback>S</AvatarFallback>
                   </Avatar>
                 )}
               </Link>

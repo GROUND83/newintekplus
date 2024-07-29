@@ -64,7 +64,7 @@ contentdownloadURL */}
                 <DownLoadButton
                   key={item._id}
                   downLoadUrl={item.contentdownloadURL}
-                  fileName={item?.contenFileName}
+                  fileName={item?.contentName}
                 />
               );
             })}

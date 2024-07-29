@@ -1,13 +1,13 @@
 "use server";
 import { UploadFile } from "@/lib/fileUploader";
-import CourseProfile from "@/models/courseProfile";
+
 import FeedBack from "@/models/feedback";
-import Group from "@/models/group";
+
 import Lesson from "@/models/lesson";
 import LessonContent from "@/models/lessonContents";
 import LessonDirective from "@/models/lessonDirective";
 import LessonResult from "@/models/lessonResult";
-import Module from "@/models/module";
+
 import Participant from "@/models/participant";
 import { UploadResponse } from "nodejs-s3-typescript/dist/cjs/types";
 

@@ -14,30 +14,30 @@ export const getMoreData = async ({
   page,
   search,
 }: {
-  pageIndex;
-  pageSize;
-  params;
-  page;
-  search;
+  pageIndex: number;
+  pageSize: number;
+  params: any;
+  page: number;
+  search: string;
 }) => {
   await connectToMongoDB();
   try {
     const session = await auth();
-    let participant = await Participant.findOne({ email: session?.user.email });
-    const query = search
-      ? {
-          participants: { $in: [{ _id: participant._id }] },
-          status: "개설완료",
-          $or: [{ name: { $regex: search, $options: "i" } }],
-        }
-      : {
-          participants: { $in: [{ _id: participant._id }] },
-          status: "개설완료",
-        };
+
+    // const query = search
+    //   ? {
+    //       participants: { $in: [{ _id: participant._id }] },
+    //       status: "개설완료",
+    //       $or: [{ name: { $regex: search, $options: "i" } }],
+    //     }
+    //   : {
+    //       participants: { $in: [{ _id: participant._id }] },
+    //       status: "개설완료",
+    //     };
     const courseProfileCount = await WholeNotice.find({
-      sendTo: { $ne: "teacher" },
+      sendTo: { $ne: "student" },
     }).countDocuments();
-    const courseProfile = await WholeNotice.find({ sendTo: { $ne: "teacher" } })
+    const courseProfile = await WholeNotice.find({ sendTo: { $ne: "student" } })
       // .select("property title createdAt lessonHour evaluation")
       .limit(pageSize)
       .skip(pageSize * (pageIndex - 1))
