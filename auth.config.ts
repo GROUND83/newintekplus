@@ -16,8 +16,8 @@ export const authConfig = {
   },
   callbacks: {
     authorized({ auth }) {
-      console.log("auth authorized", auth);
       const isAuthenticated = !!auth?.user;
+      console.log("auth authorized", auth, isAuthenticated);
       return isAuthenticated;
     },
     // async signIn({ user, profile, credentials }) {
@@ -78,8 +78,20 @@ export const authConfig = {
     //     return false;
     //   }
     // },
-    jwt: async ({ token, user, profile }) => {
-      console.log("tokendata", token, user, profile);
+    // signIn: async ({ user, account, profile, email, credentials }) => {
+    //   console.log("usercredentials", user, credentials);
+    //   const isAllowedToSignIn = true;
+    //   if (isAllowedToSignIn) {
+    //     return true;
+    //   } else {
+    //     // Return false to display a default error message
+    //     return false;
+    //     // Or you can return a URL to redirect to:
+    //     // return '/unauthorized'
+    //   }
+    // },
+    jwt: async ({ token, user }) => {
+      console.log("tokendata", token, user);
       return { ...token, ...user };
     },
     session: async ({ session, token }) => {
@@ -89,6 +101,7 @@ export const authConfig = {
         // session.user._id = token._id;
       }
       console.log("sessionsession", session);
+
       return session;
     },
   },

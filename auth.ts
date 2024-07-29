@@ -13,82 +13,80 @@ function exclude(user: any, keys: any) {
   }
   return user;
 }
-function checkCredential({
-  email,
-  password,
-  type,
-  role,
-}: {
-  email: any;
-  password: any;
-  type: any;
-  role: any;
-}) {
-  return new Promise(async (resolve, reject) => {
-    let user: any = {};
-    try {
-      await connectToMongoDB();
-      if (role === "admin") {
-        console.log(email, password, type, role);
-        let findUser = await User.findOne({ email: email })
-          .select("username email  role _id password")
-          .lean();
-        console.log("findUser", findUser);
-        if (findUser) {
-          user = findUser;
-        } else {
-          reject("계정이 없습니다.");
-        }
-      }
-      if (role === "participant") {
-        console.log(email, password, type, role);
-        let findUser = await Participant.findOne({ email: email })
-          .select("username email  role _id password")
-          .lean();
-        console.log("findUser", findUser);
-        if (findUser) {
-          user = findUser;
-        } else {
-          reject("계정이 없습니다.");
-        }
-      }
-      if (role === "teacher") {
-        console.log(email, password, type, role);
-        let findUser = await Teacher.findOne({ email: email })
-          .select("username email role _id password")
-          .lean();
-        console.log("findUser", findUser);
-        if (findUser) {
-          user = findUser;
-        } else {
-          reject("계정이 없습니다.");
-        }
-      }
+// function checkCredential({
+//   email,
+//   password,
+//   role,
+// }: {
+//   email: any;
+//   password: any;
 
-      console.log("user", user);
-      if (Object.keys(user).length > 0) {
-        const ok = await bcrypt.compare(password, user!.password ?? "");
-        console.log("ok", ok);
-        if (ok) {
-          let userdata = exclude(user, ["password"]);
-          console.log("userdata", userdata);
-          if (userdata) {
-            resolve(userdata);
-          }
-        } else {
-          reject("비밀번호가 불일치 합니다.");
-        }
-      } else {
-        console.log("reejct");
-        reject("계정이 없습니다.");
-        // throw new Error("등록된 계정이 없습니다.");
-      }
-    } catch (e: any) {
-      console.log(e);
-      reject(e);
-    }
-  });
-}
+//   role: any;
+// }) {
+//   return new Promise(async (resolve, reject) => {
+//     let user: any = {};
+//     try {
+//       await connectToMongoDB();
+//       if (role === "admin") {
+//         console.log(email, password, role);
+//         let findUser = await User.findOne({ email: email })
+//           .select("username email  role _id password")
+//           .lean();
+//         console.log("findUser", findUser);
+//         if (findUser) {
+//           user = findUser;
+//         } else {
+//           return reject("계정이 없습니다.");
+//         }
+//       }
+//       if (role === "participant") {
+//         let findUser = await Participant.findOne({ email: email })
+//           .select("username email  role _id password")
+//           .lean();
+//         console.log("findUser", findUser);
+//         if (findUser) {
+//           user = findUser;
+//         } else {
+//           reject("계정이 없습니다.");
+//         }
+//       }
+//       if (role === "teacher") {
+//         let findUser = await Teacher.findOne({ email: email })
+//           .select("username email  role _id password")
+//           .lean();
+//         console.log("findUser", findUser);
+//         if (findUser) {
+//           user = findUser;
+//         } else {
+//           return reject("계정이 없습니다.");
+//         }
+//         console.log(email, password, role);
+//       }
+
+//       console.log("user", user);
+//       if (Object.keys(user).length > 0) {
+//         const ok = await bcrypt.compare(password, user!.password ?? "");
+//         console.log("ok", ok);
+//         if (ok) {
+//           let userdata = exclude(user, ["password"]);
+//           console.log("userdata", userdata);
+//           if (userdata) {
+//             return resolve(userdata);
+//           }
+//         } else {
+//           return reject("비밀번호가 불일치 합니다.");
+//         }
+//       } else {
+//         console.log("reejct");
+//         return reject("계정이 없습니다.");
+//         // throw new Error("등록된 계정이 없습니다.");
+//       }
+//     } catch (e: any) {
+//       console.log(e);
+//       return reject(e);
+//     }
+//   });
+// }
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   ...authConfig,
@@ -99,65 +97,111 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         email: {},
         password: {},
       },
-      authorize: async (credentials: any, req) => {
+      authorize: async (credentials: any) => {
         let user = null;
-        // console.log("credentials", credentials);
-        let body = await req.json();
-        console.log("body", body);
-        let role: any = body?.role;
-        let type: any = body?.type;
+        console.log("credentials", credentials);
+
         if (!credentials?.email || !credentials?.password) {
           return null;
         }
-        if (req.body) {
-          console.log("role", role);
-          if (role === "admin") {
-            try {
-              let result: any = await checkCredential({
-                email: credentials.email!,
-                password: credentials.password!,
-                type: credentials.type!,
-                role: credentials.role!,
-              });
-              return result;
-            } catch (e: any) {
-              //
-              console.log("e", e);
 
-              throw new Error(e);
-            }
-          } else if (role === "teacher") {
-            try {
-              let result: any = await checkCredential({
-                email: credentials.email!,
-                password: credentials.password!,
-                type,
-                role,
-              });
-              // console.log("result", result);
-              return result;
-            } catch (e: any) {
-              //
-              console.log(e);
-              throw new Error(e);
-            }
-          } else if (role === "participant") {
-            try {
-              let result: any = await checkCredential({
-                email: credentials.email!,
-                password: credentials.password!,
-                type,
-                role,
-              });
-              return result;
-            } catch (e: any) {
-              //
-              console.log(e);
-              throw new Error(e);
-            }
+        console.log("credentials.role", credentials.role);
+        if (credentials.role === "admin") {
+          await connectToMongoDB();
+
+          let findUser = await User.findOne({ email: credentials.email })
+            .select("username email  role _id password")
+            .lean();
+          console.log("findUser", findUser);
+          if (findUser) {
+            user = findUser;
+          } else {
+            throw new Error("계정이 없습니다.");
           }
-        } else {
-          throw new Error("잘못된 접근입니다.");
+          console.log("user", user);
+          if (Object.keys(user).length > 0) {
+            const ok = await bcrypt.compare(
+              credentials.password,
+              user!.password ?? ""
+            );
+            console.log("ok", ok);
+            if (ok) {
+              let userdata = exclude(user, ["password"]);
+              console.log("userdata", userdata);
+
+              return userdata;
+            } else {
+              throw new Error("비밀번호가 불일치 합니다.");
+            }
+          } else {
+            throw new Error("계정이 없습니다.");
+
+            // throw new Error("등록된 계정이 없습니다.");
+          }
+        } else if (credentials.role === "teacher") {
+          await connectToMongoDB();
+
+          let findUser = await Teacher.findOne({ email: credentials.email })
+            .select("username email  role _id password")
+            .lean();
+          console.log("findUser", findUser);
+          if (findUser) {
+            user = findUser;
+          } else {
+            throw new Error("계정이 없습니다.");
+          }
+          console.log("user", user);
+          if (Object.keys(user).length > 0) {
+            const ok = await bcrypt.compare(
+              credentials.password,
+              user!.password ?? ""
+            );
+            console.log("ok", ok);
+            if (ok) {
+              let userdata = exclude(user, ["password"]);
+              console.log("userdata", userdata);
+
+              return userdata;
+            } else {
+              throw new Error("비밀번호가 불일치 합니다.");
+            }
+          } else {
+            throw new Error("계정이 없습니다.");
+
+            // throw new Error("등록된 계정이 없습니다.");
+          }
+        } else if (credentials.role === "participant") {
+          await connectToMongoDB();
+
+          let findUser = await Participant.findOne({ email: credentials.email })
+            .select("username email  role _id password")
+            .lean();
+          console.log("findUser", findUser);
+          if (findUser) {
+            user = findUser;
+          } else {
+            throw new Error("계정이 없습니다.");
+          }
+          console.log("user", user);
+          if (Object.keys(user).length > 0) {
+            const ok = await bcrypt.compare(
+              credentials.password,
+              user!.password ?? ""
+            );
+            console.log("ok", ok);
+            if (ok) {
+              let userdata = exclude(user, ["password"]);
+              console.log("userdata", userdata);
+
+              return userdata;
+            } else {
+              throw new Error("비밀번호가 불일치 합니다.");
+            }
+          } else {
+            throw new Error("계정이 없습니다.");
+
+            // throw new Error("등록된 계정이 없습니다.");
+          }
         }
       },
     }),

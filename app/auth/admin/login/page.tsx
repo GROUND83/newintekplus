@@ -15,10 +15,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 import React from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod";
+import { authenticate } from "./_component/actions";
 
 const formSchema = z.object({
   email: z.string().email({ message: "이메일을 입력하세요." }),
@@ -26,6 +29,7 @@ const formSchema = z.object({
 });
 
 export default function Page() {
+  const router = useRouter();
   const [loading, setLoading] = React.useState(false);
   // const router = useRouter();
   // const searchParams = useSearchParams();
@@ -41,14 +45,39 @@ export default function Page() {
     // console.log("data", data);
     try {
       setLoading(true);
-      let result = await signIn("credentials", {
-        email: data.email,
-        password: data.password,
-        role: "admin",
-        type: "email",
-        callbackUrl: "/admin",
-        redirect: true,
-      });
+      let formData = new FormData();
+      formData.append("email", data.email);
+      formData.append("password", data.password);
+      formData.append("role", "admin");
+      formData.append("callbackUrl", "/admin");
+      //
+      let res = await authenticate(formData);
+      if (res) {
+        console.log("res", res);
+        let resdata = JSON.parse(res);
+        if (resdata.passwrod) {
+          toast.error(resdata.passwrod);
+        } else {
+          router.push("/admin");
+        }
+      } else {
+        router.push("/admin");
+      }
+      // let result = await signIn("credentials", {
+      //   email: data.email,
+      //   password: data.password,
+      //   role: "admin",
+      //   callbackUrl: "/admin",
+      //   redirect: false,
+      // });
+      //
+      // console.log("result", result);
+      // if (result.error) {
+      //   toast.error("비밀번호가 잘못되었습니다.");
+      // } else {
+      //   router.push("/admin");
+      // }
+
       //   if (result?.ok) {
       //     console.log("redirectStr", redirectStr);
       //     if (redirectStr) {
@@ -61,6 +90,8 @@ export default function Page() {
       //     form.reset();
       //   }
     } catch (e) {
+      console.log("ee,", e);
+      toast.error(e);
     } finally {
       setLoading(false);
     }

@@ -62,7 +62,7 @@ contentdownloadURL */}
             notice?.contents.map((item: any, index: any) => {
               return (
                 <DownLoadButton
-                  key={item._id}
+                  key={index}
                   downLoadUrl={item.contentdownloadURL}
                   fileName={item?.contentName}
                 />

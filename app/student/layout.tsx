@@ -152,20 +152,18 @@ export default function Layout({
             </Accordion>
           </div>
           <div className="bg-[#08111b] w-full flex flex-col items-center border-t border-[#152b45]">
-            {session?.data?.user && (
-              <Link
-                className="py-6 gap-2 flex flex-col"
-                href={"/student/profile"}
-              >
-                {menuExpend ? (
-                  <p>{session?.data?.user.email}</p>
-                ) : (
-                  <Avatar className="bg-neutral-800 flex flex-col items-center justify-center">
-                    <AvatarFallback>S</AvatarFallback>
-                  </Avatar>
-                )}
-              </Link>
-            )}
+            <Link
+              className="py-6 gap-2 flex flex-col"
+              href={"/student/profile"}
+            >
+              {menuExpend ? (
+                <p>프로필</p>
+              ) : (
+                <Avatar className="bg-white flex flex-col items-center justify-center">
+                  <AvatarFallback>AM</AvatarFallback>
+                </Avatar>
+              )}
+            </Link>
           </div>
         </div>
 

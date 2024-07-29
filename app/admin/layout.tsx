@@ -210,20 +210,15 @@ export default function Layout({
             </Link>
           </div>
           <div className="bg-[#08111b] w-full flex flex-col items-center border-t border-[#152b45]">
-            {session?.data?.user && (
-              <Link
-                className="py-6 gap-2 flex flex-col"
-                href={"/admin/profile"}
-              >
-                {menuExpend ? (
-                  <p>{session?.data?.user.email}</p>
-                ) : (
-                  <Avatar className="bg-white flex flex-col items-center justify-center">
-                    <AvatarFallback>AM</AvatarFallback>
-                  </Avatar>
-                )}
-              </Link>
-            )}
+            <Link className="py-6 gap-2 flex flex-col" href={"/admin/profile"}>
+              {menuExpend ? (
+                <p>프로필</p>
+              ) : (
+                <Avatar className="bg-white flex flex-col items-center justify-center">
+                  <AvatarFallback>AM</AvatarFallback>
+                </Avatar>
+              )}
+            </Link>
           </div>
         </div>
 

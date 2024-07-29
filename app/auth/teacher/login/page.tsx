@@ -20,6 +20,8 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+import { authenticate } from "../../admin/login/_component/actions";
+import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
   email: z.string().email({ message: "이메일을 입력하세요." }),
@@ -27,6 +29,7 @@ const formSchema = z.object({
 });
 
 export default function Page() {
+  const router = useRouter();
   const [loading, setLoading] = React.useState(false);
   // const router = useRouter();
   // const searchParams = useSearchParams();
@@ -42,15 +45,24 @@ export default function Page() {
     // console.log("data", data);
     try {
       setLoading(true);
-      let result = await signIn("credentials", {
-        email: data.email,
-        password: data.password,
-        role: "teacher",
-        type: "email",
-        callbackUrl: "/teacher",
-        redirect: true,
-      });
-      console.log("result", result);
+      let formData = new FormData();
+      formData.append("email", data.email);
+      formData.append("password", data.password);
+      formData.append("role", "teacher");
+      formData.append("callbackUrl", "/teacher");
+      //
+      let res = await authenticate(formData);
+      if (res) {
+        console.log("res", res);
+        let resdata = JSON.parse(res);
+        if (resdata.passwrod) {
+          toast.error(resdata.passwrod);
+        } else {
+          router.push("/teacher");
+        }
+      } else {
+        router.push("/teacher");
+      }
     } catch (e) {
       console.log(e);
       toast.error(e);
@@ -64,12 +76,7 @@ export default function Page() {
         <Logo />
 
         <p className="text-3xl">리더 로그인</p>
-        {/* <div className="flex flex-row items-center gap-6">
-          <Button>교육생</Button>
-          <Button>리더</Button>
-          <Button>평가자</Button>
-        </div>
-        <p>계정의 따로 생성할 필요가 있는가?</p> */}
+
         <Form {...form}>
           <form
             className="flex flex-col gap-6 w-full"

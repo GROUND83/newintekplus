@@ -40,7 +40,7 @@ export async function createLessonLibrary(formData: FormData) {
 
         let lessonDirective = await LessonDirective.create({
           LessonDirectiveURL: location,
-          contentdescription,
+          contentdescription: contentdescription || "",
           contentfileName: filename,
           contentSize: file.size,
         });
@@ -76,8 +76,8 @@ export async function createLessonLibrary(formData: FormData) {
                   type: lessonContent[index].type,
                   lessonContentdownloadURL: location,
                   lessonContendescription:
-                    lessonContent[index].lessonContendescription,
-                  link: lessonContent[index].link,
+                    lessonContent[index].lessonContendescription || "",
+                  link: lessonContent[index].link || "",
                   lessonContenFileName: lessonContenFileName,
                   lessonContentSize: contentFile.size,
                 });
@@ -99,8 +99,8 @@ export async function createLessonLibrary(formData: FormData) {
                 type: lessonContent[index].type,
                 lessonContentdownloadURL: "",
                 contentdescription:
-                  lessonContent[index].lessonContendescription,
-                link: lessonContent[index].link,
+                  lessonContent[index].lessonContendescription || "",
+                link: lessonContent[index].link || "",
                 lessonContenFileName: "",
                 lessonContentSize: "",
               });

@@ -20,6 +20,9 @@ import Link from "next/link";
 import React from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { authenticate } from "../../admin/login/_component/actions";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 const formSchema = z.object({
   email: z.string().email({ message: "이메일을 입력하세요." }),
@@ -27,6 +30,7 @@ const formSchema = z.object({
 });
 
 export default function Page() {
+  const router = useRouter();
   const [loading, setLoading] = React.useState(false);
   // const router = useRouter();
   // const searchParams = useSearchParams();
@@ -42,15 +46,25 @@ export default function Page() {
     // console.log("data", data);
     try {
       setLoading(true);
-
-      let result = await signIn("credentials", {
-        email: data.email,
-        password: data.password,
-        role: "participant",
-        type: "email",
-        callbackUrl: "/student",
-        redirect: true,
-      });
+      setLoading(true);
+      let formData = new FormData();
+      formData.append("email", data.email);
+      formData.append("password", data.password);
+      formData.append("role", "participant");
+      formData.append("callbackUrl", "/student");
+      //
+      let res = await authenticate(formData);
+      if (res) {
+        console.log("res", res);
+        let resdata = JSON.parse(res);
+        if (resdata.passwrod) {
+          toast.error(resdata.passwrod);
+        } else {
+          router.push("/student");
+        }
+      } else {
+        router.push("/student");
+      }
     } catch (e) {
       console.log(e);
     } finally {
