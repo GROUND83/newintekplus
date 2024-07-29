@@ -1,10 +1,10 @@
 "use client";
-import { Button } from "@/components/ui/button";
 import React from "react";
+import { Button } from "@/components/ui/button";
 import { updataLessonResultPointLive } from "@/components/commonActions/commonActions";
 import { toast } from "sonner";
 
-export default function evaluationSelectEditLive({
+export default function EvaluationSelectEditLive({
   lessonResultId,
   setEvaluationOepn,
   getLessonData,
@@ -15,7 +15,7 @@ export default function evaluationSelectEditLive({
   getLessonData: () => void;
   point: number;
 }) {
-  const [select, setSelct] = React.useState<any>(point);
+  const [select, setSelct] = React.useState<any>(point || 0);
   const clickdone = async () => {
     //
     console.log(select);

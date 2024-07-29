@@ -4,7 +4,7 @@ import React from "react";
 import { updataLessonResultPointLive } from "@/components/commonActions/commonActions";
 import { toast } from "sonner";
 
-export default function evaluationSelectLive({
+export default function EvaluationSelectLive({
   lessonResultId,
   setEvaluationOepn,
   getLessonData,

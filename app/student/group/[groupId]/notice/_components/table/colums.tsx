@@ -8,7 +8,7 @@ import {
   useReactTable,
   createColumnHelper,
 } from "@tanstack/react-table";
-import { TableDataType } from "./table";
+
 import { Button } from "@/components/ui/button";
 import { ArrowUpDown } from "lucide-react";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";

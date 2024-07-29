@@ -10,9 +10,9 @@ import FormLabelWrap from "@/components/formLabel";
 import { DownloadIcon } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
-import PerformEvaluation from "./[moduleId]/live/[lessonId]/_component/performEvaluation";
 
 import { ScrollArea } from "@/components/ui/scroll-area";
+import PerformEvaluation from "@/components/commonUi/lesson/component/performEvaluation";
 
 const FormSchema = z.object({
   downUrl: z.string().optional(), //레슨다운로드

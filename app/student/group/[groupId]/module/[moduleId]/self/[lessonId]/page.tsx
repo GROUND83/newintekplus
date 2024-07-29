@@ -43,33 +43,33 @@ export default function Page({
   //
   const getLessonData = async () => {
     console.log("session", session);
-    if (session.data?.user?.email) {
-      let res = await getLessonDetail({
-        lessonId: params.lessonId,
-        participantEmail: session.data?.user?.email,
-        groupId: params.groupId,
+    let res = await getLessonDetail({
+      lessonId: params.lessonId,
+
+      groupId: params.groupId,
+    });
+    if (res.data) {
+      let lesson = JSON.parse(res.data);
+      console.log("lesson", lesson);
+      setlesson(lesson);
+    }
+    if (res.lessonResult) {
+      let lessonResult = JSON.parse(res.lessonResult);
+      console.log("lessonResult", lessonResult);
+      setlessonResult(lessonResult);
+      form.reset({
+        downUrl: lessonResult.perform.downUrl || "", //레슨다운로드
+        fileName: lessonResult.perform.fileName || "", // 레슨파일이름
+        size: lessonResult.perform.size || undefined, // 레슨 파일 크기
+        file: undefined,
       });
-      if (res.data) {
-        let lesson = JSON.parse(res.data);
-        console.log("lesson", lesson);
-        setlesson(lesson);
-      }
-      if (res.lessonResult) {
-        let lessonResult = JSON.parse(res.lessonResult);
-        console.log("lessonResult", lessonResult);
-        setlessonResult(lessonResult);
-        form.reset({
-          downUrl: lessonResult.perform.downUrl || "", //레슨다운로드
-          fileName: lessonResult.perform.fileName || "", // 레슨파일이름
-          size: lessonResult.perform.size || undefined, // 레슨 파일 크기
-          file: undefined,
-        });
-      }
+    }
+    if (session.data?.user?.email) {
     }
   };
   React.useEffect(() => {
     getLessonData();
-  }, [params.lessonId, session.data]);
+  }, [params.lessonId]);
   //
 
   async function onSubmit(values: z.infer<typeof FormSchema>) {

@@ -119,8 +119,9 @@ export default auth((req) => {
 export const config = {
   //   matcher: ["/", "/profile", "auth/:path*"], // 미들웨어 실행할 path
 
-  matcher:
+  matcher: [
     "/((?!api|_next/static|_next/image|favicon.ico|.*\\.png$|.*\\.svg$|.*\\.jpg$|.*\\.svg$).*)",
+  ],
   // matcher: [
   //   // "/reservaton/:path*",
   //   {

@@ -11,8 +11,6 @@ import {
 } from "@/components/ui/dialog";
 import { XIcon } from "lucide-react";
 import React from "react";
-import EvaluationSelect from "./lesson/component/evaluationSelect";
-import EvaluationSelectEdit from "./lesson/component/evaluationSelectEdit";
 
 //
 export default function ViewFeedBack({

@@ -11,7 +11,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { useParams, usePathname } from "next/navigation";
-import { getModuleDetail } from "./_component/actions";
+
 import { Button } from "@/components/ui/button";
 
 export default function Layout({
