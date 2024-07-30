@@ -24,7 +24,7 @@ const lessonContent = new mongoose.Schema<ILessonContentDocument>(
     type: { type: String },
     link: { type: String },
     lessonContentdownloadURL: { type: String }, //레슨다운로드
-    lessoncontentName: { type: String }, // 자료이름
+    lessoncontentName: { type: String }, // 자료이름 xx
     lessonContenFileName: { type: String }, // 레슨파일이름 링크
     lessonContendescription: { type: String }, // 교육교안 설명
     lessonContentSize: { type: Number }, // 레슨 파일 크기

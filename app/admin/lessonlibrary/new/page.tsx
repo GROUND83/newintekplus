@@ -42,7 +42,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Check, ChevronsUpDown, CalendarIcon, XIcon } from "lucide-react";
+import {
+  Check,
+  ChevronsUpDown,
+  CalendarIcon,
+  XIcon,
+  Loader2,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Calendar } from "@/components/ui/calendar";
 import dayjs from "dayjs";
@@ -60,6 +66,8 @@ import { Toaster, toast } from "sonner";
 import { useRouter } from "next/navigation";
 import LessonContent from "@/models/lessonContents";
 import React from "react";
+import { UploadFileClient } from "@/lib/fileUploaderClient";
+import { UploadResponse } from "nodejs-s3-typescript/dist/cjs/types";
 
 const FormSchema = z.object({
   title: z.string({
@@ -97,6 +105,7 @@ const FormSchema = z.object({
   ),
 });
 export default function Page() {
+  const [loading, setLoading] = React.useState(false);
   const [contentType, setContentType] = React.useState("");
   const router = useRouter();
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -113,52 +122,92 @@ export default function Page() {
   });
 
   async function onSubmit(values: z.infer<typeof FormSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    // values.lessonDirective.file.name = Buffer.from(
-    //   values.lessonDirective.file.name,
-    //   "ascii"
-    // ).toString("utf8");
     console.log("values", values);
-    const formData = new FormData();
-    formData.append("title", values.title);
-    formData.append("description", values.description);
-    formData.append("property", values.property);
-    formData.append("evaluation", values.evaluation);
-    formData.append("lessonHour", values.lessonHour);
-    if (values.lessonDirective.file) {
-      formData.append("file", values.lessonDirective.file);
-    }
-    formData.append(
-      "contentdescription",
-      values.lessonDirective.contentdescription
-    );
-    let newContentFile = [];
-    for (let i = 0; i < values.lessonContent.length; i++) {
-      if (values.lessonContent[i].file) {
-        formData.append(`contentFile_${i}`, values.lessonContent[i].file);
-        newContentFile.push({
-          ...values.lessonContent[i],
-          file: true,
+    // 클라이언트 파일업로드
+    setLoading(true);
+    try {
+      let lessonDirectivce = {
+        isDone: false,
+        LessonDirectiveURL: "",
+        contentdescription: "",
+        contentfileName: "",
+        contentSize: 0,
+      };
+      if (values.lessonDirective.file) {
+        const upload = await UploadFileClient({
+          folderName: "lessonDirective",
+          file: values.lessonDirective.file,
         });
-      } else {
-        newContentFile.push({
-          ...values.lessonContent[i],
-          file: false,
-        });
+        let { location } = upload as UploadResponse;
+        lessonDirectivce.isDone = true;
+        lessonDirectivce.LessonDirectiveURL = location;
+        lessonDirectivce.contentfileName = values.lessonDirective.file.name;
+        lessonDirectivce.contentSize = values.lessonDirective.file.size;
+        lessonDirectivce.contentdescription =
+          values.lessonDirective.contentdescription || "";
       }
-    }
-    formData.append("lessonContent", JSON.stringify(newContentFile));
-    let res = await createLessonLibrary(formData);
-    console.log(res);
-    if (res.data) {
-      let lesson = JSON.parse(res.data);
-      console.log("up", lesson);
-      toast.success("레슨 생성에 성공하였습니다.");
-      router.push("/admin/lessonlibrary");
-    } else {
-      console.log("message", res.message);
-      toast.error(res.message);
+      console.log("lessonDirectivce", lessonDirectivce);
+
+      //
+      let newContent = [];
+      for await (const lessonContent of values.lessonContent) {
+        if (lessonContent.file) {
+          const upload = await UploadFileClient({
+            folderName: "lessonContents",
+            file: lessonContent.file,
+          });
+          let { location } = upload as UploadResponse;
+          let content = {
+            type: lessonContent.type,
+            lessonContentdownloadURL: location,
+            lessonContenFileName: lessonContent.file.name,
+            lessonContentSize: lessonContent.file.size,
+            link: lessonContent.link,
+            lessonContendescription: lessonContent.lessonContendescription,
+          };
+          newContent.push(content);
+        } else {
+          let content = {
+            type: lessonContent.type,
+            lessonContentdownloadURL: "",
+            lessonContenFileName: "",
+            lessonContentSize: undefined,
+            link: lessonContent.link || "",
+            lessonContendescription: lessonContent.lessonContendescription,
+          };
+          newContent.push(content);
+        }
+      }
+      //
+      const formData = new FormData();
+      formData.append("title", values.title);
+      formData.append("description", values.description);
+      formData.append("property", values.property);
+      formData.append("evaluation", values.evaluation);
+      formData.append("lessonHour", values.lessonHour);
+      if (lessonDirectivce.isDone) {
+        formData.append("lessonDirectivce", JSON.stringify(lessonDirectivce));
+      }
+      if (newContent.length > 0) {
+        formData.append("newContent", JSON.stringify(newContent));
+      }
+
+      let res = await createLessonLibrary(formData);
+      console.log(res);
+      if (res.data) {
+        let lesson = JSON.parse(res.data);
+        console.log("up", lesson);
+        toast.success("레슨 생성에 성공하였습니다.");
+        router.push("/admin/lessonlibrary");
+      } else {
+        console.log("message", res.message);
+        toast.error(res.message);
+      }
+    } catch (e) {
+      console.log(e);
+      toast.error(e);
+    } finally {
+      setLoading(false);
     }
   }
   return (
@@ -176,8 +225,12 @@ export default function Page() {
                   <p>레슨 라이브러리를 생성하세요.</p>
                 </div>
                 <div>
-                  <Button type="submit" className="mt-6">
-                    생성
+                  <Button type="submit" className="mt-6" disabled={loading}>
+                    {loading ? (
+                      <Loader2 className=" animate-spin" />
+                    ) : (
+                      <p>생성</p>
+                    )}
                   </Button>
                 </div>
               </div>
