@@ -1,7 +1,11 @@
 "use client";
 
 import React from "react";
-import { detailCourseProfile, updateCourseProfile } from "./actions";
+import {
+  deleteCourseProfile,
+  detailCourseProfile,
+  updateCourseProfile,
+} from "./actions";
 import { useFieldArray, useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -34,7 +38,7 @@ import {
 } from "@/components/ui/card";
 import FormLabelWrap from "@/components/formLabel";
 import { Textarea } from "@/components/ui/textarea";
-import { Download, XIcon } from "lucide-react";
+import { Download, Loader2, XIcon } from "lucide-react";
 import {
   competencyType,
   eduPlaceData,
@@ -48,6 +52,8 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import ModulesLessonEdit from "./_components/modulesLessonEdit";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { UploadFileClient } from "@/lib/fileUploaderClient";
+import DeleteModal from "@/components/commonUi/DeleteModal";
 //
 const FormSchema = z.object({
   _id: z.string(),
@@ -78,6 +84,7 @@ const FormSchema = z.object({
     })
   ), // 요구 역량
   courseDirective: z.object({
+    _id: z.string().optional(),
     type: z.string().optional(),
     LessonDirectiveURL: z.string().optional(),
     contentName: z.string().optional(),
@@ -87,6 +94,7 @@ const FormSchema = z.object({
     contentdescription: z.string().optional(),
   }),
   courseWholeDirective: z.object({
+    _id: z.string().optional(),
     type: z.string().optional(),
     LessonDirectiveURL: z.string().optional(),
     contentName: z.string().optional(),
@@ -106,6 +114,8 @@ export default function Page({
   const [eduAbilityInputData, setEduAbilityInputData] = React.useState([]);
   const [loading, setLoading] = React.useState(false);
   const [updateLoading, setUpdateLoading] = React.useState(false);
+  const [deleteOpen, setDeleteOpen] = React.useState(false);
+  const [deleteLoading, setdeleteLoading] = React.useState(false);
   const [show, setShow] = React.useState(false);
   const [courseDirectiveshow, setcourseDirectiveShow] = React.useState(false);
   const [editAvaliable, setEditAvaliable] = React.useState([]);
@@ -181,29 +191,76 @@ export default function Page({
 
   async function onSubmit(values: z.infer<typeof FormSchema>) {
     console.log("values", values);
-
-    const formData = new FormData();
-    formData.append("_id", values._id);
-    formData.append("title", values.title);
-    formData.append("eduTarget", values.eduTarget);
-    formData.append("jobGroup", values.jobGroup);
-    formData.append("jobSubGroup", values.jobSubGroup);
-    formData.append("eduPlace", values.eduPlace);
-    formData.append("eduForm", values.eduForm);
-    formData.append("eduAbility", JSON.stringify(values.eduAbilitys));
-    formData.append("competency", values.competency);
-    if (values.courseDirective.file) {
-      //
-      formData.append("courseDirective_file", values.courseDirective.file);
-    }
-    if (values.courseWholeDirective.file) {
-      formData.append(
-        "courseWholeDirective_file",
-        values.courseWholeDirective.file
-      );
-      //
-    }
+    setUpdateLoading(true);
     try {
+      const formData = new FormData();
+      formData.append("_id", params.courseProfileId);
+      formData.append("title", values.title);
+      formData.append("eduTarget", values.eduTarget);
+      formData.append("jobGroup", values.jobGroup);
+      formData.append("jobSubGroup", values.jobSubGroup);
+      formData.append("eduPlace", values.eduPlace);
+      formData.append("eduForm", values.eduForm);
+      formData.append("eduAbility", JSON.stringify(values.eduAbilitys));
+      formData.append("competency", values.competency);
+
+      let courseDirective = {
+        isDone: false,
+        LessonDirectiveURL: "",
+        contentfileName: "",
+        contentSize: 0,
+      };
+      if (values.courseDirective.file) {
+        //
+        const upload = await UploadFileClient({
+          folderName: "courseDirective",
+          file: values.courseDirective.file,
+        });
+        //
+        if (upload.location) {
+          courseDirective.isDone = true;
+          courseDirective.LessonDirectiveURL = upload.location;
+          courseDirective.contentSize = values.courseDirective.file.size;
+          courseDirective.contentfileName = values.courseDirective.file.name;
+        } else {
+          toast.error("파일 업로드에 실폐하였습니다.");
+          return;
+        }
+        // formData.append("courseDirective_file", values.courseDirective.file);
+      }
+      let courseWholeDirective = {
+        isDone: false,
+        LessonDirectiveURL: "",
+        contentSize: 0,
+        contentfileName: "",
+      };
+      if (values.courseWholeDirective.file) {
+        const upload = await UploadFileClient({
+          folderName: "courseDirective",
+          file: values.courseWholeDirective.file,
+        });
+        //
+        if (upload.location) {
+          courseWholeDirective.isDone = true;
+          courseWholeDirective.LessonDirectiveURL = upload.location;
+          courseWholeDirective.contentSize =
+            values.courseWholeDirective.file.size;
+          courseWholeDirective.contentfileName =
+            values.courseWholeDirective.file.name;
+        } else {
+          toast.error("파일 업로드에 실폐하였습니다.");
+          return;
+        }
+      }
+      if (courseDirective.isDone) {
+        formData.append("courseDirective", JSON.stringify(courseDirective));
+      }
+      if (courseWholeDirective.isDone) {
+        formData.append(
+          "courseWholeDirective",
+          JSON.stringify(courseWholeDirective)
+        );
+      }
       let res = await updateCourseProfile(formData);
       console.log("resdta", res);
       if (res.data) {
@@ -215,6 +272,8 @@ export default function Page({
       //
       console.log("message", e);
       toast.error(e);
+    } finally {
+      setUpdateLoading(false);
     }
   }
 
@@ -261,6 +320,18 @@ export default function Page({
     });
     return () => subscription.unsubscribe();
   }, [form.watch]);
+
+  const clickDelete = async () => {
+    //
+    let courseProfileId = params.courseProfileId;
+    let res = await deleteCourseProfile(courseProfileId);
+    if (res.data) {
+      toast.success("코스프로파일 삭제 성공하였습니다.");
+      router.push("/admin/courseprofile");
+    } else {
+      toast.error("에러");
+    }
+  };
   return (
     <div className="w-full flex-1 flex ">
       <ScrollArea className="w-full h-[calc(100vh-70px)] flex">
@@ -274,6 +345,7 @@ export default function Page({
                 <div className="flex flex-row items-center justify-between w-full">
                   <div>
                     <p className="text-xl  font-bold">코스프로파일 수정</p>
+
                     {editAvaliable.length > 0 ? (
                       <div>
                         <p className="text-red-500">
@@ -290,14 +362,27 @@ export default function Page({
                       </div>
                     )}
                   </div>
-                  <div className=" col-span-12 flex flex-col items-end">
+                  <div className=" col-span-12 flex flex-row items-center gap-2">
                     <Button
                       type="submit"
-                      className="mt-6"
-                      disabled={editAvaliable.length > 0 ? true : false}
+                      disabled={editAvaliable.length > 0 || updateLoading}
                     >
-                      코스프로파일 수정
+                      {updateLoading ? (
+                        <Loader2 className=" animate-spin" />
+                      ) : (
+                        <p> 코스프로파일 수정</p>
+                      )}
                     </Button>
+                    <DeleteModal
+                      title="코스프로파일 삭제"
+                      desc={"코스프로파일을 삭제합니다."}
+                      btnText={"코스프로파일 삭제"}
+                      onClick={clickDelete}
+                      disabled={false}
+                      deleteOpen={deleteOpen}
+                      setDeleteOpen={setDeleteOpen}
+                      deleteLoading={deleteLoading}
+                    />
                   </div>
                 </div>
                 <div className="w-full grid grid-cols-12 gap-5 mt-3">
@@ -655,6 +740,15 @@ export default function Page({
                                   >
                                     수정
                                   </Button>
+                                  {/* <Button
+                                    type="button"
+                                    onClick={() => {
+                                      form.setValue("courseDirective", {});
+                                      setcourseDirectiveShow(false);
+                                    }}
+                                  >
+                                    삭제
+                                  </Button> */}
                                 </>
                               )}
                             </div>

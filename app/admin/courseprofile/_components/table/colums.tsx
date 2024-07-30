@@ -95,7 +95,6 @@ export const columns: ColumnDef<any>[] = [
   {
     id: "actions",
     cell: ({ row }) => {
-      console.log(row);
       return (
         <div className=" text-right">
           <Button asChild size="sm" variant="outline">

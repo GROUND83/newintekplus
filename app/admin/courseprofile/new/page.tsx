@@ -32,7 +32,7 @@ import {
 } from "@/components/ui/card";
 import FormLabelWrap from "@/components/formLabel";
 import { Textarea } from "@/components/ui/textarea";
-import { XIcon } from "lucide-react";
+import { Loader2, XIcon } from "lucide-react";
 import {
   competencyType,
   eduPlaceData,
@@ -44,6 +44,7 @@ import React from "react";
 import { getJobSubGroup, getComPetency, createCourseProfile } from "./actions";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { UploadFileClient } from "@/lib/fileUploaderClient";
 const FormSchema = z.object({
   title: z.string({
     required_error: "과정명을 입력하세요.",
@@ -91,6 +92,7 @@ const FormSchema = z.object({
   }),
 });
 export default function Page() {
+  const [updateLoading, setUpdateLoading] = React.useState(false);
   const router = useRouter();
   const [sublist, setSublist] = React.useState<any>([]);
   const [eduAbilityInputData, setEduAbilityInputData] = React.useState([]); // 인풋데이터
@@ -109,35 +111,77 @@ export default function Page() {
   });
 
   async function onSubmit(values: z.infer<typeof FormSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    // values.lessonDirective.file.name = Buffer.from(
-    //   values.lessonDirective.file.name,
-    //   "ascii"
-    // ).toString("utf8");
-    console.log("values", values);
-    const formData = new FormData();
-    formData.append("title", values.title);
-    formData.append("eduTarget", values.eduTarget);
-    formData.append("jobGroup", values.jobGroup);
-    formData.append("jobSubGroup", values.jobSubGroup);
-    formData.append("eduPlace", values.eduPlace);
-    formData.append("eduForm", values.eduForm);
-    formData.append("eduAbility", JSON.stringify(values.eduAbilitys));
-    formData.append("competency", values.competency);
-    if (values.courseDirective.file) {
-      //
-      formData.append("courseDirective_file", values.courseDirective.file);
-    }
-    if (values.courseWholeDirective.file) {
-      formData.append(
-        "courseWholeDirective_file",
-        values.courseWholeDirective.file
-      );
-      //
-    }
-
+    setUpdateLoading(false);
     try {
+      console.log("values", values);
+      const formData = new FormData();
+      formData.append("title", values.title);
+      formData.append("eduTarget", values.eduTarget);
+      formData.append("jobGroup", values.jobGroup);
+      formData.append("jobSubGroup", values.jobSubGroup);
+      formData.append("eduPlace", values.eduPlace);
+      formData.append("eduForm", values.eduForm);
+      formData.append("eduAbility", JSON.stringify(values.eduAbilitys));
+      formData.append("competency", values.competency);
+
+      let courseDirective = {
+        isDone: false,
+        LessonDirectiveURL: "",
+        contentfileName: "",
+        contentSize: 0,
+      };
+      //
+      if (values.courseDirective.file) {
+        const upload = await UploadFileClient({
+          folderName: "courseDirective",
+          file: values.courseDirective.file,
+        });
+        //
+        if (upload.location) {
+          courseDirective.isDone = true;
+          courseDirective.LessonDirectiveURL = upload.location;
+          courseDirective.contentSize = values.courseDirective.file.size;
+          courseDirective.contentfileName = values.courseDirective.file.name;
+        } else {
+          toast.error("파일 업로드에 실폐하였습니다.");
+          return;
+        }
+      }
+      if (courseDirective.isDone) {
+        formData.append("courseDirective", JSON.stringify(courseDirective));
+      }
+      let courseWholeDirective = {
+        isDone: false,
+        LessonDirectiveURL: "",
+        contentSize: 0,
+        contentfileName: "",
+      };
+
+      if (values.courseWholeDirective.file) {
+        const upload = await UploadFileClient({
+          folderName: "courseDirective",
+          file: values.courseDirective.file,
+        });
+        //
+        if (upload.location) {
+          courseWholeDirective.isDone = true;
+          courseWholeDirective.LessonDirectiveURL = upload.location;
+          courseWholeDirective.contentSize =
+            values.courseWholeDirective.file.size;
+          courseWholeDirective.contentfileName =
+            values.courseWholeDirective.file.name;
+        } else {
+          toast.error("파일 업로드에 실폐하였습니다.");
+          return;
+        }
+      }
+      if (courseWholeDirective.isDone) {
+        formData.append(
+          "courseWholeDirective",
+          JSON.stringify(courseWholeDirective)
+        );
+      }
+
       let res = await createCourseProfile(formData);
       if (res.data) {
         //
@@ -148,17 +192,9 @@ export default function Page() {
       //
       console.log("message", e);
       toast.error(e);
+    } finally {
+      setUpdateLoading(false);
     }
-    // let res = await createLessonLibrary(formData);
-    // if (res.data) {
-    //   let lesson = JSON.parse(res.data);
-    //   console.log("up", lesson);
-    //   toast.success("레슨 생성에 성공하였습니다.");
-    //   router.push("/admin/lessonlibrary");
-    // } else {
-    //   console.log("message", res.message);
-    //   toast.error(res.message);
-    // }
   }
   const getjobSubGroup = async (jobGroup: string) => {
     //
@@ -535,8 +571,16 @@ export default function Page() {
                   />
                 </div>
                 <div className=" col-span-12 flex flex-col items-end">
-                  <Button type="submit" className="mt-6">
-                    생성
+                  <Button
+                    type="submit"
+                    className="mt-6"
+                    disabled={updateLoading}
+                  >
+                    {updateLoading ? (
+                      <Loader2 className=" animate-spin" />
+                    ) : (
+                      <p>생성</p>
+                    )}
                   </Button>
                 </div>
               </CardContent>

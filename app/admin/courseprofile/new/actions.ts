@@ -127,11 +127,12 @@ export async function createCourseProfile(formData: FormData) {
   const eduAbilitys = formData.get("eduAbilitys") as string;
   const eduAbilityData = JSON.parse(eduAbilitys);
   const competency = formData.get("competency") as string;
-  const courseDirective_file = formData.get("courseDirective_file") as File;
-  const courseWholeDirective_file = formData.get(
-    "courseWholeDirective_file"
-  ) as File;
+  const courseDirective = formData.get("courseDirective") as any;
+  const courseWholeDirective = formData.get("courseWholeDirective") as any;
   try {
+    //
+
+    //
     let couserProfile = await CourseProfile.create({
       title,
       eduTarget: eduTarget ? eduTarget : "",
@@ -142,64 +143,39 @@ export async function createCourseProfile(formData: FormData) {
       eduAbilitys: eduAbilityData,
       competency,
     });
-    //
-    if (courseDirective_file) {
-      let courseDirective_filename = Buffer.from(
-        courseDirective_file.name,
-        "latin1"
-      ).toString("utf8");
-      let newFormData = new FormData();
-      newFormData.append("file", courseDirective_file);
-      newFormData.append("folderName", "courseDirective");
-      const upload = await UploadFile(newFormData);
-      console.log("uplaod", upload);
-      if (upload) {
-        let { location } = upload as UploadResponse;
-        let courseDirective = await CourseDirective.create({
-          LessonDirectiveURL: location,
-          contentSize: courseDirective_file.size,
-          contentfileName: courseDirective_filename,
-        });
-        //
-        await CourseProfile.findOneAndUpdate(
-          {
-            _id: couserProfile._id,
-          },
-          {
-            courseDirective: courseDirective,
-          }
-        );
-      }
+    if (courseDirective) {
+      let courseDirectiveData = JSON.parse(courseDirective);
+      let courseDirectivecreate = await CourseDirective.create({
+        LessonDirectiveURL: courseDirectiveData.LessonDirectiveURL,
+        contentSize: courseDirectiveData.contentSize,
+        contentfileName: courseDirectiveData.contentfileName,
+      });
+      await CourseProfile.findOneAndUpdate(
+        {
+          _id: couserProfile._id,
+        },
+        {
+          courseDirective: courseDirectivecreate,
+        }
+      );
     }
-    //
-    if (courseWholeDirective_file) {
-      let courseWholeDirective_file_filename = Buffer.from(
-        courseWholeDirective_file.name,
-        "latin1"
-      ).toString("utf8");
-      let newFormData = new FormData();
-      newFormData.append("file", courseWholeDirective_file);
-      newFormData.append("folderName", "courseWholeDirective");
-      const upload = await UploadFile(newFormData);
-      console.log("uplaod", upload);
-      if (upload) {
-        let { location } = upload as UploadResponse;
-        let courseDirective = await CourseDirective.create({
-          LessonDirectiveURL: location,
-          contentSize: courseWholeDirective_file.size,
-          contentfileName: courseWholeDirective_file_filename,
-        });
-        //
-        await CourseProfile.findOneAndUpdate(
-          {
-            _id: couserProfile._id,
-          },
-          {
-            courseWholeDirective: courseDirective,
-          }
-        );
-      }
+    if (courseWholeDirective) {
+      let courseWholeDirectiveData = JSON.parse(courseWholeDirective);
+      let courseWholeDirectivecreate = await CourseDirective.create({
+        LessonDirectiveURL: courseWholeDirectiveData.LessonDirectiveURL,
+        contentSize: courseWholeDirectiveData.contentSize,
+        contentfileName: courseWholeDirectiveData.contentfileName,
+      });
+      await CourseProfile.findOneAndUpdate(
+        {
+          _id: couserProfile._id,
+        },
+        {
+          courseWholeDirective: courseWholeDirectivecreate,
+        }
+      );
     }
+
     return { data: JSON.stringify(couserProfile) };
   } catch (e) {
     return {
