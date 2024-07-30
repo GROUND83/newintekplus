@@ -32,6 +32,8 @@ import { ExclamationCircleIcon as FillExclamtion } from "@heroicons/react/24/sol
 import ActionModal from "@/components/commonUi/ActionModal";
 import DeleteModal from "@/components/commonUi/DeleteModal";
 import { useRouter } from "next/navigation";
+import { UploadFileClient } from "@/lib/fileUploaderClient";
+import { UploadResponse } from "nodejs-s3-typescript/dist/cjs/types";
 //
 export default function Page({ params }: { params: { lessonId: string } }) {
   const [contentType, setContentType] = React.useState("");
@@ -90,22 +92,78 @@ export default function Page({ params }: { params: { lessonId: string } }) {
     formData.append("lessonHour", values.lessonHour.toString());
     formData.append("description", values.description);
     //
-    if (values.lessonDirective.file) {
-      //
-      formData.append("lessonDirective_id", values.lessonDirective._id);
-      formData.append(
-        "lessonDirective_contentdescription",
+    let lessonDirectivce = {
+      _id: "",
+      isDone: false,
+      LessonDirectiveURL: "",
+      contentdescription: "",
+      contentfileName: "",
+      contentSize: 0,
+    };
+    if (values.lessonDirective._id) {
+      if (values.lessonDirective.file) {
+        const upload = await UploadFileClient({
+          folderName: "lessonDirective",
+          file: values.lessonDirective.file,
+        });
+        console.log("upload", upload);
+        if (upload.location) {
+          lessonDirectivce._id = values.lessonDirective._id;
+          lessonDirectivce.isDone = true;
+          lessonDirectivce.LessonDirectiveURL = upload.location;
+          lessonDirectivce.contentfileName = values.lessonDirective.file.name;
+          lessonDirectivce.contentSize = values.lessonDirective.file.size;
+          lessonDirectivce.contentdescription =
+            values.lessonDirective.contentdescription || "";
+        } else {
+          toast.error("파일 업로드에 실폐하였습니다.");
+          return;
+        }
+      } else if (
+        !values.lessonDirective.file &&
         values.lessonDirective.contentdescription
-      );
-      formData.append("lessonDirective_file", values.lessonDirective.file);
+      ) {
+        lessonDirectivce._id = values.lessonDirective._id;
+        lessonDirectivce.isDone = true;
+        lessonDirectivce.LessonDirectiveURL = "";
+        lessonDirectivce.contentfileName = "";
+        lessonDirectivce.contentSize = undefined;
+        lessonDirectivce.contentdescription =
+          values.lessonDirective.contentdescription;
+      }
     } else {
-      //
-      formData.append("lessonDirective_id", values.lessonDirective._id);
-      formData.append(
-        "lessonDirective_contentdescription",
+      if (values.lessonDirective.file) {
+        const upload = await UploadFileClient({
+          folderName: "lessonDirective",
+          file: values.lessonDirective.file,
+        });
+        if (upload.location) {
+          lessonDirectivce._id = "";
+          lessonDirectivce.isDone = true;
+          lessonDirectivce.LessonDirectiveURL = upload.location;
+          lessonDirectivce.contentfileName = values.lessonDirective.file.name;
+          lessonDirectivce.contentSize = values.lessonDirective.file.size;
+          lessonDirectivce.contentdescription =
+            values.lessonDirective.contentdescription || "";
+        } else {
+          toast.error("파일 업로드에 실폐하였습니다.");
+          return;
+        }
+      } else if (
+        !values.lessonDirective.file &&
         values.lessonDirective.contentdescription
-      );
+      ) {
+        lessonDirectivce._id = "";
+        lessonDirectivce.isDone = true;
+        lessonDirectivce.LessonDirectiveURL = "";
+        lessonDirectivce.contentfileName = "";
+        lessonDirectivce.contentSize = undefined;
+        lessonDirectivce.contentdescription =
+          values.lessonDirective.contentdescription;
+      }
     }
+    formData.append("lessonDirectivce", JSON.stringify(lessonDirectivce));
+
     setUpdateLoading(true);
     try {
       let res = await updateLessonLibrary(formData);

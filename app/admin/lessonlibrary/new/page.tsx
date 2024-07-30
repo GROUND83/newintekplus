@@ -138,44 +138,64 @@ export default function Page() {
           folderName: "lessonDirective",
           file: values.lessonDirective.file,
         });
-        let { location } = upload as UploadResponse;
+        if (upload.location) {
+          lessonDirectivce.isDone = true;
+          lessonDirectivce.LessonDirectiveURL = upload.location;
+          lessonDirectivce.contentfileName = values.lessonDirective.file.name;
+          lessonDirectivce.contentSize = values.lessonDirective.file.size;
+          lessonDirectivce.contentdescription =
+            values.lessonDirective.contentdescription || "";
+        } else {
+          toast.error("파일 업로드에 실폐하였습니다.");
+          return;
+        }
+      } else if (
+        !values.lessonDirective.file &&
+        values.lessonDirective.contentdescription
+      ) {
         lessonDirectivce.isDone = true;
-        lessonDirectivce.LessonDirectiveURL = location;
-        lessonDirectivce.contentfileName = values.lessonDirective.file.name;
-        lessonDirectivce.contentSize = values.lessonDirective.file.size;
+        lessonDirectivce.LessonDirectiveURL = "";
+        lessonDirectivce.contentfileName = "";
+        lessonDirectivce.contentSize = undefined;
         lessonDirectivce.contentdescription =
-          values.lessonDirective.contentdescription || "";
+          values.lessonDirective.contentdescription;
       }
       console.log("lessonDirectivce", lessonDirectivce);
 
       //
       let newContent = [];
-      for await (const lessonContent of values.lessonContent) {
-        if (lessonContent.file) {
-          const upload = await UploadFileClient({
-            folderName: "lessonContents",
-            file: lessonContent.file,
-          });
-          let { location } = upload as UploadResponse;
-          let content = {
-            type: lessonContent.type,
-            lessonContentdownloadURL: location,
-            lessonContenFileName: lessonContent.file.name,
-            lessonContentSize: lessonContent.file.size,
-            link: lessonContent.link,
-            lessonContendescription: lessonContent.lessonContendescription,
-          };
-          newContent.push(content);
-        } else {
-          let content = {
-            type: lessonContent.type,
-            lessonContentdownloadURL: "",
-            lessonContenFileName: "",
-            lessonContentSize: undefined,
-            link: lessonContent.link || "",
-            lessonContendescription: lessonContent.lessonContendescription,
-          };
-          newContent.push(content);
+      if (values.lessonContent.length > 0) {
+        for await (const lessonContent of values.lessonContent) {
+          if (lessonContent.file) {
+            const upload = await UploadFileClient({
+              folderName: "lessonContents",
+              file: lessonContent.file,
+            });
+            if (upload.location) {
+              let content = {
+                type: lessonContent.type,
+                lessonContentdownloadURL: upload.location,
+                lessonContenFileName: lessonContent.file.name,
+                lessonContentSize: lessonContent.file.size,
+                link: lessonContent.link,
+                lessonContendescription: lessonContent.lessonContendescription,
+              };
+              newContent.push(content);
+            } else {
+              toast.error("파일 업로드에 실폐하였습니다.");
+              return;
+            }
+          } else {
+            let content = {
+              type: lessonContent.type,
+              lessonContentdownloadURL: "",
+              lessonContenFileName: "",
+              lessonContentSize: undefined,
+              link: lessonContent.link || "",
+              lessonContendescription: lessonContent.lessonContendescription,
+            };
+            newContent.push(content);
+          }
         }
       }
       //

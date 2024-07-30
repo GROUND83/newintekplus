@@ -121,56 +121,114 @@ export const createWholeNotice = async (formdata: FormData) => {
     let sendTo = formdata.get("sendTo") as string;
     let title = formdata.get("title") as string;
     let description = formdata.get("description") as string;
-    const lessonContentData = formdata.get("lessonContent") as string;
-    const lessonContent = JSON.parse(lessonContentData);
+    const newContent = formdata.get("newContent") as string;
+    const newContentData = JSON.parse(newContent);
 
     let whoteNotice = await WholeNotice.create({
       sendTo,
       title,
       description,
     });
-    if (lessonContent.length > 0) {
-      for (const index in lessonContent) {
-        if (lessonContent[index].file) {
-          //
-          const contentFile = formdata.get(`contentFile_${index}`) as File;
-          console.log("contentFile_", contentFile);
-          let contentFileFormData = new FormData();
-          contentFileFormData.append("file", contentFile);
-          contentFileFormData.append("folderName", "noticeContents");
-          const upload = await UploadFile(contentFileFormData);
-          console.log("uplaod", upload);
-          if (upload) {
-            let { location } = upload as UploadResponse;
-            //
-            let lessonContenFileName = Buffer.from(
-              contentFile.name,
-              "latin1"
-            ).toString("utf8");
-            let noticeContent = await NoticeContent.create({
-              contentdownloadURL: location,
-              contentName: lessonContenFileName,
-              contentSize: contentFile.size,
-            });
-            await WholeNotice.findOneAndUpdate(
-              {
-                _id: whoteNotice._id,
-              },
-              {
-                $push: {
-                  contents: noticeContent,
-                },
-              },
-              { upsert: true }
-            );
-          }
-        }
+    if (newContent) {
+      for (const content of newContentData) {
+        let noticeContent = await NoticeContent.create({
+          contentdownloadURL: content.contentdownloadURL,
+          contentName: content.contentName,
+          contentSize: content.contentSize,
+        });
+        await WholeNotice.findOneAndUpdate(
+          {
+            _id: whoteNotice._id,
+          },
+          {
+            $push: {
+              contents: noticeContent,
+            },
+          },
+          { upsert: true }
+        );
       }
     }
 
-    // .select("property title createdAt lessonHour evaluation")
+    return {
+      data: JSON.stringify(whoteNotice),
+    };
+  } catch (e) {
+    console.log(e);
+    return { message: "코스프로파일 오류" };
+  }
+};
+export const updateWholeNotice = async (formdata: FormData) => {
+  await connectToMongoDB();
+  try {
+    let _id = formdata.get("_id") as string;
+    let sendTo = formdata.get("sendTo") as string;
+    let title = formdata.get("title") as string;
+    let description = formdata.get("description") as string;
+    const newContent = formdata.get("newContent") as string;
+    const newContentData = JSON.parse(newContent);
 
-    // console.log("liveSurvey", liveSurvey);
+    let whoteNotice = await WholeNotice.findOneAndUpdate(
+      {
+        _id: _id,
+      },
+      {
+        sendTo,
+        title,
+        description,
+      }
+    );
+    if (newContent) {
+      if (newContentData.length > 0) {
+        let newContent = [];
+        for (const content of newContentData) {
+          console.log("content", content);
+          if (!content._id) {
+            let noticeContent = await NoticeContent.create({
+              contentdownloadURL: content.contentdownloadURL,
+              contentName: content.contentName,
+              contentSize: content.contentSize,
+            });
+            newContent.push(noticeContent);
+          } else {
+            if (content.isnew) {
+              let noticeContent = await NoticeContent.create({
+                contentdownloadURL: content.contentdownloadURL,
+                contentName: content.contentName,
+                contentSize: content.contentSize,
+              });
+              newContent.push(noticeContent);
+            } else {
+              newContent.push(content);
+            }
+          }
+        }
+        await WholeNotice.findOneAndUpdate(
+          {
+            _id: whoteNotice._id,
+          },
+          {
+            $set: {
+              contents: newContent,
+            },
+          },
+          { upsert: true }
+        );
+      }
+    } else {
+      await WholeNotice.findOneAndUpdate(
+        {
+          _id: whoteNotice._id,
+        },
+        {
+          $set: {
+            contents: null,
+          },
+        },
+        { upsert: true }
+      );
+    }
+
     return {
       data: JSON.stringify(whoteNotice),
     };

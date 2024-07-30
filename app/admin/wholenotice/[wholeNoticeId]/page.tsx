@@ -3,6 +3,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   detailWholeNotice,
   updateLiveSurvey,
+  updateWholeNotice,
 } from "../_components/table/actions";
 import React from "react";
 import { z } from "zod";
@@ -36,10 +37,13 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import FormLabelWrap from "@/components/formLabel";
-import { XIcon } from "lucide-react";
+import { Loader2, XIcon } from "lucide-react";
 import { toast } from "sonner";
 import { sendToType } from "@/lib/common";
 import { Textarea } from "@/components/ui/textarea";
+import { FileEdit } from "../_components/fileEdit";
+import { UploadFileClient } from "@/lib/fileUploaderClient";
+import { useRouter } from "next/navigation";
 const FormSchema = z.object({
   sendTo: z.string({
     required_error: "대상을 선택하세요.",
@@ -50,7 +54,7 @@ const FormSchema = z.object({
   description: z.string().optional(),
   contents: z.array(
     z.object({
-      title: z.string().optional(),
+      _id: z.string().optional(),
       contentdownloadURL: z.string().optional(),
       contentName: z.string().optional(),
       file: z.instanceof(File).optional(),
@@ -63,7 +67,9 @@ export default function Page({
   params: { wholeNoticeId: string };
 }) {
   //
+  const router = useRouter();
   const [loading, setLoading] = React.useState(false);
+  const [updateloading, setUpdateLoading] = React.useState(false);
   const [editAvaliable, setEditAvaliable] = React.useState<any>([]);
   //
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -110,26 +116,59 @@ export default function Page({
 
   async function onSubmit(values: z.infer<typeof FormSchema>) {
     console.log("values", values);
+    setUpdateLoading(true);
+    try {
+      const formData = new FormData();
+      formData.append("_id", params.wholeNoticeId);
+      formData.append("title", values.title);
+      formData.append("sendTo", values.sendTo);
+      formData.append("description", values.description);
+      let newContent = [];
+      // contents
+      if (values.contents.length > 0) {
+        for (const content of values.contents) {
+          if (content.file) {
+            const upload = await UploadFileClient({
+              folderName: "noticeContents",
+              file: content.file,
+            });
+            if (upload.location) {
+              let contentdata = {
+                isnew: true,
+                contentdownloadURL: upload.location,
+                contentName: content.file.name,
+                contentSize: content.file.size,
+              };
+              newContent.push(contentdata);
+            } else {
+              toast.error("파일 업로드에 실폐하였습니다.");
+              return;
+            }
+          } else {
+            //
+            newContent.push(content);
+          }
+        }
+      }
+      if (newContent.length > 0) {
+        formData.append("newContent", JSON.stringify(newContent));
+      }
 
-    const formData = new FormData();
-    formData.append("_id", params.wholeNoticeId);
-    formData.append("title", values.title);
-    // formData.append("surveys", JSON.stringify(values.surveys));
+      let res = await updateWholeNotice(formData);
+      console.log("resdta", res);
+      if (res.data) {
+        //
+        toast.success("공지사항 수정에 성공하였습니다.");
 
-    // try {
-    //   let res = await updateLiveSurvey(formData);
-    //   console.log("resdta", res);
-    //   if (res.data) {
-    //     //
-    //     toast.success("설문 수정에 성공하였습니다.");
-    //     reload();
-    //     // router.push("/admin/courseprofile");
-    //   }
-    // } catch (e) {
-    //   //
-    //   console.log("message", e);
-    //   toast.error(e);
-    // }
+        router.push("/admin/wholenotice");
+      }
+    } catch (e) {
+      //
+      console.log("message", e);
+      toast.error(e);
+    } finally {
+      setUpdateLoading(false);
+    }
   }
 
   return (
@@ -223,40 +262,15 @@ export default function Page({
                       </Button>
                     </div>
                     {contentsFields.map((content, contentIndex) => {
+                      console.log("content", content);
                       return (
-                        <div
-                          className="flex flex-row items-center gap-2 border px-3 py-2 rounded-md bg-neutral-100 col-span-12"
+                        <FileEdit
                           key={contentIndex}
-                        >
-                          <FormField
-                            control={form.control}
-                            name={`contents.${contentIndex}.file`}
-                            render={({
-                              field: { ref, name, onBlur, onChange },
-                            }) => (
-                              <FormItem className="flex flex-col flex-1">
-                                <Input
-                                  type="file"
-                                  ref={ref}
-                                  name={name}
-                                  onBlur={onBlur}
-                                  onChange={(e) =>
-                                    onChange(e.target.files?.[0])
-                                  }
-                                />
-
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                          <Button
-                            type="button"
-                            variant={"outline"}
-                            onClick={() => contentsRemove(contentIndex)}
-                          >
-                            <XIcon className="size-4" />
-                          </Button>
-                        </div>
+                          form={form}
+                          contentIndex={contentIndex}
+                          content={content}
+                          contentsRemove={contentsRemove}
+                        />
                       );
                     })}
                   </div>
@@ -265,10 +279,15 @@ export default function Page({
                     <Button
                       type="submit"
                       className="mt-6"
+                      disabled={updateloading}
 
                       // disabled={editAvaliable.length > 0 ? true : false}
                     >
-                      공지사항 수정
+                      {updateloading ? (
+                        <Loader2 className=" animate-spin" />
+                      ) : (
+                        <p>공지사항 수정</p>
+                      )}
                     </Button>
                   </div>
                 </div>

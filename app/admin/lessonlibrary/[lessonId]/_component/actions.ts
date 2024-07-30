@@ -65,44 +65,48 @@ export async function updateLessonLibrary(formData: FormData) {
   const property = formData.get("property") as string;
   const evaluation = formData.get("evaluation") as string;
   const lessonHour = formData.get("lessonHour") as string;
+  const lessonDirectivce = formData.get("lessonDirectivce") as string;
 
-  const lessonDirective_file = formData.get("lessonDirective_file") as File;
-  const lessonDirective_id = formData.get("lessonDirective_id") as string;
-  const lessonDirective_contentdescription = formData.get(
-    "lessonDirective_contentdescription"
-  ) as string;
+  // const lessonDirective_file = formData.get("lessonDirective_file") as File;
+  // const lessonDirective_id = formData.get("lessonDirective_id") as string;
+  // const lessonDirective_contentdescription = formData.get(
+  //   "lessonDirective_contentdescription"
+  // ) as string;
   try {
     const client = await connectToMongoDB();
     //   학습교안 있을때
-    console.log(
-      "lessonDirective_file",
-      lessonDirective_file,
-      lessonDirective_contentdescription
+    console.log("lessonDirectivce", lessonDirectivce);
+    let lesson = await Lesson.findOneAndUpdate(
+      { _id: lessonId },
+      {
+        title,
+        property,
+        description,
+        evaluation,
+        lessonHour: Number(lessonHour),
+      }
     );
-    if (lessonDirective_file) {
-      let filename = Buffer.from(lessonDirective_file.name, "latin1").toString(
-        "utf8"
-      );
-
-      console.log("file", lessonDirective_file, filename);
-      //   const fileWithCorrectName = new File([file]);
-      let newFormData = new FormData();
-      newFormData.append("file", lessonDirective_file);
-      newFormData.append("folderName", "lessonLibrary");
-      const upload = await UploadFile(newFormData);
-      console.log("uplaod", upload);
-
-      if (upload) {
-        let { location } = upload as UploadResponse;
-
+    if (lessonDirectivce) {
+      let lessonDirectivceData = JSON.parse(lessonDirectivce);
+      if (lessonDirectivceData._id) {
+        await LessonDirective.findOneAndUpdate(
+          {
+            _id: lessonDirectivceData._id,
+          },
+          {
+            LessonDirectiveURL: lessonDirectivceData.LessonDirectiveURL,
+            contentdescription: lessonDirectivceData.contentdescription || "",
+            contentfileName: lessonDirectivceData.contentfileName,
+            contentSize: lessonDirectivceData.contentSize,
+          }
+        );
+      } else {
         let lessonDirective = await LessonDirective.create({
-          LessonDirectiveURL: location,
-          contentdescription: lessonDirective_contentdescription || "",
-          contentfileName: filename,
-          contentSize: lessonDirective_file.size,
+          LessonDirectiveURL: lessonDirectivceData.LessonDirectiveURL,
+          contentdescription: lessonDirectivceData.contentdescription || "",
+          contentfileName: lessonDirectivceData.contentfileName,
+          contentSize: lessonDirectivceData.contentSize,
         });
-
-        //
         let lesson = await Lesson.findOneAndUpdate(
           { _id: lessonId },
           {
@@ -114,34 +118,9 @@ export async function updateLessonLibrary(formData: FormData) {
             lessonDirective: lessonDirective,
           }
         );
-        //
+      }
+      //   const fileWithCorrectName = new File([file]);
 
-        return { data: JSON.stringify(lesson) };
-      } else {
-        return { message: "업로드 에러" };
-      }
-    } else {
-      // 학습교안 없을때
-      let lesson = await Lesson.findOneAndUpdate(
-        { _id: lessonId },
-        {
-          title,
-          property,
-          description,
-          evaluation,
-          lessonHour: Number(lessonHour),
-        }
-      );
-      if (lessonDirective_contentdescription) {
-        let lessonDirective = await LessonDirective.findOneAndUpdate(
-          {
-            _id: lessonDirective_id,
-          },
-          {
-            contentdescription: lessonDirective_contentdescription,
-          }
-        );
-      }
       console.log("lesson", lesson);
       return { data: JSON.stringify(lesson) };
     }
@@ -233,25 +212,23 @@ export async function deleteContent({
 
 export async function editContent(formData: FormData) {
   //
-  const lessonId = formData.get("id") as string;
-  const lessonContendescription = formData.get(
-    "lessonContendescription"
-  ) as string;
-  const link = formData.get("link") as string;
-  const type = formData.get("type") as string;
-  const lessonContentdownloadURL = formData.get(
-    "lessonContentdownloadURL"
-  ) as string;
+  const lessonContentId = formData.get("_id") as string;
+  const lessonId = formData.get("lessonId") as string;
+  const lessonContent = formData.get("lessonContent") as string;
+  let lessonContentdata = JSON.parse(lessonContent);
+
+  console.log("lessonContentId", lessonContentId);
   try {
     let updateContent = await LessonContent.findOneAndUpdate(
       {
-        _id: lessonId,
+        _id: lessonContentId,
       },
       {
-        link,
-        lessonContendescription,
-        type,
-        lessonContentdownloadURL,
+        link: lessonContentdata.link,
+        lessonContenFileName: lessonContentdata.lessonContenFileName,
+        lessonContendescription: lessonContentdata.lessonContendescription,
+        type: lessonContentdata.type,
+        lessonContentdownloadURL: lessonContentdata.lessonContentdownloadURL,
       }
     );
 

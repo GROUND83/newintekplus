@@ -41,6 +41,7 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { Textarea } from "@/components/ui/textarea";
 import { sendToType } from "@/lib/common";
+import { UploadFileClient } from "@/lib/fileUploaderClient";
 const FormSchema = z.object({
   sendTo: z.string({
     required_error: "대상을 선택하세요.",
@@ -85,23 +86,30 @@ export default function Page() {
     formData.append("sendTo", values.sendTo);
     formData.append("title", values.title);
     formData.append("description", values.description);
+    let newContent = [];
     if (values.contents.length > 0) {
-      let newContentFile = [];
-      for (let i = 0; i < values.contents.length; i++) {
-        if (values.contents[i].file) {
-          formData.append(`contentFile_${i}`, values.contents[i].file);
-          newContentFile.push({
-            ...values.contents[i],
-            file: true,
+      for (const content of values.contents) {
+        if (content.file) {
+          const upload = await UploadFileClient({
+            folderName: "noticeContents",
+            file: content.file,
           });
-        } else {
-          newContentFile.push({
-            ...values.contents[i],
-            file: false,
-          });
+          if (upload.location) {
+            let contentdata = {
+              contentdownloadURL: upload.location,
+              contentName: content.file.name,
+              contentSize: content.file.size,
+            };
+            newContent.push(contentdata);
+          } else {
+            toast.error("파일 업로드에 실폐하였습니다.");
+            return;
+          }
         }
       }
-      formData.append("lessonContent", JSON.stringify(newContentFile));
+    }
+    if (newContent.length > 0) {
+      formData.append("newContent", JSON.stringify(newContent));
     }
     try {
       let res = await createWholeNotice(formData);

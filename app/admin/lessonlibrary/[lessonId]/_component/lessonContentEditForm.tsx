@@ -21,6 +21,7 @@ import { Button } from "@/components/ui/button";
 import AlertDialogWrap from "@/app/admin/_component/alertDialogWrap";
 import { deleteContent, editContenWithFile, editContent } from "./actions";
 import { toast } from "sonner";
+import { UploadFileClient } from "@/lib/fileUploaderClient";
 
 export const lessonContent = z.object({
   _id: z.string().optional(),
@@ -46,7 +47,7 @@ export default function LessonContentEditForm({
 }: {
   content: any;
   lessonId: string;
-  getContents: any;
+  getContents: () => void;
   disabled: boolean;
 }) {
   const [show, setShow] = React.useState(false);
@@ -82,68 +83,61 @@ export default function LessonContentEditForm({
   };
   React.useEffect(() => {
     reload();
-  }, []);
+  }, [content]);
   //
   async function onSubmit(values: z.infer<typeof lessonContent>) {
+    setUpdateLoading(true);
     console.log("values", values);
+    const formData = new FormData();
+    if (values._id) {
+      formData.append("_id", values._id);
+    }
+    formData.append("lessonId", lessonId);
     if (values.file) {
-      const formData = new FormData();
-      // const formData = new FormData();
-      formData.append("id", values._id);
-      formData.append("file", values.file);
-      formData.append(
-        "lessonContendescription",
-        values.lessonContendescription
-      );
-      formData.append("link", values.link);
-      formData.append("type", values.type);
-      formData.append(
-        "lessonContentdownloadURL",
-        values.lessonContentdownloadURL
-      );
-      setUpdateLoading(true);
-      try {
-        let res = await editContenWithFile(formData);
-        console.log("res", res);
-        if (res.data) {
-          //
-          getContents();
-          toast.success("컨텐츠 수정에 성공하였습니다.");
-        }
-      } catch (e) {
-        //
-        toast.error(e);
-      } finally {
-        setUpdateLoading(false);
+      const upload = await UploadFileClient({
+        folderName: "lessonContents",
+        file: values.file,
+      });
+      console.log(upload.location);
+      if (upload.location) {
+        let lessonContent = {
+          type: values.type,
+          link: values.link || "",
+          lessonContendescription: values.lessonContendescription,
+          lessonContenFileName: values.file.name,
+          lessonContentdownloadURL: upload.location,
+        };
+        formData.append("lessonContent", JSON.stringify(lessonContent));
       }
-    } else {
-      const formData = new FormData();
-      formData.append("id", values._id);
-      formData.append(
-        "lessonContendescription",
-        values.lessonContendescription
-      );
-      formData.append("link", values.link);
-      formData.append("type", values.type);
-      formData.append(
-        "lessonContentdownloadURL",
-        values.lessonContentdownloadURL
-      );
-      setUpdateLoading(true);
-      try {
-        let res = await editContent(formData);
-        console.log("res", res);
-        if (res.data) {
-          //
-          getContents();
-          toast.success("컨텐츠 수정에 성공하였습니다.");
-        }
-      } catch (e) {
+      //
+    } else if (!values.file && values.lessonContendescription) {
+      let lessonContent = {
+        type: values.type,
+        link: values.link || "",
+        lessonContendescription: values.lessonContendescription,
+        lessonContenFileName: "",
+        lessonContentdownloadURL: "",
+      };
+      formData.append("lessonContent", JSON.stringify(lessonContent));
+    }
+
+    // const formData = new FormData();
+
+    try {
+      let res = await editContent(formData);
+      console.log("res", res);
+      if (res.data) {
         //
-        toast.error(e);
-      } finally {
-        setUpdateLoading(false);
+        toast.success("컨텐츠 수정에 성공하였습니다.");
+        setShow(false);
+        getContents();
+        // reload();
       }
+    } catch (e) {
+      //
+      toast.error(e);
+    } finally {
+      setUpdateLoading(false);
     }
     //
   }
@@ -291,7 +285,11 @@ export default function LessonContentEditForm({
               />
             </div>
             <div className="border-t p-3 w-full ">
-              <Button type="submit" className="w-full" disabled={disabled}>
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={disabled || updateLoading}
+              >
                 {updateLoading ? (
                   <Loader2 className=" animate-spin" />
                 ) : (
