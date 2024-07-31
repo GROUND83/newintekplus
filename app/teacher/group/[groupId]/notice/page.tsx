@@ -16,6 +16,7 @@ export default function Page({ params }: { params: { groupId: string } }) {
           subMenu={true}
           searchShow={true}
           placeHolder="제목을 검색하세요."
+          height="h-[calc(100vh-220px)]"
         />
       </div>
     </div>

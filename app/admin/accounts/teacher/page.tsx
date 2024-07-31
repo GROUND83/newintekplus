@@ -13,6 +13,7 @@ export default function Page() {
           subMenu={true}
           placeHolder="강사이름 또는 이메일을 검색하세요."
           searchShow={true}
+          height="h-[calc(100vh-220px)]"
         />
       </div>
     </div>

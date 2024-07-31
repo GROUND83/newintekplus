@@ -14,6 +14,7 @@ export default function Page() {
           subMenu={false}
           searchShow={true}
           placeHolder="그룹명을 검색하세요."
+          height="h-[calc(100vh-170px)]"
         />
       </div>
     </div>

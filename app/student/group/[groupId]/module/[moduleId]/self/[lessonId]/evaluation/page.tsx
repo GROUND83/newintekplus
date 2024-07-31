@@ -208,6 +208,7 @@ export default function Page({
                     title="과제 제출"
                     form={form}
                     loading={updateLoading}
+                    disabled={false}
                   />
                 </div>
               </form>

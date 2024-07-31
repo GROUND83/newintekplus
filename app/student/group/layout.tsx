@@ -44,7 +44,7 @@ export default function Layout({
       <div className="w-full bg-white py-3 border-b px-6 flex flex-row items-center justify-between h-[70px]">
         <div className="flex flex-row items-center gap-2">
           <p>학습그룹</p>
-          {group && <GroupData group={group} />}
+          <GroupData groupId={params.groupId} />
         </div>
       </div>
       <div className="flex flex-col  bg-neutral-100">{children}</div>

@@ -3,13 +3,15 @@ import { Roboto, Inter, Noto_Sans_KR } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import AuthProvider from "@/components/authProvider";
-import { connectToMongoDB } from "@/lib/db";
+// import { connectToMongoDB } from "@/lib/db";
 import { Toaster } from "@/components/ui/sonner";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+// import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
 import React from "react";
 import { ReactQueryClientProvider } from "@/components/reactQuery/queryProvider";
 import Head from "next/head";
+
+//
 const notoSansKr = Noto_Sans_KR({
   // preload: true, 기본값
   preload: false,
@@ -28,31 +30,27 @@ export const metadata: Metadata = {
   description: "인재육성교육지원시스템 by SMARTAL Inc",
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: React.PropsWithChildren) {
   // connectToMongoDB();
   return (
-    <ReactQueryClientProvider>
-      <html lang="en">
-        <Head>
-          <meta
-            http-equiv="Content-Security-Policy"
-            content="default-src 'self';script-src 'self';"
-          />
-        </Head>
-        <AuthProvider>
-          <body
-            className={cn(notoSansKr.className, roboto.variable)}
-            style={{ fontSize: 14 }}
-          >
+    <html lang="en">
+      <Head>
+        <meta
+          http-equiv="Content-Security-Policy"
+          content="default-src 'self';script-src 'self';"
+        />
+      </Head>
+      <AuthProvider>
+        <body
+          className={cn(notoSansKr.className, roboto.variable)}
+          style={{ fontSize: 14 }}
+        >
+          <ReactQueryClientProvider>
             {children}
             <Toaster richColors />
-          </body>
-        </AuthProvider>
-      </html>
-    </ReactQueryClientProvider>
+          </ReactQueryClientProvider>
+        </body>
+      </AuthProvider>
+    </html>
   );
 }

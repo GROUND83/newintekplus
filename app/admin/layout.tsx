@@ -29,6 +29,7 @@ import { signOut, useSession } from "next-auth/react";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { AvatarFallback } from "@radix-ui/react-avatar";
 import { usePathname } from "next/navigation";
+import { ProfileButton } from "@/components/commonUi/menuButton";
 // JobCompetency
 const queryClient = new QueryClient();
 
@@ -40,8 +41,8 @@ export default function Layout({
   //
   const [menuExpend, setMenuExpend] = React.useState(true);
 
-  const session = useSession();
-  console.log("session", session);
+  // const session = useSession();
+  // console.log("session", session);
   const pathname = usePathname();
   return (
     <QueryClientProvider client={queryClient}>
@@ -210,6 +211,7 @@ export default function Layout({
             </Link>
           </div>
           <div className="bg-[#08111b] w-full flex flex-col items-center border-t border-[#152b45]">
+            {/* <ProfileButton /> */}
             <Link className="py-6 gap-2 flex flex-col" href={"/admin/profile"}>
               {menuExpend ? (
                 <p>프로필</p>

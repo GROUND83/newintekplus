@@ -100,3 +100,15 @@ export async function updateGroupNotice(formData: FormData) {
     return { message: JSON.stringify(e) };
   }
 }
+export async function deleteGroupNotice(noticeId: string) {
+  //
+
+  try {
+    let notice = await Notice.deleteOne({
+      _id: noticeId,
+    });
+    return { data: JSON.stringify(notice) };
+  } catch (e) {
+    return { message: JSON.stringify(e) };
+  }
+}

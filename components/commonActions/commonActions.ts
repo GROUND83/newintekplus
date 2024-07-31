@@ -1,8 +1,11 @@
 "use server";
 
+import { auth } from "@/auth";
+import { connectToMongoDB } from "@/lib/db";
 import { UploadFile } from "@/lib/fileUploader";
 import feedbackTemplate from "@/lib/mailtemplate/feedbackTemplate";
 import sendMail from "@/lib/sendMail/sendMail";
+import CourseProfile from "@/models/courseProfile";
 import FeedBack from "@/models/feedback";
 import Group from "@/models/group";
 
@@ -11,11 +14,58 @@ import Lesson from "@/models/lesson";
 import LessonContent from "@/models/lessonContents";
 import LessonDirective from "@/models/lessonDirective";
 import LessonResult from "@/models/lessonResult";
+import LiveSurvey from "@/models/liveSurvey";
 import Module from "@/models/module";
 
 import Participant from "@/models/participant";
 import Teacher from "@/models/teacher";
 import { UploadResponse } from "nodejs-s3-typescript/dist/cjs/types";
+export const getSession = async () => {
+  let session = await auth();
+  console.log("session", session);
+};
+//
+export async function detailGroup(groupId: string) {
+  //
+  await connectToMongoDB();
+  try {
+    let groups = await Group.findOne({ _id: groupId })
+      .populate({
+        path: "teacher",
+        model: Teacher,
+        select: "_id username email",
+      })
+      .populate({
+        path: "liveSurvey",
+        model: LiveSurvey,
+      })
+
+      .populate({
+        path: "participants",
+        model: Participant,
+        select: "_id username email jobPosition",
+      })
+      .populate({
+        path: "courseProfile",
+        model: CourseProfile,
+        select:
+          "_id title eduForm eduPlace eduTarget eduAbilitys competency courseDirective courseWholeDirective jobGroup jobPosition jobSubGroup modules status train",
+        populate: {
+          path: "modules",
+          model: Module,
+
+          populate: {
+            path: "lessons",
+            model: Lesson,
+          },
+        },
+      });
+    // console.log("data", groups);
+    return { data: JSON.stringify(groups) };
+  } catch (e) {
+    return { message: e };
+  }
+}
 
 export async function getModuleDetail({
   lessonId,

@@ -12,44 +12,9 @@ import Notice from "@/models/notice";
 import Participant from "@/models/participant";
 import ResultSurvey from "@/models/resultSurvey";
 import Teacher from "@/models/teacher";
-import mongoose from "mongoose";
+import dayjs from "dayjs";
 
-export async function detailGroup(groupId: string) {
-  //
-  await connectToMongoDB();
-  try {
-    let groups = await Group.findOne({ _id: groupId })
-      .populate({
-        path: "teacher",
-        model: Teacher,
-      })
-      .populate({
-        path: "liveSurvey",
-        model: LiveSurvey,
-      })
-
-      .populate({
-        path: "participants",
-        model: Participant,
-      })
-      .populate({
-        path: "courseProfile",
-        model: CourseProfile,
-        populate: {
-          path: "modules",
-          model: Module,
-          populate: {
-            path: "lessons",
-            model: Lesson,
-          },
-        },
-      });
-    // console.log("data", groups);
-    return { data: JSON.stringify(groups) };
-  } catch (e) {
-    return { message: e };
-  }
-}
+dayjs.locale("ko");
 
 export async function getLiveSurvey({ groupId }: { groupId: string }) {
   //
@@ -272,5 +237,120 @@ export async function deleteGroup(groupId: string) {
     return { data: true };
   } catch (error) {
     return { message: error };
+  }
+}
+
+export async function getSelectInitData() {
+  //
+  try {
+    let reader = await Teacher.find({ aproved: true })
+      .select("_id username email")
+      .sort({
+        username: 1,
+      });
+    let courseProfile = await CourseProfile.find()
+      .populate({
+        path: "modules",
+        model: Module,
+        populate: { path: "lessons", model: Lesson },
+      })
+      .sort({
+        createdAt: -1,
+      });
+    let participants = await Participant.find({ aproved: true })
+      .select("_id username email jobPosition")
+      .sort({
+        username: 1,
+      });
+    if (reader) {
+      return {
+        data: {
+          reader: JSON.stringify(reader),
+          courseProfile: JSON.stringify(courseProfile),
+          participants: JSON.stringify(participants),
+        },
+      };
+    }
+  } catch (e) {
+    return { message: e };
+  }
+}
+export async function editGroup(formData: FormData) {
+  //
+  //
+  let groupId = formData.get("groupId") as string;
+  let courseProfileId = formData.get("courseProfileId") as string;
+  let teacherId = formData.get("teacherId") as string;
+  let name = formData.get("name") as string;
+  let startDate = formData.get("startDate") as string;
+  let startDateParser = dayjs(startDate, "YYYY-MM-DD").add(9, "hours").toDate();
+  let endDate = formData.get("endDate") as string;
+  let endDateParser = dayjs(endDate, "YYYY-MM-DD").add(9, "hours").toDate();
+  let participants = formData.get("participants") as any;
+  let participantsParser = JSON.parse(participants);
+  //
+  try {
+    let courseProfile = await CourseProfile.findOne({
+      _id: courseProfileId,
+    }).populate({
+      path: "modules",
+      model: Module,
+      populate: { path: "lessons", model: Lesson },
+    });
+    let teacher = await Teacher.findOne({ _id: teacherId });
+
+    let group = await Group.findOneAndUpdate(
+      {
+        _id: groupId,
+      },
+      {
+        name,
+        teacher,
+        courseProfile,
+        startDate: startDateParser,
+        endDate: endDateParser,
+        participants: participantsParser,
+      }
+    );
+
+    return { data: JSON.stringify(group) };
+  } catch (e) {
+    return { message: e };
+  }
+}
+export async function createGroup(formData: FormData) {
+  //
+  let courseProfileId = formData.get("courseProfileId") as string;
+  let teacherId = formData.get("teacherId") as string;
+  let name = formData.get("name") as string;
+  let startDate = formData.get("startDate") as string;
+  let startDateParser = dayjs(startDate, "YYYY-MM-DD").add(9, "hours").toDate();
+  let endDate = formData.get("endDate") as string;
+  let endDateParser = dayjs(endDate, "YYYY-MM-DD").add(9, "hours").toDate();
+  let participants = formData.get("participants") as any;
+  let participantsParser = JSON.parse(participants);
+  //
+  try {
+    let courseProfile = await CourseProfile.findOne({
+      _id: courseProfileId,
+    }).populate({
+      path: "modules",
+      model: Module,
+      populate: { path: "lessons", model: Lesson },
+    });
+    let teacher = await Teacher.findOne({ _id: teacherId });
+
+    let group = await Group.create({
+      name,
+      teacher,
+      courseProfile,
+      startDate: startDateParser,
+      endDate: endDateParser,
+      participants: participantsParser,
+    });
+
+    return { data: JSON.stringify(group) };
+  } catch (e) {
+    return { message: e };
   }
 }

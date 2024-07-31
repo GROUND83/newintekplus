@@ -8,6 +8,9 @@ import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import dayjs from "dayjs";
 import "dayjs/locale/ko";
+import DeleteTableRow from "../../../_component/deleteTableRow";
+import UpdateTableRow from "../../../_component/upDataTableRow";
+
 dayjs.locale("ko");
 
 export const columns: ColumnDef<any>[] = [
@@ -186,12 +189,14 @@ export const columns: ColumnDef<any>[] = [
   {
     id: "actions1",
     cell: ({ row }) => {
-      // console.log(row);
+      console.log(row);
       return (
-        <div className=" text-right">
-          <Button asChild size="xs" variant="outline">
-            <p>승인</p>
-          </Button>
+        <div className="">
+          <UpdateTableRow
+            id={row.original._id}
+            type="participants"
+            aproved={row.original.aproved}
+          />
         </div>
       );
     },
@@ -201,27 +206,10 @@ export const columns: ColumnDef<any>[] = [
     cell: ({ row }) => {
       // console.log(row);
       return (
-        <div className=" text-right">
-          <Button asChild size="xs" variant="outline">
-            <p>삭제</p>
-          </Button>
+        <div className="">
+          <DeleteTableRow id={row.original._id} type="participants" />
         </div>
       );
     },
   },
-  // {
-  //   id: "actions",
-  //   cell: ({ row }) => {
-  //     // console.log(row);
-  //     return (
-  //       <div className=" text-right">
-  //         <Button asChild size="sm" variant="outline">
-  //           <Link href={`/admin/wholenotice/${row.original._id}`}>
-  //             <Search className="size-4" />
-  //           </Link>
-  //         </Button>
-  //       </div>
-  //     );
-  //   },
-  // },
 ];

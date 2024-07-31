@@ -14,6 +14,7 @@ export default function Page() {
           subMenu={false}
           placeHolder="제목을 검색하세요."
           searchShow={true}
+          height="h-[calc(100vh-170px)]"
         />
       </div>
     </div>

@@ -5,12 +5,14 @@ import { useFieldArray, useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
+  FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -42,13 +44,14 @@ import { Calendar } from "@/components/ui/calendar";
 import dayjs from "dayjs";
 import FormLabelWrap from "@/components/formLabel";
 
+import Participant from "@/models/participant";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
-import {
-  createGroup,
-  getSelectInitData,
-} from "../[groupId]/_components/actions";
+import { useParams, useRouter } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
+import { detailGroup } from "@/components/commonActions/commonActions";
+import { FormSubmitButton } from "@/components/commonUi/formUi";
+import { editGroup, getSelectInitData } from "../_components/actions";
 
 const FormSchema = z.object({
   teacher: z.object({
@@ -82,29 +85,80 @@ const FormSchema = z.object({
 });
 
 //
-export default function Page() {
+export default function Page({ params }: { params: { groupId: string } }) {
   const [readerArray, setReaderArray] = React.useState<any>([]);
   const [courseProfileArray, setCourseProfile] = React.useState<any>([]);
   const [paricipantArray, setParticipant] = React.useState<any>([]);
-  const [courseProfileData, setCourseProfileData] = React.useState<any>();
+  const [loading, setLoading] = React.useState(false);
+
   const router = useRouter();
-  const getSelectData = async () => {
-    //
-    let readers = await getSelectInitData();
-    if (readers.data) {
-      let reader = JSON.parse(readers.data.reader);
-      let participants = JSON.parse(readers.data.participants);
-      let courseProfile = JSON.parse(readers.data.courseProfile);
-      console.log("reader", reader, participants, courseProfile);
-      setReaderArray(reader);
-      setCourseProfile(courseProfile);
-      setParticipant(participants);
-    }
-  };
+  // const getSelectData = async () => {
+  //   //
+  //   let readers = await getSelectInitData();
+  //   if (readers.data) {
+  //     let reader = JSON.parse(readers.data.reader);
+  //     let participants = JSON.parse(readers.data.participants);
+  //     let courseProfile = JSON.parse(readers.data.courseProfile);
+  //     console.log("reader", reader, participants, courseProfile);
+  //     setReaderArray(reader);
+  //     setCourseProfile(courseProfile);
+  //     setParticipant(participants);
+  //   }
+  // };
   //
-  React.useEffect(() => {
-    getSelectData();
-  }, []);
+  const fetchDataOptions = {
+    groupId: params.groupId,
+  };
+
+  const {
+    data: groupData,
+    isLoading,
+    isError,
+    refetch,
+  } = useQuery({
+    queryKey: ["groupedit", fetchDataOptions],
+    queryFn: async () => {
+      let res = await getSelectInitData();
+      if (res.data) {
+        let reader = JSON.parse(res.data.reader);
+        let participants = JSON.parse(res.data.participants);
+        let courseProfile = JSON.parse(res.data.courseProfile);
+        console.log("reader", reader, participants, courseProfile);
+        setReaderArray(reader);
+        setCourseProfile(courseProfile);
+        setParticipant(participants);
+      }
+      let groupDetail = await detailGroup(params.groupId);
+      let group = JSON.parse(groupDetail.data);
+      console.log("group", group);
+      form.reset({
+        teacher: {
+          _id: group.teacher._id,
+          username: group.teacher.username,
+          email: group.teacher.email,
+        },
+        courseProfile: {
+          _id: group.courseProfile._id,
+          title: group.courseProfile.title,
+        },
+        participants: group.participants,
+        name: group.name,
+        dob: {
+          from: group.startDate,
+          to: group.endDate,
+        },
+      });
+      if (group) {
+        return group;
+      }
+    },
+    refetchOnMount: true,
+  });
+
+  //
+  // React.useEffect(() => {
+  //   getSelectData();
+  // }, []);
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -127,26 +181,27 @@ export default function Page() {
     name: "participants",
   });
   async function onSubmit(values: z.infer<typeof FormSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values, dayjs(values.dob.from).format("YYYY-MM-DD"));
-    const formData = new FormData();
-    formData.append("courseProfileId", values.courseProfile._id);
-    formData.append("name", values.name);
-    formData.append("startDate", dayjs(values.dob.from).format("YYYY-MM-DD"));
-    formData.append("endDate", dayjs(values.dob.to).format("YYYY-MM-DD"));
-    formData.append("teacherId", values.teacher._id);
-    formData.append("participants", JSON.stringify(values.participants));
-
-    // 코스프로파일에 모듈 .레슨이 있는지
-    // 레슨에 집합교육이면 라이브서베이 설정 되었는지.
-    // 코스프로 파일 선택 하면 eduForm 집학교육 or SOJT 확인 후 설문 배정
-    //
     try {
-      let res = await createGroup(formData);
+      setLoading(true);
+      console.log(values, dayjs(values.dob.from).format("YYYY-MM-DD"));
+      const formData = new FormData();
+      formData.append("groupId", params.groupId);
+      formData.append("courseProfileId", values.courseProfile._id);
+      formData.append("name", values.name);
+      formData.append("startDate", dayjs(values.dob.from).format("YYYY-MM-DD"));
+      formData.append("endDate", dayjs(values.dob.to).format("YYYY-MM-DD"));
+      formData.append("teacherId", values.teacher._id);
+      formData.append("participants", JSON.stringify(values.participants));
+
+      // 코스프로파일에 모듈 .레슨이 있는지
+      // 레슨에 집합교육이면 라이브서베이 설정 되었는지.
+      // 코스프로 파일 선택 하면 eduForm 집학교육 or SOJT 확인 후 설문 배정
+      //
+
+      let res = await editGroup(formData);
       console.log(res);
       if (res.data) {
-        toast.success("그룹생성이 성공하였습니다.");
+        toast.success("그룹수정 성공하였습니다.");
         router.push(`/admin/group`);
       } else {
         toast.error(res.message);
@@ -154,30 +209,35 @@ export default function Page() {
     } catch (e) {
       toast.error(e);
       //
+    } finally {
+      setLoading(false);
     }
   }
 
   //
-  React.useEffect(() => {
-    const subscription = form.watch((value, { name, type }) => {
-      console.log(value, name, type);
-      if (name === "courseProfile" && value.courseProfile) {
-        console.log(value.courseProfile);
-        let result = courseProfileArray.filter(
-          (item: any) => item._id === value.courseProfile._id
-        );
-        console.log("result", result);
-        if (result.length > 0) {
-          setCourseProfileData(result[0]);
-        }
-      }
-    });
-    return () => subscription.unsubscribe();
-  }, [form.watch]);
+  // React.useEffect(() => {
+  //   const subscription = form.watch((value, { name, type }) => {
+  //     console.log(value, name, type);
+  //     if (name === "courseProfile" && value.courseProfile) {
+  //       console.log(value.courseProfile);
+  //       let result = courseProfileArray.filter(
+  //         (item: any) => item._id === value.courseProfile._id
+  //       );
+  //       console.log("result", result);
+  //       if (result.length > 0) {
+  //         setCourseProfileData(result[0]);
+  //       }
+  //     }
+  //   });
+  //   return () => subscription.unsubscribe();
+  // }, [form.watch]);
   return (
     <div className="w-full flex flex-col items-stretch flex-1  ">
       <div className="flex-1 flex flex-col  w-full">
-        <ScrollArea className="h-[calc(100vh-70px)]">
+        <div className="py-3 flex flex-col items-start px-6 h-[30px] justify-center">
+          <p className=" font-bold text-bold">그룹 수정</p>
+        </div>
+        <ScrollArea className="h-[calc(100vh-100px)]">
           <div className="bg-white border flex-1 w-full flex flex-col items-start gap-2">
             <Form {...form}>
               <form
@@ -187,11 +247,6 @@ export default function Page() {
                 <div className="w-full p-6 border-b">
                   <div>
                     <p className="text-lg font-bold">1. 그룹 설정</p>
-                    <p>그룹명과 교육기간, 리더, 참여자를 입력하세요.</p>
-                    <p>
-                      그룹 생성 후 그룹의 기본 정보, 참여자, 코스프로파일은
-                      변경이 불가 합니다.
-                    </p>
                   </div>
                   <div className="flex flex-col items-start gap-3 w-full mt-3">
                     <div className="w-full grid grid-cols-2 gap-3">
@@ -259,11 +314,6 @@ export default function Page() {
                                     to: field.value.to,
                                   }}
                                   onSelect={field.onChange}
-                                  // disabled={
-                                  //   (date) => date < new Date()
-                                  //   //   ||
-                                  //   // date < new Date("1900-01-01")
-                                  // }
                                 />
                               </PopoverContent>
                             </Popover>
@@ -979,7 +1029,12 @@ export default function Page() {
                   </div>
                 </div>
                 <div className="w-full  p-6">
-                  <Button type="submit">생성</Button>
+                  <FormSubmitButton
+                    title="수정"
+                    form={form}
+                    loading={loading}
+                    disabled={false}
+                  />
                 </div>
               </form>
             </Form>

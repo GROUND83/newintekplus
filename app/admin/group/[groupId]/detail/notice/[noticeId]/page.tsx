@@ -26,29 +26,27 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import FormLabelWrap from "@/components/formLabel";
 import { Textarea } from "@/components/ui/textarea";
-import { XIcon } from "lucide-react";
-import {
-  competencyType,
-  eduPlaceData,
-  evaluationMethod,
-  jobGroupType,
-  lessonType,
-  sendToType,
-} from "@/lib/common";
+import { sendToType } from "@/lib/common";
 import React from "react";
 
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { detailGroupNotice, updateGroupNotice } from "./action";
+import {
+  deleteGroupNotice,
+  detailGroupNotice,
+  updateGroupNotice,
+} from "./action";
 import NoticeFileEdit from "./_component/noticeFileEdit";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import DeleteModal from "@/components/commonUi/DeleteModal";
+import { useQuery } from "@tanstack/react-query";
+import { Skeleton } from "@/components/ui/skeleton";
 const FormSchema = z.object({
   _id: z.string(),
   title: z.string({
@@ -76,47 +74,90 @@ export default function Page({
   const [loading, setLoading] = React.useState(false);
   const router = useRouter();
   const session = useSession();
+  const [deleteOpen, setDeleteOpen] = React.useState(false);
+  const [deleteLoading, setDeleteLoading] = React.useState(false);
+  // const initailData = async () => {
+  //   //
+  //   let response = await detailGroupNotice(params.noticeId);
+  //   if (response.data) {
+  //     let result = JSON.parse(response.data);
 
-  const initailData = async () => {
-    //
-    let response = await detailGroupNotice(params.noticeId);
-    if (response.data) {
-      let result = JSON.parse(response.data);
+  //     console.log("data", result);
+  //     return result;
+  //   }
+  // };
+  // const reload = async () => {
+  //   setLoading(true);
+  //   let data = await initailData();
+  //   let newContents = [];
+  //   for (const content of data.contents) {
+  //     newContents.push({
+  //       _id: content._id,
+  //       contentdownloadURL: content.contentdownloadURL,
+  //       contentName: content.contentName,
+  //       contentSize: content.contentSize,
+  //       file: undefined,
+  //     });
+  //   }
+  //   console.log("newContents", newContents);
+  //   form.reset(
+  //     {
+  //       _id: data._id,
+  //       title: data.title,
+  //       description: data.description,
+  //       sendTo: data.sendTo,
+  //       contents: newContents,
+  //     },
+  //     { keepDirtyValues: true }
+  //   );
+  //   setLoading(false);
+  // };
 
-      console.log("data", result);
-      return result;
-    }
+  const fetchDataOptions = {
+    noticeId: params.noticeId,
   };
-  const reload = async () => {
-    setLoading(true);
-    let data = await initailData();
-    let newContents = [];
-    for (const content of data.contents) {
-      newContents.push({
-        _id: content._id,
-        contentdownloadURL: content.contentdownloadURL,
-        contentName: content.contentName,
-        contentSize: content.contentSize,
-        file: undefined,
-      });
-    }
-    console.log("newContents", newContents);
-    form.reset(
-      {
-        _id: data._id,
-        title: data.title,
-        description: data.description,
-        sendTo: data.sendTo,
-        contents: newContents,
-      },
-      { keepDirtyValues: true }
-    );
-    setLoading(false);
-  };
 
-  React.useEffect(() => {
-    reload();
-  }, []);
+  const {
+    data: groupData,
+    isLoading,
+    isError,
+    refetch,
+  } = useQuery({
+    queryKey: ["groupNoticeDetail", fetchDataOptions],
+    queryFn: async () => {
+      let response = await detailGroupNotice(params.noticeId);
+
+      let data = JSON.parse(response.data);
+
+      let newContents = [];
+      for (const content of data.contents) {
+        newContents.push({
+          _id: content._id,
+          contentdownloadURL: content.contentdownloadURL,
+          contentName: content.contentName,
+          contentSize: content.contentSize,
+          file: undefined,
+        });
+      }
+      console.log("newContents", newContents);
+      form.reset(
+        {
+          _id: data._id,
+          title: data.title,
+          description: data.description,
+          sendTo: data.sendTo,
+          contents: newContents,
+        },
+        { keepDirtyValues: true }
+      );
+      return data;
+    },
+    refetchOnMount: true,
+  });
+  // React.useEffect(() => {
+  //   reload();
+  // }, []);
+  //
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {},
@@ -171,123 +212,169 @@ export default function Page({
     }
   }
 
+  //
+  const clickDeleteGroup = async () => {
+    setDeleteLoading(true);
+    try {
+      let res = await deleteGroupNotice(params.noticeId);
+      if (res.data) {
+        console.log("ok");
+        toast.success("그룹 삭제에 성공하였습니다.");
+        router.push(`/admin/group/${params.groupId}`);
+      }
+      if (res.message) {
+        toast.error(res.message);
+      }
+    } catch (e) {
+      toast.error(e);
+    } finally {
+      setDeleteOpen(false);
+      setDeleteLoading(false);
+    }
+  };
+  //
   return (
     <div className="w-full flex flex-col items-stretch flex-1  ">
-      <div className="flex-1 flex flex-col  w-full">
-        <ScrollArea className="  bg-white  w-full max-h-[calc(100vh-140px)] ">
-          <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit(onSubmit)}
-              className="space-y-8 w-full"
-            >
-              <Card className="w-full">
-                <CardHeader>
-                  <CardTitle className="text-xl">그룹 공지사항 수정</CardTitle>
-                  <CardDescription>그룹 공지사항을 수정하세요.</CardDescription>
-                </CardHeader>
-                <CardContent className="w-full grid grid-cols-12 gap-5">
-                  <FormField
-                    control={form.control}
-                    name="sendTo"
-                    render={({ field }) => (
-                      <FormItem className="flex flex-col col-span-2 gap-2">
-                        <FormLabelWrap title="대상" required />
+      {isLoading ? (
+        <ScrollArea className="  bg-white  w-full h-[calc(100vh-140px)] p-6  ">
+          <div className="flex flex-col items-start gap-6">
+            <Skeleton className="w-[100px] h-[30px] rounded-sm bg-neutral-200" />
+            <Skeleton className="w-[100px] h-[30px] rounded-sm bg-neutral-200" />
+            <Skeleton className="w-full h-[200px] rounded-sm bg-neutral-200" />
+            <Skeleton className="w-full  h-[200px] rounded-sm bg-neutral-200" />
+            <Skeleton className="w-full  h-[200px] rounded-sm bg-neutral-200" />
+          </div>
+        </ScrollArea>
+      ) : (
+        <div className="flex-1 flex flex-col  w-full ">
+          <ScrollArea className="  bg-white  w-full h-[calc(100vh-140px)] ">
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className=" w-full">
+                <div className="w-full p-6 flex flex-col gap-3">
+                  <div className="border-b  pb-6 flex flex-row items-center w-full  justify-between">
+                    <div className="">
+                      <p className="text-xl font-bold">그룹 공지사항 수정</p>
+                      <p>그룹 공지사항을 수정하세요.</p>
+                    </div>
 
-                        <Select
-                          onValueChange={field.onChange}
-                          value={field.value || ""}
+                    <DeleteModal
+                      title="공지사항 삭제"
+                      desc="그공지사항 삭제 시 복구 되지 않습니다."
+                      btnText="공지사항 삭제"
+                      onClick={clickDeleteGroup}
+                      disabled={deleteLoading}
+                      deleteOpen={deleteOpen}
+                      setDeleteOpen={setDeleteOpen}
+                      deleteLoading={deleteLoading}
+                    />
+                  </div>
+                  <div className="w-full grid grid-cols-12 gap-5">
+                    <FormField
+                      control={form.control}
+                      name="sendTo"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-col col-span-2 gap-2">
+                          <FormLabelWrap title="대상" required />
+
+                          <Select
+                            onValueChange={field.onChange}
+                            value={field.value || ""}
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="대상을 선택하세요." />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {sendToType.map((sendto, index) => {
+                                return (
+                                  <SelectItem value={sendto.value} key={index}>
+                                    {sendto.label}
+                                  </SelectItem>
+                                );
+                              })}
+                            </SelectContent>
+                          </Select>
+
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="title"
+                      render={({ field: { value, onChange } }) => (
+                        <FormItem className="flex flex-col col-span-12 gap-2">
+                          <FormLabelWrap title="제목" required />
+                          <Input
+                            value={value || ""}
+                            onChange={onChange}
+                            placeholder="공지사항 제목을 입력하세요."
+                          />
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="description"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-col col-span-12 gap-2">
+                          <FormLabelWrap title="내용" required={false} />
+
+                          <Textarea
+                            placeholder="내용을 입력하세요."
+                            className="resize-none"
+                            {...field}
+                            rows={12}
+                          />
+
+                          {/* <FormDescription>필수 입력</FormDescription> */}
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <div className="col-span-12 flex flex-col  gap-4 ">
+                      <div>
+                        <Button
+                          type="button"
+                          onClick={() => contentsAppend({})}
                         >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="대상을 선택하세요." />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {sendToType.map((sendto, index) => {
-                              return (
-                                <SelectItem value={sendto.value} key={index}>
-                                  {sendto.label}
-                                </SelectItem>
-                              );
-                            })}
-                          </SelectContent>
-                        </Select>
+                          + 첨부파일 추가
+                        </Button>
+                      </div>
+                      {contentsFields.map((content, contentIndex) => {
+                        return (
+                          <div
+                            className="flex flex-row items-center gap-1  w-full"
+                            key={contentIndex}
+                          >
+                            <NoticeFileEdit
+                              form={form}
+                              content={content}
+                              contentIndex={contentIndex}
+                              groupId={params.groupId}
+                              disabled={false}
+                              contentsRemove={contentsRemove}
+                            />
+                          </div>
+                        );
+                      })}
+                    </div>
 
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="title"
-                    render={({ field: { value, onChange } }) => (
-                      <FormItem className="flex flex-col col-span-12 gap-2">
-                        <FormLabelWrap title="제목" required />
-                        <Input
-                          value={value || ""}
-                          onChange={onChange}
-                          placeholder="공지사항 제목을 입력하세요."
-                        />
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="description"
-                    render={({ field }) => (
-                      <FormItem className="flex flex-col col-span-12 gap-2">
-                        <FormLabelWrap title="내용" required={false} />
-
-                        <Textarea
-                          placeholder="내용을 입력하세요."
-                          className="resize-none"
-                          {...field}
-                          rows={12}
-                        />
-
-                        {/* <FormDescription>필수 입력</FormDescription> */}
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <div className="col-span-12 flex flex-col  gap-4 ">
-                    <div>
-                      <Button type="button" onClick={() => contentsAppend({})}>
-                        + 첨부파일 추가
+                    <div className=" col-span-12 flex flex-col items-end">
+                      <Button type="submit" className="mt-6">
+                        수정
                       </Button>
                     </div>
-                    {contentsFields.map((content, contentIndex) => {
-                      return (
-                        <div
-                          className="flex flex-row items-center gap-1  w-full"
-                          key={contentIndex}
-                        >
-                          <NoticeFileEdit
-                            form={form}
-                            content={content}
-                            contentIndex={contentIndex}
-                            groupId={params.groupId}
-                            disabled={false}
-                            contentsRemove={contentsRemove}
-                          />
-                        </div>
-                      );
-                    })}
                   </div>
-
-                  <div className=" col-span-12 flex flex-col items-end">
-                    <Button type="submit" className="mt-6">
-                      수정
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </form>
-          </Form>
-        </ScrollArea>
-      </div>
+                </div>
+              </form>
+            </Form>
+          </ScrollArea>
+        </div>
+      )}
     </div>
   );
 }

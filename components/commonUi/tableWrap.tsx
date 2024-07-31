@@ -30,6 +30,7 @@ import {
 } from "@tanstack/react-table";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
   TableBody,
@@ -53,12 +54,14 @@ function TableWrapData({
   subMenu = false,
   placeHolder,
   searchShow,
+  height,
 }: {
   columns: any;
   getMoreData: any;
   subMenu: boolean;
   placeHolder: string;
   searchShow: boolean;
+  height: string | undefined;
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -85,7 +88,7 @@ function TableWrapData({
       } else {
         //
       }
-    } else if (!subMenu) {
+    } else {
       defaultHeight = "h-[calc(100vh-170px)]";
       if (searchShow) {
         defaultHeight = "h-[calc(100vh-170px)]";
@@ -122,8 +125,10 @@ function TableWrapData({
       }
     },
   });
-  const defaultData = React.useMemo(() => [], []);
 
+  //
+  const defaultData = React.useMemo(() => [], []);
+  //
   const table = useReactTable({
     data: data?.rows ?? defaultData,
     columns: columns,
@@ -133,7 +138,7 @@ function TableWrapData({
     },
     getSortedRowModel: getSortedRowModel(),
     getCoreRowModel: getCoreRowModel(),
-    debugTable: true,
+    // debugTable: true,
   });
 
   React.useEffect(() => {
@@ -190,9 +195,16 @@ function TableWrapData({
   if (isLoading) {
     return (
       <div
-        className={`w-full  ${heightSize}  flex flex-col items-center justify-center`}
+        className={`w-full  ${height}  flex flex-col items-start justify-start gap-2 p-6`}
       >
-        <Loader2 className=" animate-spin size-8 text-primary" />
+        {new Array(8).fill("").map((item, index) => {
+          return (
+            <Skeleton
+              key={index}
+              className="w-full h-[30px] rounded-sm bg-neutral-200"
+            />
+          );
+        })}
       </div>
     );
   }
@@ -201,7 +213,7 @@ function TableWrapData({
     <div className="w-full ">
       {searchShow && <Search placeHolder={placeHolder} />}
 
-      <ScrollArea className={` bg-white  w-full ${heightSize} `}>
+      <ScrollArea className={` bg-white  w-full ${height} `}>
         <Table className="" wrapperClassName="overflow-clip">
           <TableHeader className="">
             {table.getHeaderGroups().map((headerGroup) => (
@@ -281,21 +293,7 @@ function TableWrapData({
             </Button>
           </div>
         ) : null}
-        {/* <div>
-          <ReactPaginate
-            // breakLabel="..."
-            onPageChange={handlePageClick}
-            pageRangeDisplayed={5}
-            pageCount={pageCount}
-            previousLabel={<ChevronLeft />}
-            nextLabel={<ChevronRight />}
-            // renderOnZeroPageCount={null}
-            currentPage={currentPage}
-            containerClassName={"pagination"}
-            pageLinkClassName={"pagination__link"}
-            activeLinkClassName={"pagination__link__active"}
-          />
-        </div> */}
+
         <div className="flex flex-row items-center justify-center flex-1 gap-2">
           <p>테이블 출력</p>
           <Select
@@ -330,12 +328,14 @@ const TableWrap = ({
   subMenu,
   placeHolder,
   searchShow,
+  height,
 }: {
   columns: any;
   getMoreData: any;
   subMenu: boolean;
   placeHolder: string;
   searchShow: boolean;
+  height: string | undefined;
 }) => {
   return (
     <React.Suspense>
@@ -345,6 +345,7 @@ const TableWrap = ({
         subMenu={subMenu}
         placeHolder={placeHolder}
         searchShow={searchShow}
+        height={height}
       />
     </React.Suspense>
   );

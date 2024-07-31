@@ -14,6 +14,7 @@ export default function Page() {
           subMenu={false}
           placeHolder="설문명을 검색하세요."
           searchShow={true}
+          height=""
         />
       </div>
     </div>

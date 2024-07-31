@@ -50,6 +50,7 @@ export async function getGroupDetail(groupId: string) {
         path: "resultSurvey",
         model: ResultSurvey,
       });
+    //
     let resultSurvey = await ResultSurvey.find({
       groupId: groupId,
       liveSurveyId: groupData.liveSurvey._id,

@@ -1,5 +1,5 @@
 "use server";
-
+import bcrypt from "bcrypt";
 import { connectToMongoDB } from "@/lib/db";
 import { UploadFile } from "@/lib/fileUploader";
 import CourseProfile from "@/models/courseProfile";
@@ -11,6 +11,8 @@ import Participant from "@/models/participant";
 import Survey from "@/models/survey";
 import WholeNotice from "@/models/wholenotice";
 import { UploadResponse } from "nodejs-s3-typescript/dist/cjs/types";
+import { revalidatePath } from "next/cache";
+import Teacher from "@/models/teacher";
 
 export const getMoreData = async ({
   pageIndex,
@@ -183,5 +185,125 @@ export const createWholeNotice = async (formdata: FormData) => {
   } catch (e) {
     console.log(e);
     return { message: "코스프로파일 오류" };
+  }
+};
+export const getParticipants = async () => {
+  await connectToMongoDB();
+  try {
+    const participant = await Participant.find({}).select(
+      "_id email username jobPosition "
+    );
+
+    return {
+      data: JSON.stringify(participant),
+    };
+  } catch (e) {
+    console.log(e);
+    return { message: "participant 오류" };
+  }
+};
+export const getTeachers = async () => {
+  await connectToMongoDB();
+  try {
+    const teacher = await Teacher.find({}).select("_id email username ");
+
+    return {
+      data: JSON.stringify(teacher),
+    };
+  } catch (e) {
+    console.log(e);
+    return { message: "Teacher 오류" };
+  }
+};
+export const createParticipants = async (formdata: FormData) => {
+  try {
+    await connectToMongoDB();
+    //
+    let participant = formdata.get("paticipants") as string;
+    let participantParser = JSON.parse(participant);
+
+    for (const student of participantParser) {
+      let particapant = await Participant.findOne({ email: student.email });
+      if (!particapant) {
+        console.log("없음");
+        const hash = await bcrypt.hash("intekplus2024", 10);
+        let createStudent = await Participant.create({
+          status: 1,
+          phone: student.phone,
+          department: student.department,
+          part: student.part,
+          jobGroup: student.jobGroup,
+          jobSubGroup: student.jobSubGroup,
+          jobPosition: student.jobPosition,
+          email: student.email,
+          password: hash,
+          username: student.username,
+          aproved: true,
+          directCreate: true,
+        });
+      }
+    }
+    revalidatePath("/admin/account/student");
+    return {
+      data: JSON.stringify(participant),
+    };
+  } catch (e) {
+    console.log(e);
+    return { message: "participant 오류" };
+  }
+};
+export const createTeacher = async (formdata: FormData) => {
+  try {
+    await connectToMongoDB();
+    //
+    let teachers = formdata.get("teachers") as string;
+    let teachersParser = JSON.parse(teachers);
+
+    for (const teacher of teachersParser) {
+      let teacherData = await Teacher.findOne({ email: teacher.email });
+      if (!teacherData) {
+        console.log("없음");
+        const hash = await bcrypt.hash("intekplus2024", 10);
+        let createStudent = await Teacher.create({
+          status: 1,
+
+          type: teacher.type,
+          email: teacher.email,
+          password: hash,
+          username: teacher.username,
+          aproved: true,
+          directCreate: true,
+        });
+      }
+    }
+    revalidatePath("/admin/account/teacher");
+    return {
+      data: JSON.stringify(teachers),
+    };
+  } catch (e) {
+    console.log(e);
+    return { message: "participant 오류" };
+  }
+};
+
+export const approveParticipant = async (studentId: string) => {
+  await connectToMongoDB();
+  try {
+    const participant = await Participant.findOneAndUpdate(
+      {
+        _id: studentId,
+      },
+      {
+        aproved: true,
+        status: 1,
+      }
+    );
+    revalidatePath("/admin/account/student");
+    return {
+      data: JSON.stringify(participant),
+    };
+  } catch (e) {
+    console.log(e);
+    return { message: "participant 오류" };
   }
 };

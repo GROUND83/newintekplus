@@ -12,6 +12,7 @@ export default function Page() {
           subMenu={false}
           placeHolder="그룹명을 입력하세요."
           searchShow={true}
+          height="h-[calc(100vh-170px)]"
         />
       </div>
     </div>

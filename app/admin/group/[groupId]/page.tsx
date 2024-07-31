@@ -1,24 +1,17 @@
 "use client";
 
-import React, { use } from "react";
+import React from "react";
 import { z } from "zod";
-
-import { useForm, useFieldArray } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { ko } from "date-fns/locale";
 import {
   Command,
   CommandEmpty,
@@ -33,41 +26,20 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
   Check,
   ChevronsUpDown,
-  CalendarIcon,
-  CircleMinus,
-  CirclePlus,
-  CircleCheck,
   Loader2,
   SquareArrowOutUpRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Calendar } from "@/components/ui/calendar";
-import dayjs from "dayjs";
-import FormLabelWrap from "@/components/formLabel";
-
-import Participant from "@/models/participant";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { getSelectInitData } from "../new/actions";
 import {
   deleteGroup,
-  detailGroup,
   getLiveSurvey,
   updateGroupStatus,
   updateLiveSurvey,
 } from "./_components/actions";
 import { Badge } from "@/components/ui/badge";
-import { Label } from "@/components/ui/label";
-
 import { toast } from "sonner";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
@@ -78,9 +50,10 @@ import {
   PeriodWrap,
   StudentWrap,
 } from "@/components/commonUi/aboutGroup";
-import ActionModal from "@/components/commonUi/ActionModal";
 import DeleteModal from "@/components/commonUi/DeleteModal";
 import { notFound, useRouter } from "next/navigation";
+import { detailGroup } from "@/components/commonActions/commonActions";
+import { FormSubmitButton } from "@/components/commonUi/formUi";
 
 const FormSchema = z.object({
   liveSurvey: z.object({
@@ -89,9 +62,7 @@ const FormSchema = z.object({
   }),
 });
 export default function Page({ params }: { params: { groupId: string } }) {
-  // const [courseProfileArray, setCourseProfile] = React.useState<any>([]);
   const router = useRouter();
-  // const [groupData, setGroupData] = React.useState<any>();
   const [liveSurveyData, setLiveSurveyData] = React.useState<any>([]);
   const [loading, setLoading] = React.useState<any>(false);
   const [statusloading, setStatusLoading] = React.useState<any>(false);
@@ -109,52 +80,32 @@ export default function Page({ params }: { params: { groupId: string } }) {
   } = useQuery({
     queryKey: ["groupDetail", fetchDataOptions],
     queryFn: async () => {
-      let data = await initailData();
+      let res = await detailGroup(params.groupId);
+      let data = JSON.parse(res.data);
       let newLiveSurvey = [];
-      let liveSurvey = await getLiveSurvey({
+      let wholeliveSurvey = await getLiveSurvey({
         groupId: fetchDataOptions.groupId,
       });
+      if (wholeliveSurvey.data) {
+        newLiveSurvey = await JSON.parse(wholeliveSurvey.data);
 
-      if (liveSurvey.data) {
-        //
-        newLiveSurvey = await JSON.parse(liveSurvey.data);
-        console.log("newLiveSurvey", newLiveSurvey);
         setLiveSurveyData(newLiveSurvey);
       }
 
-      console.log("data.liveSurvey", data.liveSurvey);
-      form.reset(
-        {
-          liveSurvey: {
-            _id: data.liveSurvey?._id || "",
-            title: data.liveSurvey?.title || "",
-          },
-        }
-        //   { keepDirtyValues: true }
-      );
+      form.reset({
+        liveSurvey: {
+          _id: data.liveSurvey?._id || "",
+          title: data.liveSurvey?.title || "",
+        },
+      });
       if (data) {
         return data;
       }
-      // else {
-      //   notFound();
-      // }
     },
-    // staleTime: 6000, // 1분
     refetchOnMount: true,
   });
   //
 
-  const initailData = async () => {
-    //
-    let response = await detailGroup(params.groupId);
-    if (response.data) {
-      let result = JSON.parse(response.data);
-      console.log("data", result);
-
-      return result;
-    }
-  };
-  //
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -164,6 +115,10 @@ export default function Page({ params }: { params: { groupId: string } }) {
 
   const changeStatus = async () => {
     let groupId = params.groupId;
+    console.log("liveSurvey", form.getValues("liveSurvey"));
+    if (!form.getValues("liveSurvey")._id) {
+      return alert("설문을 배정하세요.");
+    }
     setStatusLoading(true);
     try {
       let res = await updateGroupStatus({ groupId: groupId });
@@ -178,9 +133,9 @@ export default function Page({ params }: { params: { groupId: string } }) {
     } finally {
       setStatusLoading(false);
     }
-
-    //
   };
+
+  // 설문설정
   async function onSubmit(values: z.infer<typeof FormSchema>) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
@@ -255,13 +210,15 @@ export default function Page({ params }: { params: { groupId: string } }) {
               </p>
               <p className="w-[500px] text-neutral-500">
                 개설 완료 변경시 그룹 데이터는{" "}
-                <span className="text-red-500">변경 불가</span> 합니다.
+                <span className="text-red-500">수정 불가(그룹삭제는 가능)</span>{" "}
+                합니다.
               </p>
               <p className="w-[500px] text-neutral-500">
                 <span className="text-red-500">개설 완료 시 </span>리더,
                 교육생에게 노출 됩니다.
               </p>
             </div>
+
             <div className=" flex flex-row items-center gap-2 ">
               {groupData?.status === "개설중" ? (
                 <Button onClick={() => changeStatus()}>
@@ -295,11 +252,15 @@ export default function Page({ params }: { params: { groupId: string } }) {
           </div>
 
           <div className="w-full flex flex-col items-start  p-6 bg-white  border-b ">
-            <div className=" w-full flex flex-row items-center justify-between">
+            <div className=" w-full flex flex-row items-center justify-between border-b pb-6">
               <p className="text-lg font-bold">그룹 정보</p>
               <div className=" ">
                 {groupData?.status === "개설중" ? (
-                  <Button>그룹 수정</Button>
+                  <Button asChild>
+                    <Link href={`/admin/group/${params.groupId}/edit`}>
+                      그룹수정
+                    </Link>
+                  </Button>
                 ) : (
                   <Button disabled>그룹 수정 불가</Button>
                 )}
@@ -343,14 +304,14 @@ export default function Page({ params }: { params: { groupId: string } }) {
             <div className="w-full  mt-3">
               <Form {...form}>
                 <form
-                  className="col-span-12  grid grid-cols-12 gap-3 w-full"
+                  className="col-span-12  flex flex-row items-center gap-3 w-full"
                   onSubmit={form.handleSubmit(onSubmit)}
                 >
                   <FormField
                     control={form.control}
                     name="liveSurvey"
                     render={({ field: { value, onChange } }) => (
-                      <FormItem className="flex flex-col   col-span-10">
+                      <FormItem className="flex flex-col   col-span-10 flex-1">
                         <Popover>
                           <PopoverTrigger
                             asChild
@@ -419,8 +380,14 @@ export default function Page({ params }: { params: { groupId: string } }) {
                       </FormItem>
                     )}
                   />
-                  <div className=" col-span-2">
-                    <Button
+                  <div className=" col-span-1">
+                    <FormSubmitButton
+                      title="설문 설정"
+                      form={form}
+                      loading={loading}
+                      disabled={groupData?.status === "개설완료" ? true : false}
+                    />
+                    {/* <Button
                       type="submit"
                       disabled={groupData?.status === "개설완료" ? true : false}
                     >
@@ -429,7 +396,7 @@ export default function Page({ params }: { params: { groupId: string } }) {
                       ) : (
                         <span>설문 설정</span>
                       )}
-                    </Button>
+                    </Button> */}
                   </div>
                 </form>
               </Form>

@@ -4,10 +4,11 @@ import React from "react";
 import Link from "next/link";
 
 import { useParams, usePathname } from "next/navigation";
-import { detailGroup } from "../_components/actions";
+
 import { useQuery } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import { Submenu, SubMenuWrap } from "@/components/commonUi/mainTitleWrap";
+import { detailGroup } from "@/components/commonActions/commonActions";
 
 export default function Layout({
   children,
@@ -23,7 +24,7 @@ export default function Layout({
     isError,
     refetch,
   } = useQuery({
-    queryKey: ["evauation"],
+    queryKey: ["detail_group_id"],
     queryFn: async () => {
       let res = await detailGroup(params.groupId);
       if (res.data) {
@@ -37,18 +38,9 @@ export default function Layout({
     },
   });
 
-  if (isLoading) {
-    return (
-      <div
-        className={`w-full  h-[calc(100vh-70px)]  flex flex-col items-center justify-center`}
-      >
-        <Loader2 className=" animate-spin size-8 text-primary" />
-      </div>
-    );
-  }
   return (
     <div className="w-full flex flex-col ">
-      <SubMenuWrap>
+      <SubMenuWrap isLoading={isLoading}>
         <Submenu
           link={`/admin/group/${params.groupId}/detail/notice`}
           pathname={pathname}

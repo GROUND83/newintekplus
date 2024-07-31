@@ -13,6 +13,7 @@ export default function Page() {
           subMenu={false}
           placeHolder="교육형태, 코스프로파일 명을 검색하세요."
           searchShow={true}
+          height="h-[calc(100vh-170px)]"
         />
       </div>
     </div>

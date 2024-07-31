@@ -47,6 +47,7 @@ export default function Page({ params }: { params: { groupId: string } }) {
   // React.useEffect(() => {
   //   getData();
   // }, []);
+
   const fetchDataOptions = {
     groupId: params.groupId,
   };
