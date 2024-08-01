@@ -13,38 +13,13 @@ export default function Layout({
   children: React.ReactNode;
 }>) {
   //
-  const [group, setGroup] = React.useState<any>();
-  const params = useParams<{ groupId: string }>();
-  const pathname = usePathname();
-  const getGroup = async () => {
-    if (params.groupId) {
-      let res = await detailGroup(params.groupId);
-      if (res.data) {
-        let group = JSON.parse(res.data);
-        console.log("group", group);
-        setGroup(group);
-      }
-    } else {
-      setGroup(null);
-    }
-  };
-  // const getTest = async () => {
-  //   let res = await getTestData();
-  //   let data = JSON.parse(res.data);
-  //   console.log("res", data);
-  // };
 
-  //
-
-  React.useEffect(() => {
-    getGroup();
-  }, [params]);
   return (
     <div className="w-full flex flex-col items-stretch flex-1  ">
       <div className="w-full bg-white py-3 border-b px-6 flex flex-row items-center justify-between h-[70px]">
         <div className="flex flex-row items-center gap-2">
           <p>학습그룹</p>
-          <GroupData groupId={params.groupId} />
+          <GroupData />
         </div>
       </div>
       <div className="flex flex-col  bg-neutral-100">{children}</div>

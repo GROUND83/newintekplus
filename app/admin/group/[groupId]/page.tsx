@@ -221,7 +221,7 @@ export default function Page({ params }: { params: { groupId: string } }) {
 
             <div className=" flex flex-row items-center gap-2 ">
               {groupData?.status === "개설중" ? (
-                <Button onClick={() => changeStatus()}>
+                <Button onClick={() => changeStatus()} type="button">
                   {statusloading ? (
                     <Loader2 className=" animate-spin" />
                   ) : (
@@ -229,7 +229,7 @@ export default function Page({ params }: { params: { groupId: string } }) {
                   )}
                 </Button>
               ) : (
-                <Button asChild>
+                <Button asChild type="button">
                   <Link
                     href={`/admin/group/${params.groupId}/detail/notice`}
                     className="flex flex-row gap-2"
@@ -352,10 +352,14 @@ export default function Page({ params }: { params: { groupId: string } }) {
                                         value={readerdata.title}
                                         key={readerdata._id}
                                         onSelect={() => {
-                                          form.setValue("liveSurvey", {
-                                            _id: readerdata._id,
-                                            title: readerdata.title,
-                                          });
+                                          form.setValue(
+                                            "liveSurvey",
+                                            {
+                                              _id: readerdata._id,
+                                              title: readerdata.title,
+                                            },
+                                            { shouldDirty: true }
+                                          );
                                         }}
                                       >
                                         <Check

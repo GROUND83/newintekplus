@@ -3,10 +3,12 @@ import passportLocalMongoose from "passport-local-mongoose";
 
 export interface INotice {
   groupId: string;
+  mail: boolean;
   sendTo: string;
   title: string; // 타이틀
   description: string;
   contents: Array<{
+    [x: string]: any;
     type: mongoose.Schema.Types.ObjectId;
     ref: "NoticeContent";
   }>;
@@ -31,6 +33,7 @@ export interface INoticeDocument extends INotice, Document {
 const notice = new mongoose.Schema<INoticeDocument>(
   {
     groupId: { type: String },
+    mail: { type: Boolean, default: false },
     sendTo: {
       type: String,
       enum: ["all", "teacher", "student"],

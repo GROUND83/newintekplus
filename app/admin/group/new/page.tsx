@@ -259,11 +259,6 @@ export default function Page() {
                                     to: field.value.to,
                                   }}
                                   onSelect={field.onChange}
-                                  // disabled={
-                                  //   (date) => date < new Date()
-                                  //   //   ||
-                                  //   // date < new Date("1900-01-01")
-                                  // }
                                 />
                               </PopoverContent>
                             </Popover>

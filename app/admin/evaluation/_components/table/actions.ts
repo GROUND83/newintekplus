@@ -33,6 +33,7 @@ export const getMoreData = async ({
       : {};
     const liveSurveyCount = await LiveSurvey.find(query).countDocuments();
     const liveSurvey = await LiveSurvey.find(query)
+      .populate({ path: "surveys", model: Survey })
       // .select("property title createdAt lessonHour evaluation")
       .limit(pageSize)
       .skip(pageSize * (pageIndex - 1))
@@ -125,13 +126,16 @@ export const createLiveSurvey = async (formdata: FormData) => {
 
     console.log("surveysArray", surveysArray);
     let surveyNewArray = [];
-    for (const survey of surveysArray) {
-      let newsurvey = await Survey.create({ title: survey.title });
+    for await (const survey of surveysArray) {
+      let newsurvey = await Survey.create({
+        title: survey.title,
+        type: survey.type,
+      });
       surveyNewArray.push(newsurvey);
     }
     const liveSurvey = await LiveSurvey.create({
       title,
-      $set: { surveys: surveyNewArray },
+      surveys: surveyNewArray,
     });
 
     // .select("property title createdAt lessonHour evaluation")
@@ -144,4 +148,11 @@ export const createLiveSurvey = async (formdata: FormData) => {
     console.log(e);
     return { message: "코스프로파일 오류" };
   }
+};
+
+export const deleteLiceSurvey = async (liveSurveyId: string) => {
+  let res = await LiveSurvey.deleteOne({
+    _id: liveSurveyId,
+  });
+  return { data: JSON.stringify(res) };
 };

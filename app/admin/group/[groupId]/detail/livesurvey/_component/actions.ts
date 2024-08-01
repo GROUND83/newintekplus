@@ -97,7 +97,6 @@ export async function getTotalResultSurvey(groupId: string) {
         _id: new mongoose.Types.ObjectId(groupId),
       },
     },
-
     {
       $lookup: {
         from: "resultsurveys",
@@ -119,18 +118,26 @@ export async function getTotalResultSurvey(groupId: string) {
     {
       $group: {
         _id: "$resultsurveys.results.surveyId",
+        type: {
+          $first: "$resultsurveys.results.type",
+        },
         name: { $first: "$name" },
         title: {
           $first: "$resultsurveys.results.title",
         },
         resultsurveyslength: {
-          $first: { $size: "$resultSurvey" },
+          $sum: {
+            $cond: { if: "$resultSurvey.results.isDone", then: 1, else: 0 },
+          },
         },
         totalPoint: {
           $sum: "$resultsurveys.results.point",
         },
         participantsLength: {
           $first: { $size: "$participants" },
+        },
+        answer: {
+          $push: "$resultsurveys.results.answer",
         },
 
         // $count: "sum",
@@ -141,6 +148,8 @@ export async function getTotalResultSurvey(groupId: string) {
         _id: 1,
         title: 1,
         name: 1,
+        type: 1,
+        answer: 1,
         totalPoint: 1,
         resultsurveyslength: 1,
         participantsLength: 1,

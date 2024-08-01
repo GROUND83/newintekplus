@@ -87,9 +87,9 @@ export default function LessonInfoPage() {
                   </div>
                 </div>
               ) : (
-                <div className="w-full bg-white   h-[200px] flex flex-col items-center justify-center">
-                  <div className="w-[200px] h-[200px] flex flex-col items-center justify-center">
-                    <p>학습컨텐츠가 없습니다.</p>
+                <div className=" col-span-12 flex flex-col gap-2 pb-2">
+                  <div className="flex flex-col items-center justify-center w-full bg-neutral-100 py-12 border">
+                    <p className="text-neutral-500">학습컨텐츠가 없습니다.</p>
                   </div>
                 </div>
               )}

@@ -9,6 +9,8 @@ import { useQuery } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import { Submenu, SubMenuWrap } from "@/components/commonUi/mainTitleWrap";
 import { detailGroup } from "@/components/commonActions/commonActions";
+import { Button } from "@/components/ui/button";
+import NewGroupNotivce from "./notice/_components/newGroupNotice";
 
 export default function Layout({
   children,
@@ -91,6 +93,11 @@ export default function Layout({
           title="교육생 진도율"
           size="sm"
         />
+        {pathname.includes("/detail/notice") && (
+          <div className=" flex flex-col items-end justify-center flex-1">
+            <NewGroupNotivce />
+          </div>
+        )}
       </SubMenuWrap>
 
       <div className="flex flex-col  bg-neutral-100">{children}</div>

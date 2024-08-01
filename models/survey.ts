@@ -7,6 +7,8 @@ export interface ISurvey {
   lessonId: string;
   title: string;
   point: number;
+  type: string;
+  answer: string;
 }
 
 export interface ISurveyDocument extends ISurvey, Document {
@@ -22,6 +24,8 @@ const survey = new mongoose.Schema<ISurveyDocument>(
     lessonId: { type: String },
     title: { type: String },
     point: { type: Number, default: 0 },
+    answer: { type: String },
+    type: { type: String, default: "객관식" },
   },
   {
     timestamps: true,

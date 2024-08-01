@@ -21,31 +21,15 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import FormLabelWrap from "@/components/formLabel";
-import { Textarea } from "@/components/ui/textarea";
+
 import { Loader2, XIcon } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
-import ViewResultSurveyStudent from "./_component/viewResultSurveyStudent";
 import { useRouter } from "next/navigation";
 import EditSurveyStudent from "./_component/editSurveyStudent";
+import ViewResultSurveyt from "@/components/commonUi/viewResultSurvey";
 //
 
 const FormSchema = z.object({
@@ -54,6 +38,8 @@ const FormSchema = z.object({
       surveyId: z.string().optional(),
       point: z.number({ required_error: "필수사항 입니다." }),
       title: z.string().optional(),
+      type: z.string().optional(),
+      answer: z.string().optional(),
     })
   ), // 요구 역량
 });
@@ -80,16 +66,6 @@ export default function Page({ params }: { params: { groupId: string } }) {
       console.log("data", data);
       if (data.liveSurvey) {
         setLiveSurvey(data.liveSurvey);
-        let newArray = [];
-        // for (const survey of data.liveSurvey.surveys) {
-        //   let newData = {
-        //     surveyId: survey._id,
-
-        //     title: survey.title,
-        //     point: undefined,
-        //   };
-        //   newArray.push(newData);
-        // }
       }
       let resultSurvey = JSON.parse(res.resultSurvey);
       console.log("resultSurvey", resultSurvey);
@@ -101,12 +77,25 @@ export default function Page({ params }: { params: { groupId: string } }) {
       } else {
         let newArray = [];
         for (const survey of data.liveSurvey.surveys) {
-          let newData = {
-            surveyId: survey._id,
-            title: survey.title,
-            point: undefined,
-          };
-          newArray.push(newData);
+          if (survey.type === "객관식") {
+            let newData = {
+              surveyId: survey._id,
+              title: survey.title,
+              point: undefined,
+              type: survey.type,
+              answer: "",
+            };
+            newArray.push(newData);
+          } else {
+            let newData = {
+              surveyId: survey._id,
+              title: survey.title,
+              point: 0,
+              type: survey.type,
+              answer: "",
+            };
+            newArray.push(newData);
+          }
         }
         form.reset({
           results: newArray,
@@ -133,8 +122,8 @@ export default function Page({ params }: { params: { groupId: string } }) {
   });
 
   async function onSubmit(values: z.infer<typeof FormSchema>) {
-    setUpdateLoading(true);
-    console.log("session", session);
+    // setUpdateLoading(true);
+    // console.log("session", session);
     console.log("values", values);
     const formData = new FormData();
     formData.append("resultSurveyId", resultSurveyData._id);
@@ -180,84 +169,121 @@ export default function Page({ params }: { params: { groupId: string } }) {
                         className=" border px-3 py-3 rounded-md bg-neutral-100 w-full"
                         key={resuResultIndex}
                       >
-                        {/* <p>{livesurveydata.title}</p> */}
-                        <FormField
-                          control={form.control}
-                          name={`results.${resuResultIndex}.point`}
-                          render={({ field: { value, onChange } }) => (
-                            <FormItem className="flex flex-col col-span-12 gap-1">
-                              <div className="py-2 ">
-                                <p className=" font-bold text-md">
-                                  {resuResultIndex + 1}. {livesurveydata.title}
-                                </p>
-                              </div>
+                        {livesurveydata.type === "객관식" ? (
+                          <FormField
+                            control={form.control}
+                            name={`results.${resuResultIndex}.point`}
+                            render={({ field: { value, onChange } }) => (
+                              <FormItem className="flex flex-col col-span-12 gap-1">
+                                <div className="py-2 ">
+                                  <p className=" font-bold text-md">
+                                    {resuResultIndex + 1}.{" "}
+                                    {livesurveydata.title}
+                                  </p>
 
-                              <div className="flex flex-row items-center gap-2">
-                                <Button
-                                  type="button"
-                                  variant={
-                                    value === 1 ? "default" : "defaultoutline"
-                                  }
-                                  size="sm"
-                                  onClick={() => {
-                                    onChange(1);
-                                  }}
-                                >
-                                  전혀 그렇지 않다
-                                </Button>
-                                <Button
-                                  type="button"
-                                  variant={
-                                    value === 2 ? "default" : "defaultoutline"
-                                  }
-                                  size="sm"
-                                  onClick={() => {
-                                    onChange(2);
-                                  }}
-                                >
-                                  별로 그렇지 않다
-                                </Button>
-                                <Button
-                                  type="button"
-                                  variant={
-                                    value === 3 ? "default" : "defaultoutline"
-                                  }
-                                  size="sm"
-                                  onClick={() => {
-                                    onChange(3);
-                                  }}
-                                >
-                                  보통이다
-                                </Button>
-                                <Button
-                                  type="button"
-                                  variant={
-                                    value === 4 ? "default" : "defaultoutline"
-                                  }
-                                  size="sm"
-                                  onClick={() => {
-                                    onChange(4);
-                                  }}
-                                >
-                                  다소 그렇다
-                                </Button>
-                                <Button
-                                  type="button"
-                                  variant={
-                                    value === 5 ? "default" : "defaultoutline"
-                                  }
-                                  size="sm"
-                                  onClick={() => {
-                                    onChange(5);
-                                  }}
-                                >
-                                  매우 그렇다
-                                </Button>
-                              </div>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
+                                  <div className="flex flex-row items-center gap-2">
+                                    <Button
+                                      type="button"
+                                      variant={
+                                        value === 1
+                                          ? "default"
+                                          : "defaultoutline"
+                                      }
+                                      size="sm"
+                                      onClick={() => {
+                                        onChange(1);
+                                      }}
+                                    >
+                                      전혀 그렇지 않다
+                                    </Button>
+                                    <Button
+                                      type="button"
+                                      variant={
+                                        value === 2
+                                          ? "default"
+                                          : "defaultoutline"
+                                      }
+                                      size="sm"
+                                      onClick={() => {
+                                        onChange(2);
+                                      }}
+                                    >
+                                      별로 그렇지 않다
+                                    </Button>
+                                    <Button
+                                      type="button"
+                                      variant={
+                                        value === 3
+                                          ? "default"
+                                          : "defaultoutline"
+                                      }
+                                      size="sm"
+                                      onClick={() => {
+                                        onChange(3);
+                                      }}
+                                    >
+                                      보통이다
+                                    </Button>
+                                    <Button
+                                      type="button"
+                                      variant={
+                                        value === 4
+                                          ? "default"
+                                          : "defaultoutline"
+                                      }
+                                      size="sm"
+                                      onClick={() => {
+                                        onChange(4);
+                                      }}
+                                    >
+                                      다소 그렇다
+                                    </Button>
+                                    <Button
+                                      type="button"
+                                      variant={
+                                        value === 5
+                                          ? "default"
+                                          : "defaultoutline"
+                                      }
+                                      size="sm"
+                                      onClick={() => {
+                                        onChange(5);
+                                      }}
+                                    >
+                                      매우 그렇다
+                                    </Button>
+                                  </div>
+                                </div>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        ) : (
+                          <FormField
+                            control={form.control}
+                            name={`results.${resuResultIndex}.answer`}
+                            render={({ field: { value, onChange } }) => (
+                              <FormItem className="flex flex-col col-span-12 gap-1">
+                                <div className="py-2 ">
+                                  <p className=" font-bold text-md">
+                                    {resuResultIndex + 1}.{" "}
+                                    {livesurveydata.title}
+                                  </p>
+                                </div>
+
+                                <div>
+                                  <Input
+                                    value={value || ""}
+                                    onChange={onChange}
+                                    placeholder="답변을 입력하세요."
+                                  />
+                                </div>
+
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        )}
                       </div>
                     );
                   })}
@@ -280,7 +306,7 @@ export default function Page({ params }: { params: { groupId: string } }) {
           <div className="bg-white border  w-full p-6 flex flex-col items-center justify-center gap-2 h-[calc(100vh-140px)]">
             <p>설문을 완료 하였습니다.</p>
 
-            <ViewResultSurveyStudent resultSurvey={resultSurveyData} />
+            <ViewResultSurveyt resultSurvey={resultSurveyData} />
             {!resultSurveyData.isSend && (
               <EditSurveyStudent
                 livesurveytitle={livesurvey.title}

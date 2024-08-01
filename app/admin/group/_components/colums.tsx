@@ -105,7 +105,7 @@ export const columns: ColumnDef<any>[] = [
             className=" p-0 text-xs"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
-            교육기간
+            교육시작
             <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
         </div>
@@ -116,7 +116,32 @@ export const columns: ColumnDef<any>[] = [
       let endDate = row.original.endDate;
       return (
         <div className=" text-xs">
-          {dayjs(startDate).format("YYYY/MM/DD(dd)")} ~
+          {dayjs(startDate).format("YYYY/MM/DD(dd)")}
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "endDate",
+    header: ({ column }) => {
+      return (
+        <div>
+          <Button
+            variant="ghost"
+            className=" p-0 text-xs"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            교육마감
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+        </div>
+      );
+    },
+    cell: ({ row }) => {
+      let startDate = row.original.startDate;
+      let endDate = row.original.endDate;
+      return (
+        <div className=" text-xs">
           {dayjs(endDate).format("YYYY/MM/DD(dd)")}
         </div>
       );
@@ -142,7 +167,7 @@ export const columns: ColumnDef<any>[] = [
       return (
         <div className="text-center">
           <p className="text-xs">
-            {dayjs(row.getValue("createdAt")).format("YYYY/MM/DD HH:mm(dddd)")}
+            {dayjs(row.getValue("createdAt")).format("YYYY/MM/DD HH:mm(dd)")}
           </p>
         </div>
       );

@@ -5,12 +5,13 @@ import { getGroupDetail, settingResult } from "./_component/actions";
 
 import { Loader2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import ViewResultSurvey from "./_component/viewResultSurvey";
+// import ViewResultSurvey from "./_component/viewResultSurvey";
 import SendVertification from "./_component/sendVertification";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useQuery } from "@tanstack/react-query";
 import ViewTotalResultSurvey from "./_component/viewTotalResultSurvey";
 import { Button } from "@/components/ui/button";
+import ViewResultSurvey from "@/components/commonUi/viewResultSurvey";
 
 export default function Page({ params }: { params: { groupId: string } }) {
   const fetchDataOptions = {
@@ -74,12 +75,16 @@ export default function Page({ params }: { params: { groupId: string } }) {
           {data?.livesurvey && (
             <div className="bg-white border w-full p-6 flex flex-col items-start gap-2 h-[calc(100vh-170px)] flex-1">
               <p className=" font-bold">{data.livesurvey?.title}</p>
-              <div className="mt-3">
+              <div className="mt-3 w-full">
                 <p>설문내용</p>
-                <div className="mt-3">
+                <div className="mt-3 flex flex-col items-start w-full gap-1">
                   {data.livesurvey?.surveys.map((item: any, index: any) => {
                     return (
-                      <div key={item._id}>
+                      <div
+                        key={item._id}
+                        className="flex flex-row items-center gap-2 border-b w-full py-2"
+                      >
+                        <Badge variant="defaultOutline">{item.type}</Badge>
                         <p>
                           {index + 1}. {item.title}
                         </p>

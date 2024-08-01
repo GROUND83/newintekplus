@@ -378,7 +378,7 @@ export default function Page({
                       desc={"코스프로파일을 삭제합니다."}
                       btnText={"코스프로파일 삭제"}
                       onClick={clickDelete}
-                      disabled={false}
+                      disabled={editAvaliable.length > 0}
                       deleteOpen={deleteOpen}
                       setDeleteOpen={setDeleteOpen}
                       deleteLoading={deleteLoading}

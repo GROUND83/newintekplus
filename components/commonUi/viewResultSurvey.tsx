@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
 import React from "react";
 
-export default function ViewResultSurveyStudent({
+export default function ViewResultSurveyt({
   resultSurvey,
 }: {
   resultSurvey: any;
@@ -33,12 +33,20 @@ export default function ViewResultSurveyStudent({
               return (
                 <div
                   key={item._id}
-                  className="flex flex-row items-center gap-3 border-b py-3 justify-between"
+                  className={`flex ${
+                    item.type === "객관식"
+                      ? "flex-row items-center"
+                      : "flex-col items-start"
+                  } gap-3 border-b py-3 justify-between`}
                 >
                   <p>
                     {index + 1}. {item.title}
                   </p>
-                  <p>{item.point}점</p>
+                  {item.type === "객관식" ? (
+                    <p>{item.point}점</p>
+                  ) : (
+                    <p className=" whitespace-pre-wrap">{item.answer}</p>
+                  )}
                 </div>
               );
             })}

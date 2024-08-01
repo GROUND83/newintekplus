@@ -12,6 +12,8 @@ export interface IResultSurvey {
     surveyId: string;
     point: number;
     title: string;
+    type: string;
+    answer: string;
   }>;
 }
 export interface IResultSurveyDocument extends IResultSurvey, Document {
@@ -34,6 +36,8 @@ const resultSurvey = new mongoose.Schema<IResultSurveyDocument>(
         surveyId: { type: String },
         point: { type: Number },
         title: { type: String },
+        type: { type: String },
+        answer: { type: String },
       },
     ],
   },

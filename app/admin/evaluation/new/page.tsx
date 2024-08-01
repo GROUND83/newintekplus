@@ -1,45 +1,21 @@
 "use client";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  createLiveSurvey,
-  detailLiveSurvey,
-  updateLiveSurvey,
-} from "../_components/table/actions";
+import { createLiveSurvey } from "../_components/table/actions";
 import React from "react";
 import { z } from "zod";
 import { useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ExclamationCircleIcon as FillExclamtion } from "@heroicons/react/24/solid";
+
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+import { Form, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import FormLabelWrap from "@/components/formLabel";
 import { XIcon } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { FormSubmitButton } from "@/components/commonUi/formUi";
 const FormSchema = z.object({
   title: z.string({
     required_error: "과정명을 입력하세요.",
@@ -47,6 +23,7 @@ const FormSchema = z.object({
   surveys: z.array(
     z.object({
       title: z.string().optional(),
+      type: z.string().optional(),
     })
   ), // 요구 역량
 });
@@ -71,6 +48,7 @@ export default function Page() {
   });
 
   async function onSubmit(values: z.infer<typeof FormSchema>) {
+    setLoading(true);
     console.log("values", values);
 
     const formData = new FormData();
@@ -84,13 +62,14 @@ export default function Page() {
       if (res.data) {
         //
         toast.success("설문 생성에 성공하였습니다.");
-
         router.push("/admin/evaluation");
       }
     } catch (e) {
       //
       console.log("message", e);
       toast.error(e);
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -129,10 +108,23 @@ export default function Page() {
                   />
 
                   <div className="col-span-12  grid grid-cols-12 gap-3">
-                    <div>
-                      <Button onClick={() => surveysAppend({})} type="button">
-                        + 설문항목 추가
+                    <div className="flex flex-row items-center gap-2">
+                      <Button
+                        onClick={() => surveysAppend({ type: "객관식" })}
+                        type="button"
+                      >
+                        + 설문항목(객관식) 추가
                       </Button>
+                      <div>
+                        <Button
+                          onClick={() =>
+                            surveysAppend({ type: "주관식", title: "" })
+                          }
+                          type="button"
+                        >
+                          + 설문항목(주관식) 추가
+                        </Button>
+                      </div>
                     </div>
                     {surveysFields.map((survey, surveyIndex) => {
                       return (
@@ -145,16 +137,26 @@ export default function Page() {
                             name={`surveys.${surveyIndex}.title`}
                             render={({ field: { value, onChange } }) => (
                               <FormItem className="flex flex-row items-center col-span-12 gap-2 flex-1">
-                                {/* <FormLabelWrap title="과정명" required /> */}
                                 <p>{surveyIndex + 1}.</p>
-                                <Input
-                                  value={value || ""}
-                                  onChange={onChange}
-                                  placeholder="설문 내용을 입력하세요."
-                                  disabled={
-                                    editAvaliable.length > 0 ? true : false
-                                  }
-                                />
+                                {survey.type === "객관식" ? (
+                                  <Input
+                                    value={value || ""}
+                                    onChange={onChange}
+                                    placeholder="객관식 설문 내용을 입력하세요."
+                                    disabled={
+                                      editAvaliable.length > 0 ? true : false
+                                    }
+                                  />
+                                ) : (
+                                  <Input
+                                    value={value || ""}
+                                    onChange={onChange}
+                                    placeholder="주관식 설문 내용을 입력하세요."
+                                    disabled={
+                                      editAvaliable.length > 0 ? true : false
+                                    }
+                                  />
+                                )}
                                 <FormMessage />
                               </FormItem>
                             )}
@@ -173,14 +175,20 @@ export default function Page() {
                   </div>
 
                   <div className=" col-span-12 flex flex-col items-end">
-                    <Button
+                    <FormSubmitButton
+                      title="설문 생성"
+                      form={form}
+                      loading={loading}
+                      disabled={false}
+                    />
+                    {/* <Button
                       type="submit"
                       className="mt-6"
 
                       // disabled={editAvaliable.length > 0 ? true : false}
                     >
                       설문 생성
-                    </Button>
+                    </Button> */}
                   </div>
                 </CardContent>
               </Card>

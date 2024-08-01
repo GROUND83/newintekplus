@@ -8,6 +8,7 @@ import LiveSurvey from "@/models/liveSurvey";
 import Module from "@/models/module";
 import Notice from "@/models/notice";
 import NoticeContent from "@/models/noticeContent";
+import Participant from "@/models/participant";
 import Teacher from "@/models/teacher";
 
 export async function getMoreData({
@@ -50,5 +51,42 @@ export async function getMoreData({
   } catch (e) {
     console.log(e);
     return { message: "noticeCount 오류" };
+  }
+}
+
+export async function getSenderData({
+  sendTo,
+  groupId,
+}: {
+  sendTo: string;
+  groupId: string;
+}) {
+  //
+  let group = await Group.findOne({ _id: groupId })
+    .populate({
+      path: "teacher",
+      model: Teacher,
+      select: "email _id username",
+    })
+    .populate({
+      path: "participants",
+      model: Participant,
+      select: "email _id username",
+    });
+  console.log("sendTo", sendTo);
+  if (sendTo === "all") {
+    //
+    let to = [group.teacher, ...group.participants];
+    return { data: JSON.stringify(to) };
+  }
+  if (sendTo === "teacher") {
+    //
+    let to = [group.teacher];
+    return { data: JSON.stringify(to) };
+  }
+  if (sendTo === "student") {
+    //
+    let to = group.participants;
+    return { data: JSON.stringify(to) };
   }
 }

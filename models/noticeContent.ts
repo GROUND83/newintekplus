@@ -5,7 +5,7 @@ export interface INoticeContent {
   groupId: string;
   contentdownloadURL: string; //레슨다운로드
   contentName: string; // 자료이름
-
+  type: string;
   contentSize: number; // 레슨 파일 크기
 }
 
@@ -21,6 +21,7 @@ const noticeContent = new mongoose.Schema<INoticeContentDocument>(
     contentdownloadURL: { type: String, required: true }, //레슨다운로드
     contentName: { type: String }, // 자료이름
     contentSize: { type: Number, required: true }, // 레슨 파일 크기
+    type: { type: String },
   },
   {
     timestamps: true,

@@ -33,21 +33,36 @@ export default function ViewTotalResultSurvey({
 
   const getResult = async () => {
     let res = await getTotalResultSurvey(groupId);
-    console.log(res);
+    console.log("res", res);
     if (res.data) {
       let data = JSON.parse(res.data);
       console.log("data", data);
       let newArray = [];
       for (const index in data) {
-        let newdata = {
-          순서: Number(index) + 1,
-          설문명: data[index].title,
-          점수: data[index].totalPoint,
-          만점: data[index].total,
-          응답자: data[index].resultsurveyslength,
-          총설문자: data[index].participantsLength,
-        };
-        newArray.push(newdata);
+        if (data[index].type === "객관식") {
+          let newdata = {
+            순서: Number(index) + 1,
+            타입: data[index].type,
+            설문명: data[index].title,
+            점수: data[index].totalPoint,
+            만점: data[index].total,
+            응답자: data[index].resultsurveyslength,
+            총설문자: data[index].participantsLength,
+          };
+          newArray.push(newdata);
+        } else {
+          for (const answer of data[index].answer) {
+            let newdata = {
+              순서: Number(index) + 1,
+              타입: data[index].type,
+              설문명: data[index].title,
+              주관식답변: answer,
+              응답자: data[index].resultsurveyslength,
+              총설문자: data[index].participantsLength,
+            };
+            newArray.push(newdata);
+          }
+        }
       }
       setDataExcel(newArray);
       setData(data);
@@ -133,24 +148,28 @@ export default function ViewTotalResultSurvey({
                       <p className="font-bold">
                         {index + 1}. {item.title}
                       </p>
-                      <div className="flex flex-row items-center gap-1 w-full">
-                        <p>점수/만점</p>
-                        <p>
-                          [{item.totalPoint}/{item.total}]
-                        </p>
-                      </div>
-                      <div className="flex flex-row items-center gap-2 w-full">
-                        <Progress
-                          indicatorColor="bg-primary"
-                          value={Number(item.totalPoint / item.total) * 100}
-                        />
-                        <p>
-                          {(Number(item.totalPoint / item.total) * 100).toFixed(
-                            2
-                          )}
-                          %
-                        </p>
-                      </div>
+                      {item.type === "객관식" && (
+                        <div className="flex flex-row items-center gap-1 w-full">
+                          <p>점수/만점</p>
+                          <p>
+                            [{item.totalPoint}/{item.total}]
+                          </p>
+                        </div>
+                      )}
+                      {item.type === "객관식" && (
+                        <div className="flex flex-row items-center gap-2 w-full">
+                          <Progress
+                            indicatorColor="bg-primary"
+                            value={Number(item.totalPoint / item.total) * 100}
+                          />
+                          <p>
+                            {(
+                              Number(item.totalPoint / item.total) * 100
+                            ).toFixed(2)}
+                            %
+                          </p>
+                        </div>
+                      )}
 
                       <div className="flex flex-row items-center gap-1 w-full">
                         <p>응답자/총설문자</p>
@@ -176,6 +195,21 @@ export default function ViewTotalResultSurvey({
                           %
                         </p>
                       </div>
+                      {item.type === "주관식" && (
+                        <div className="w-full flex flex-col items-start gap-2">
+                          <div className="">
+                            <p>답변</p>
+                          </div>
+                          {item.answer.map((an: any, anindex: any) => {
+                            return (
+                              <div key={anindex} className="w-full border p-2">
+                                <p className=" whitespace-pre-wrap">{an}</p>
+                              </div>
+                            );
+                          })}
+                          <p></p>
+                        </div>
+                      )}
                     </div>
                   );
                 })}

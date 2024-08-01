@@ -1,6 +1,7 @@
 "use client";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
+  deleteLiceSurvey,
   detailLiveSurvey,
   updateLiveSurvey,
 } from "../_components/table/actions";
@@ -38,6 +39,9 @@ import {
 import FormLabelWrap from "@/components/formLabel";
 import { XIcon } from "lucide-react";
 import { toast } from "sonner";
+import { Badge } from "@/components/ui/badge";
+import DeleteModal from "@/components/commonUi/DeleteModal";
+import { useRouter } from "next/navigation";
 const FormSchema = z.object({
   _id: z.string(),
   title: z.string({
@@ -48,14 +52,18 @@ const FormSchema = z.object({
     z.object({
       _id: z.string().optional(),
       title: z.string().optional(),
+      type: z.string().optional(),
     })
   ), // 요구 역량
 });
 export default function Page({ params }: { params: { livesurveyId: string } }) {
   //
+  const router = useRouter();
   const [loading, setLoading] = React.useState(false);
   const [editAvaliable, setEditAvaliable] = React.useState<any>([]);
   //
+  const [deleteOpen, setDeleteOpen] = React.useState(false);
+  const [deleteLoading, setdeleteLoading] = React.useState(false);
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {},
@@ -127,7 +135,16 @@ export default function Page({ params }: { params: { livesurveyId: string } }) {
       toast.error(e);
     }
   }
-
+  const clickDelete = async () => {
+    //
+    let res = await deleteLiceSurvey(params.livesurveyId);
+    if (res.data) {
+      //
+      toast.success("설문 삭제에 성공하였습니다.");
+      router.push("/admin/evaluation");
+    }
+    //
+  };
   return (
     <div className="w-full flex-1 flex ">
       <ScrollArea className="w-full h-[calc(100vh-70px)] flex bg-white">
@@ -138,25 +155,36 @@ export default function Page({ params }: { params: { livesurveyId: string } }) {
               className="space-y-8 w-full"
             >
               <div className="w-full p-6">
-                <div>
-                  <p className="text-xl font-bold">설문수정</p>
-
+                <div className="w-full flex flex-row items-center justify-between">
                   <div>
-                    {editAvaliable && editAvaliable.length > 0 ? (
-                      <div>
-                        <span className="text-red-500">
-                          {editAvaliable.length}개의 그룹에 배정되었습니다.
-                        </span>
-                        <span className="flex flex-row items-center gap-2 text-red-500">
-                          그룹에 배정된 설문은 수정이 불가 합니다.
-                        </span>
-                      </div>
-                    ) : (
-                      <div>
-                        <span> 설문을 수정하세요.</span>
-                      </div>
-                    )}
+                    <p className="text-xl font-bold">설문수정</p>
+                    <div>
+                      {editAvaliable && editAvaliable.length > 0 ? (
+                        <div>
+                          <span className="text-red-500">
+                            {editAvaliable.length}개의 그룹에 배정되었습니다.
+                          </span>
+                          <span className="flex flex-row items-center gap-2 text-red-500">
+                            그룹에 배정된 설문은 수정이 불가 합니다.
+                          </span>
+                        </div>
+                      ) : (
+                        <div>
+                          <span> 설문을 수정하세요.</span>
+                        </div>
+                      )}
+                    </div>
                   </div>
+                  <DeleteModal
+                    title="설문 삭제"
+                    desc={"설문을 삭제합니다."}
+                    btnText={"설문 삭제"}
+                    onClick={clickDelete}
+                    disabled={editAvaliable.length > 0}
+                    deleteOpen={deleteOpen}
+                    setDeleteOpen={setDeleteOpen}
+                    deleteLoading={deleteLoading}
+                  />
                 </div>
                 <div className="w-full grid grid-cols-12 gap-5 mt-3">
                   <FormField
@@ -177,13 +205,22 @@ export default function Page({ params }: { params: { livesurveyId: string } }) {
                   />
 
                   <div className="col-span-12  grid grid-cols-12 gap-3">
-                    <div>
+                    <div className="flex flex-row items-center gap-2">
                       <Button
-                        onClick={() => surveysAppend({})}
+                        onClick={() => surveysAppend({ type: "객관식" })}
                         type="button"
                         disabled={editAvaliable.length > 0 ? true : false}
                       >
-                        + 설문항목 추가
+                        + 설문항목(객관식) 추가
+                      </Button>
+                      <Button
+                        onClick={() =>
+                          surveysAppend({ type: "주관식", title: "" })
+                        }
+                        type="button"
+                        disabled={editAvaliable.length > 0 ? true : false}
+                      >
+                        + 설문항목(주관식) 추가
                       </Button>
                     </div>
                     {surveysFields.map((survey, surveyIndex) => {
@@ -197,7 +234,11 @@ export default function Page({ params }: { params: { livesurveyId: string } }) {
                             name={`surveys.${surveyIndex}.title`}
                             render={({ field: { value, onChange } }) => (
                               <FormItem className="flex flex-row items-center col-span-12 gap-2 flex-1">
-                                {/* <FormLabelWrap title="과정명" required /> */}
+                                <div className="w-[80px] flex flex-row items-center justify-center ">
+                                  <Badge variant="defaultOutline">
+                                    {survey.type ? survey.type : null}
+                                  </Badge>
+                                </div>
                                 <p>{surveyIndex + 1}.</p>
                                 <Input
                                   value={value || ""}

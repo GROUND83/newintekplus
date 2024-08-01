@@ -29,6 +29,7 @@ import {
 } from "@/components/ui/form";
 import { toast, Toaster } from "sonner";
 import { updateResultSurvey } from "./actions";
+import { Input } from "@/components/ui/input";
 
 const FormSchema = z.object({
   results: z.array(
@@ -36,6 +37,8 @@ const FormSchema = z.object({
       surveyId: z.string().optional(),
       point: z.number({ required_error: "필수사항 입니다." }),
       title: z.string().optional(),
+      type: z.string().optional(),
+      answer: z.string().optional(),
     })
   ), // 요구 역량
 });
@@ -132,83 +135,112 @@ export default function EditSurveyStudent({
                                 className=" border px-3 py-3 rounded-md bg-neutral-100 w-full"
                                 key={resultSurveyIndex}
                               >
-                                <FormField
-                                  control={form.control}
-                                  name={`results.${resultSurveyIndex}.point`}
-                                  render={({ field: { value, onChange } }) => (
-                                    <FormItem className="flex flex-col col-span-12 gap-1">
-                                      <div className="py-2 ">
-                                        <p className=" font-bold text-md">
-                                          {resultSurveyIndex + 1}.{" "}
-                                          {resultSurvey.title}
-                                        </p>
-                                      </div>
-                                      <div className="flex flex-row items-center gap-2">
-                                        <Button
-                                          type="button"
-                                          variant={
-                                            value === 1
-                                              ? "default"
-                                              : "defaultoutline"
-                                          }
-                                          size="sm"
-                                          onClick={() => onChange(1)}
-                                        >
-                                          전혀 그렇지 않다
-                                        </Button>
-                                        <Button
-                                          type="button"
-                                          variant={
-                                            value === 2
-                                              ? "default"
-                                              : "defaultoutline"
-                                          }
-                                          size="sm"
-                                          onClick={() => onChange(2)}
-                                        >
-                                          별로 그렇지 않다
-                                        </Button>
-                                        <Button
-                                          type="button"
-                                          variant={
-                                            value === 3
-                                              ? "default"
-                                              : "defaultoutline"
-                                          }
-                                          size="sm"
-                                          onClick={() => onChange(3)}
-                                        >
-                                          보통이다
-                                        </Button>
-                                        <Button
-                                          type="button"
-                                          variant={
-                                            value === 4
-                                              ? "default"
-                                              : "defaultoutline"
-                                          }
-                                          size="sm"
-                                          onClick={() => onChange(4)}
-                                        >
-                                          다소 그렇다
-                                        </Button>
-                                        <Button
-                                          type="button"
-                                          variant={
-                                            value === 5
-                                              ? "default"
-                                              : "defaultoutline"
-                                          }
-                                          size="sm"
-                                          onClick={() => onChange(5)}
-                                        >
-                                          매우 그렇다
-                                        </Button>
-                                      </div>
-                                      <FormMessage />
-                                    </FormItem>
-                                  )}
-                                />
+                                {resultSurvey.type === "객관식" ? (
+                                  <FormField
+                                    control={form.control}
+                                    name={`results.${resultSurveyIndex}.point`}
+                                    render={({
+                                      field: { value, onChange },
+                                    }) => (
+                                      <FormItem className="flex flex-col col-span-12 gap-1">
+                                        <div className="py-2 ">
+                                          <p className=" font-bold text-md">
+                                            {resultSurveyIndex + 1}.{" "}
+                                            {resultSurvey.title}
+                                          </p>
+                                        </div>
+                                        <div className="flex flex-row items-center gap-2">
+                                          <Button
+                                            type="button"
+                                            variant={
+                                              value === 1
+                                                ? "default"
+                                                : "defaultoutline"
+                                            }
+                                            size="sm"
+                                            onClick={() => onChange(1)}
+                                          >
+                                            전혀 그렇지 않다
+                                          </Button>
+                                          <Button
+                                            type="button"
+                                            variant={
+                                              value === 2
+                                                ? "default"
+                                                : "defaultoutline"
+                                            }
+                                            size="sm"
+                                            onClick={() => onChange(2)}
+                                          >
+                                            별로 그렇지 않다
+                                          </Button>
+                                          <Button
+                                            type="button"
+                                            variant={
+                                              value === 3
+                                                ? "default"
+                                                : "defaultoutline"
+                                            }
+                                            size="sm"
+                                            onClick={() => onChange(3)}
+                                          >
+                                            보통이다
+                                          </Button>
+                                          <Button
+                                            type="button"
+                                            variant={
+                                              value === 4
+                                                ? "default"
+                                                : "defaultoutline"
+                                            }
+                                            size="sm"
+                                            onClick={() => onChange(4)}
+                                          >
+                                            다소 그렇다
+                                          </Button>
+                                          <Button
+                                            type="button"
+                                            variant={
+                                              value === 5
+                                                ? "default"
+                                                : "defaultoutline"
+                                            }
+                                            size="sm"
+                                            onClick={() => onChange(5)}
+                                          >
+                                            매우 그렇다
+                                          </Button>
+                                        </div>
+                                        <FormMessage />
+                                      </FormItem>
+                                    )}
+                                  />
+                                ) : (
+                                  <FormField
+                                    control={form.control}
+                                    name={`results.${resultSurveyIndex}.answer`}
+                                    render={({
+                                      field: { value, onChange },
+                                    }) => (
+                                      <FormItem className="flex flex-col col-span-12 gap-1">
+                                        <div className="py-2 ">
+                                          <p className=" font-bold text-md">
+                                            {resultSurveyIndex + 1}.{" "}
+                                            {resultSurvey.title}
+                                          </p>
+                                        </div>
+                                        <div>
+                                          <Input
+                                            value={value || ""}
+                                            onChange={onChange}
+                                            placeholder="답변을 입력하세요."
+                                          />
+                                        </div>
+                                        <FormMessage />
+                                      </FormItem>
+                                    )}
+                                  />
+                                )}
                               </div>
                             );
                           }
