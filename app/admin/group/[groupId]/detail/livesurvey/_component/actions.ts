@@ -9,7 +9,7 @@ import Participant from "@/models/participant";
 import ResultSurvey from "@/models/resultSurvey";
 import Survey from "@/models/survey";
 import Teacher from "@/models/teacher";
-import mongoose from "mongoose";
+import mongoose, { model } from "mongoose";
 
 export async function getGroupDetail(groupId: string) {
   //
@@ -49,19 +49,27 @@ export async function getGroupDetail(groupId: string) {
       .populate({
         path: "resultSurvey",
         model: ResultSurvey,
+        populate: {
+          path: "onwer",
+          model: Participant,
+          select: "_id username email",
+        },
       });
+    //
     //
     let resultSurvey = await ResultSurvey.find({
       groupId: groupId,
-      liveSurveyId: groupData.liveSurvey._id,
     }).populate({
       path: "onwer",
       model: Participant,
       select: "_id username email",
     });
+
+    //
+
     return {
       data: JSON.stringify(groupData),
-      resultSurvey: JSON.stringify(resultSurvey),
+      resultSurvey: JSON.stringify(groupData.resultSurvey),
     };
   } catch (e) {
     return { message: e };
@@ -149,4 +157,76 @@ export async function getTotalResultSurvey(groupId: string) {
   ]);
 
   return { data: JSON.stringify(res) };
+}
+
+export async function settingResult(groupId: string) {
+  let groupData = await Group.findOne({ _id: groupId })
+    .populate({
+      path: "teacher",
+      model: Teacher,
+    })
+    .populate({
+      path: "liveSurvey",
+      model: LiveSurvey,
+    })
+    .populate({
+      path: "participants",
+      model: Participant,
+    })
+    .populate({
+      path: "courseProfile",
+      model: CourseProfile,
+      populate: {
+        path: "modules",
+        model: Module,
+        populate: {
+          path: "lessons",
+          model: Lesson,
+        },
+      },
+    })
+    .lean();
+
+  let resultDelete = await ResultSurvey.deleteMany({
+    groupId: groupId,
+  });
+  let resultSuveyArray = [];
+  for await (const participant of groupData.participants) {
+    let isexsit = await ResultSurvey.findOne({
+      groupId: groupData._id,
+      onwer: participant,
+    });
+    // if (isexsit.length > 0) {
+    //   for (const isexsitdata of isexsit) {
+    //     if (isexsitdata.results.length > 0) {
+    //       //
+    //     } else {
+    //       console.log("isexsitdata", isexsitdata);
+    //       let isexsit = await ResultSurvey.deleteOne({
+    //         _id: isexsitdata._id,
+    //       });
+    //     }
+    //   }
+    // }
+    // console.log("isexsit", isexsit);
+    if (isexsit) {
+      //
+      resultSuveyArray.push(isexsit);
+    } else {
+      let resultSurvey = await ResultSurvey.create({
+        liveSurveyId: groupData?.liveSurvey ? groupData.liveSurvey?._id : null,
+        groupId: groupData._id,
+        onwer: participant,
+      });
+      resultSuveyArray.push(resultSurvey);
+    }
+  }
+  console.log("resultSuveyArray", resultSuveyArray);
+  let groupUpdate = await Group.findOneAndUpdate(
+    { _id: groupData._id },
+    {
+      resultSurvey: resultSuveyArray,
+    }
+  );
+  return { data: JSON.stringify(groupData) };
 }

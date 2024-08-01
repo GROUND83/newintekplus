@@ -20,11 +20,14 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { detailGroup } from "../commonActions/commonActions";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useParams } from "next/navigation";
 
-export default function GroupData({ groupId }: { groupId: string }) {
+export default function GroupData() {
   //
+
+  const params = useParams<{ groupId: string }>();
   const fetchDataOptions = {
-    groupId: groupId,
+    groupId: params.groupId,
   };
   const {
     data: groupdata,
@@ -52,7 +55,7 @@ export default function GroupData({ groupId }: { groupId: string }) {
   return (
     <div className="flex flex-row items-center gap-2">
       <p>학습그룹</p>
-      {isLoading && groupId && (
+      {isLoading && params.groupId && (
         <Skeleton className="w-[200px] h-[30px] rounded-sm bg-neutral-200 ml-6" />
       )}
       {groupdata && (

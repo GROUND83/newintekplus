@@ -48,12 +48,12 @@ export default function Layout({
           size="sm"
         />
 
-        <Submenu
+        {/* <Submenu
           link={`/admin/group/${params.groupId}/detail/message`}
           pathname={pathname}
           title="메세지"
           size="sm"
-        />
+        /> */}
 
         <Submenu
           link={`/admin/group/${params.groupId}/detail/module`}

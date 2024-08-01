@@ -134,23 +134,33 @@ export async function updateGroupStatus({ groupId }: { groupId: string }) {
           }
         }
       }
-      // let resultSuveyArray = [];
-      // for await (const participant of groupData.participants) {
-      //   let resultSurvey = await ResultSurvey.create({
-      //     liveSurveyId: groupData?.liveSurvey
-      //       ? groupData.liveSurvey?._id
-      //       : null,
-      //     groupId: groupData._id,
-      //     title: groupData.liveSurvey ? groupData.liveSurvey?.title : null,
-      //     onwer: participant,
-      //   });
-      //   resultSuveyArray.push(resultSurvey);
-      // }
+      // 1. resultSruvey 검색 (groupId,onwer)
+      //
+      let resultSuveyArray = [];
+      for await (const participant of groupData.participants) {
+        let isexsit = await ResultSurvey.findOne({
+          groupId: groupData._id,
+          onwer: participant,
+        });
+        if (isexsit) {
+          //
+          resultSuveyArray.push(isexsit);
+        } else {
+          let resultSurvey = await ResultSurvey.create({
+            liveSurveyId: groupData?.liveSurvey
+              ? groupData.liveSurvey?._id
+              : null,
+            groupId: groupData._id,
+            onwer: participant,
+          });
+          resultSuveyArray.push(resultSurvey);
+        }
+      }
       let notice = await Notice.create({
         groupId: groupData._id,
         sendTo: "all",
         title: "안녕하세요? 그룹이 성공적으로 개설되었습니다.",
-        description: `${Group.name} 과정이 성공적으로 개설되었습니다.\n 문의사항은 intekplus@saloncanvas.kr 으로 문의하세요.`,
+        description: `${groupData.name} 과정이 성공적으로 개설되었습니다.\n 문의사항은 intekplus@saloncanvas.kr 으로 문의하세요.`,
       });
       let groupUpdate = await Group.findOneAndUpdate(
         { _id: groupData._id },
@@ -159,7 +169,7 @@ export async function updateGroupStatus({ groupId }: { groupId: string }) {
           lessonActivitys: lessonActivityArray,
           status: "개설완료",
           $push: { notices: notice },
-          // resultSurvey: resultSuveyArray,
+          resultSurvey: resultSuveyArray,
         }
       );
       return { data: JSON.stringify(groupUpdate) };

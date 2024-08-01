@@ -185,90 +185,83 @@ export default function SendVertification({
 
   return (
     <div className="">
-      {resultSurveyId ? (
-        <ActionModal
-          title={"수료증 발급"}
-          desc={`${participants.username}(${participants.email})에게 수료증을 발급합니다.`}
-          trigger={
-            isSend ? (
-              <Button
-                size="xs"
-                type="button"
-                onClick={() => setOpen(true)}
-                variant="defaultoutline"
-                className="flex flex-row items-center gap-2"
-              >
-                <RotateCw className="size-3" />
-                <p>수료증 재발급</p>
-              </Button>
-            ) : (
-              <Button
-                size="xs"
-                type="button"
-                onClick={() => setOpen(true)}
-                className="flex flex-row items-center gap-2"
-              >
-                <Send className="size-3" />
-                <p>수료증 발급</p>
-              </Button>
-            )
-          }
-          btnText="발급"
-          onClick={handlePrint}
-          open={open}
-          setOpen={setOpen}
-        >
-          <div className="w-full mt-6">
-            <ScrollArea className="flex h-[500px]">
-              <div className="flex flex-col w-full gap-2 border p-6">
-                <div className="flex flex-col items-center">
-                  <p className="font-bold text-2xl">교육 수료증</p>
-                </div>
-                <div className="flex flex-col items-start justify-center text-md gap-3 mt-6 ">
-                  <div className="flex flex-row items-center gap-6">
-                    <div className="">
-                      <p>성명</p>
-                    </div>
-                    <p>{participants.username}</p>
+      <ActionModal
+        title={"수료증 발급"}
+        desc={`${participants.username}(${participants.email})에게 수료증을 발급합니다.`}
+        trigger={
+          isSend ? (
+            <Button
+              size="xs"
+              type="button"
+              onClick={() => setOpen(true)}
+              variant="defaultoutline"
+              className="flex flex-row items-center gap-2"
+            >
+              <RotateCw className="size-3" />
+              <p>수료증 재발급</p>
+            </Button>
+          ) : (
+            <Button
+              size="xs"
+              type="button"
+              onClick={() => setOpen(true)}
+              className="flex flex-row items-center gap-2"
+            >
+              <Send className="size-3" />
+              <p>수료증 발급</p>
+            </Button>
+          )
+        }
+        btnText="발급"
+        onClick={handlePrint}
+        open={open}
+        setOpen={setOpen}
+      >
+        <div className="w-full mt-6">
+          <ScrollArea className="flex h-[500px]">
+            <div className="flex flex-col w-full gap-2 border p-6">
+              <div className="flex flex-col items-center">
+                <p className="font-bold text-2xl">교육 수료증</p>
+              </div>
+              <div className="flex flex-col items-start justify-center text-md gap-3 mt-6 ">
+                <div className="flex flex-row items-center gap-6">
+                  <div className="">
+                    <p>성명</p>
                   </div>
-                  <div className="flex flex-row items-center gap-6">
-                    <div className="">
-                      <p>소속</p>
-                    </div>
-                    <p>{participants.department || "-"}</p>
-                  </div>
-                  <div className="flex flex-row items-center gap-6">
-                    <div className="">
-                      <p>과정명</p>
-                    </div>
-                    <p>{group.name}</p>
-                  </div>
-                  <div className="flex flex-row items-center gap-6">
-                    <p>교육기간</p>
-                    <p>{dayjs(group.startDate).format("YYYY.MM.DD")} ~ </p>
-                    <p>{dayjs(group.endDate).format("YYYY.MM.DD")}</p>
-                  </div>
+                  <p>{participants.username}</p>
                 </div>
-                <div className=" col-span-12 flex flex-col items-center justify-center text-md gap-3 mt-6">
-                  <p className="text-md">위 사람은 {group.name} 과정에</p>
-                  <p className="text-md">성실히 수료하였기에 이를 수여함.</p>
+                <div className="flex flex-row items-center gap-6">
+                  <div className="">
+                    <p>소속</p>
+                  </div>
+                  <p>{participants.department || "-"}</p>
                 </div>
-                <div className=" col-span-12 flex flex-row items-center justify-center text-md gap-3 mt-6">
-                  <p className="text-md">{dayjs().format("YYYY.MM.DD")}</p>
+                <div className="flex flex-row items-center gap-6">
+                  <div className="">
+                    <p>과정명</p>
+                  </div>
+                  <p>{group.name}</p>
                 </div>
-                <div className=" col-span-12 flex flex-row items-center justify-center text-md gap-3">
-                  <p className="text-md">인텍플러스 교육위원회</p>
+                <div className="flex flex-row items-center gap-6">
+                  <p>교육기간</p>
+                  <p>{dayjs(group.startDate).format("YYYY.MM.DD")} ~ </p>
+                  <p>{dayjs(group.endDate).format("YYYY.MM.DD")}</p>
                 </div>
               </div>
-            </ScrollArea>
-          </div>
-        </ActionModal>
-      ) : (
-        <Button size="xs" disabled className="flex flex-row items-center gap-2">
-          <Loader className="size-3" />
-          <p>설문 대기</p>
-        </Button>
-      )}
+              <div className=" col-span-12 flex flex-col items-center justify-center text-md gap-3 mt-6">
+                <p className="text-md">위 사람은 {group.name} 과정에</p>
+                <p className="text-md">성실히 수료하였기에 이를 수여함.</p>
+              </div>
+              <div className=" col-span-12 flex flex-row items-center justify-center text-md gap-3 mt-6">
+                <p className="text-md">{dayjs().format("YYYY.MM.DD")}</p>
+              </div>
+              <div className=" col-span-12 flex flex-row items-center justify-center text-md gap-3">
+                <p className="text-md">인텍플러스 교육위원회</p>
+              </div>
+            </div>
+          </ScrollArea>
+        </div>
+      </ActionModal>
     </div>
   );
 }

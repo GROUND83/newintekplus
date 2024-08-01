@@ -73,52 +73,28 @@ export async function getGroupDetail({
 
 export async function createResultSurvey(formData: FormData) {
   //
+  let session = await auth();
+  let resultSurveyId = formData.get("resultSurveyId") as string;
   let liveSurveyId = formData.get("liveSurveyId") as string;
   let groupId = formData.get("groupId") as string;
-  let userEmail = formData.get("onwer") as string;
+
   let resultsString = formData.get("results") as string;
   let result = JSON.parse(resultsString);
-  let onwer = await Participant.findOne({ email: userEmail });
+  let onwer = await Participant.findOne({ email: session.user.email });
   //
   try {
-    let resultSurveyfind = await ResultSurvey.findOne({
-      liveSurveyId,
-      groupId,
-      onwer,
-    });
-    if (resultSurveyfind) {
-      return { message: "이미 생성하였습니다." };
-    } else {
-      let resultSurvey = await ResultSurvey.create({
+    let resultSurveyfind = await ResultSurvey.findOneAndUpdate(
+      { _id: resultSurveyId },
+      {
         liveSurveyId,
         groupId,
-        results: result,
         onwer,
+        results: result,
         isDone: true,
-      });
-      // let lessonResult = await LessonResult.findOneAndUpdate(
-      //   {
-      //     groupId,
-      //     lessonActivityId: resultSurveyfind.lessonActivityId,
-      //     onwer,
-      //   },
-      //   {
-      //     isPass: "passed",
-      //     isEvaluationDone: true,
-      //   }
-      // );
-      let group = await Group.findOneAndUpdate(
-        {
-          _id: groupId,
-        },
-        {
-          $addToSet: {
-            resultSurvey: resultSurvey,
-          },
-        }
-      );
-      return { data: JSON.stringify(group) };
-    }
+      }
+    );
+
+    return { data: JSON.stringify(resultSurveyfind) };
   } catch (e) {
     return { message: e };
   }
@@ -133,11 +109,42 @@ export async function getResultSurveyData(groupId: string) {
     let onwer = await Participant.findOne({
       email: userEmail,
     });
-    let group = await Group.findOne({ _id: groupId });
+    let group = await Group.findOne({ _id: groupId })
+      .populate({
+        path: "teacher",
+        model: Teacher,
+      })
+      .populate({
+        path: "liveSurvey",
+        model: LiveSurvey,
+        populate: {
+          path: "surveys",
+          model: Survey,
+        },
+      })
+      .populate({
+        path: "participants",
+        model: Participant,
+      })
+      .populate({
+        path: "courseProfile",
+        model: CourseProfile,
+        populate: {
+          path: "modules",
+          model: Module,
+          populate: {
+            path: "lessons",
+            model: Lesson,
+          },
+        },
+      })
+      .populate({
+        path: "resultSurvey",
+        model: ResultSurvey,
+      });
     let resultSurvey = await ResultSurvey.findOne({
       groupId: groupId,
       onwer,
-      liveSurveyId: group.liveSurvey,
     }).populate({ path: "results", model: Survey });
 
     return {

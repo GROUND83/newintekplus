@@ -35,30 +35,7 @@ export const columns: ColumnDef<any>[] = [
       );
     },
   },
-  {
-    accessorKey: "_id",
-    header: ({ column }) => {
-      return (
-        <div className="flex flex-col items-start">
-          <Button
-            variant="ghost"
-            className="p-0"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            레슨명
-            <ArrowUpDown className="ml-2 h-4 w-4" />
-          </Button>
-        </div>
-      );
-    },
-    cell: ({ row }) => {
-      return (
-        <div className=" w-[300px]">
-          <p className="text-xs">{row.getValue("_id")}</p>
-        </div>
-      );
-    },
-  },
+
   {
     accessorKey: "userName",
     header: ({ column }) => {

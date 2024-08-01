@@ -1,7 +1,11 @@
 "use client";
 
 import React from "react";
-import { createResultSurvey, getGroupDetail } from "./_component/actions";
+import {
+  createResultSurvey,
+  getGroupDetail,
+  getResultSurveyData,
+} from "./_component/actions";
 import { Button } from "@/components/ui/button";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -48,7 +52,6 @@ const FormSchema = z.object({
   results: z.array(
     z.object({
       surveyId: z.string().optional(),
-
       point: z.number({ required_error: "필수사항 입니다." }),
       title: z.string().optional(),
     })
@@ -67,20 +70,39 @@ export default function Page({ params }: { params: { groupId: string } }) {
   const session = useSession();
 
   const getData = async () => {
-    let res = await getGroupDetail({
-      groupId: params.groupId,
-      userEmail: session?.data.user.email,
-    });
+    // let res = await getGroupDetail({
+    //   groupId: params.groupId,
+    //   userEmail: session?.data.user.email,
+    // });
+    let res = await getResultSurveyData(params.groupId);
     if (res.data) {
       let data = JSON.parse(res.data);
       console.log("data", data);
       if (data.liveSurvey) {
         setLiveSurvey(data.liveSurvey);
         let newArray = [];
+        // for (const survey of data.liveSurvey.surveys) {
+        //   let newData = {
+        //     surveyId: survey._id,
+
+        //     title: survey.title,
+        //     point: undefined,
+        //   };
+        //   newArray.push(newData);
+        // }
+      }
+      let resultSurvey = JSON.parse(res.resultSurvey);
+      console.log("resultSurvey", resultSurvey);
+      setResultSurvey(resultSurvey);
+      if (resultSurvey.results.length > 0) {
+        form.reset({
+          results: resultSurvey.results,
+        });
+      } else {
+        let newArray = [];
         for (const survey of data.liveSurvey.surveys) {
           let newData = {
             surveyId: survey._id,
-
             title: survey.title,
             point: undefined,
           };
@@ -90,17 +112,13 @@ export default function Page({ params }: { params: { groupId: string } }) {
           results: newArray,
         });
       }
-      let resultSurvey = JSON.parse(res.resultSurvey);
-      console.log("resultSurvey", resultSurvey);
-      setResultSurvey(resultSurvey);
+      // setResultSurvey(resultSurvey);
     }
   };
 
   React.useEffect(() => {
-    if (session?.data?.user) {
-      getData();
-    }
-  }, [session]);
+    getData();
+  }, []);
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {},
@@ -119,10 +137,10 @@ export default function Page({ params }: { params: { groupId: string } }) {
     console.log("session", session);
     console.log("values", values);
     const formData = new FormData();
+    formData.append("resultSurveyId", resultSurveyData._id);
     formData.append("liveSurveyId", livesurvey._id);
     formData.append("groupId", params.groupId);
 
-    formData.append("onwer", session?.data?.user.email);
     formData.append("results", JSON.stringify(values.results));
 
     try {
@@ -130,11 +148,11 @@ export default function Page({ params }: { params: { groupId: string } }) {
       if (res.data) {
         //
         console.log(JSON.parse(res.data));
-        toast.success("레슨 생성에 성공하였습니다.");
+        toast.success("설문 업데이트에 성공하였습니다.");
         router.push(`/student/group/${params.groupId}/notice`);
       } else {
         console.log("res.data", res.message);
-        toast.success("레슨 생성에 성공하였습니다.");
+        toast.success(res.message);
       }
     } catch (e) {
       //
@@ -146,7 +164,7 @@ export default function Page({ params }: { params: { groupId: string } }) {
   }
   return (
     <div className="w-full flex flex-col items-stretch flex-1  ">
-      {!resultSurveyData ? (
+      {!resultSurveyData?.isDone ? (
         <ScrollArea className="flex flex-col  w-full h-[calc(100vh-120px)]">
           <div className="bg-white border flex-1 w-full p-6 flex flex-col items-start gap-2">
             <Form {...form}>
@@ -156,28 +174,24 @@ export default function Page({ params }: { params: { groupId: string } }) {
               >
                 <div className="flex flex-row  items-center gap-2 flex-wrap  w-full">
                   <p>{livesurvey?.title}</p>
-                  {resultsFields.map((resultSurvey, resultSurveyIndex) => {
+                  {resultsFields.map((livesurveydata, resuResultIndex) => {
                     return (
                       <div
                         className=" border px-3 py-3 rounded-md bg-neutral-100 w-full"
-                        key={resultSurveyIndex}
+                        key={resuResultIndex}
                       >
+                        {/* <p>{livesurveydata.title}</p> */}
                         <FormField
                           control={form.control}
-                          name={`results.${resultSurveyIndex}.point`}
+                          name={`results.${resuResultIndex}.point`}
                           render={({ field: { value, onChange } }) => (
                             <FormItem className="flex flex-col col-span-12 gap-1">
                               <div className="py-2 ">
                                 <p className=" font-bold text-md">
-                                  {resultSurveyIndex + 1}. {resultSurvey.title}
+                                  {resuResultIndex + 1}. {livesurveydata.title}
                                 </p>
                               </div>
 
-                              {/* <Input
-                              value={value || ""}
-                              onChange={onChange}
-                              placeholder="과정명을 입력하세요."
-                            /> */}
                               <div className="flex flex-row items-center gap-2">
                                 <Button
                                   type="button"
@@ -185,7 +199,9 @@ export default function Page({ params }: { params: { groupId: string } }) {
                                     value === 1 ? "default" : "defaultoutline"
                                   }
                                   size="sm"
-                                  onClick={() => onChange(1)}
+                                  onClick={() => {
+                                    onChange(1);
+                                  }}
                                 >
                                   전혀 그렇지 않다
                                 </Button>
@@ -195,7 +211,9 @@ export default function Page({ params }: { params: { groupId: string } }) {
                                     value === 2 ? "default" : "defaultoutline"
                                   }
                                   size="sm"
-                                  onClick={() => onChange(2)}
+                                  onClick={() => {
+                                    onChange(2);
+                                  }}
                                 >
                                   별로 그렇지 않다
                                 </Button>
@@ -205,7 +223,9 @@ export default function Page({ params }: { params: { groupId: string } }) {
                                     value === 3 ? "default" : "defaultoutline"
                                   }
                                   size="sm"
-                                  onClick={() => onChange(3)}
+                                  onClick={() => {
+                                    onChange(3);
+                                  }}
                                 >
                                   보통이다
                                 </Button>
@@ -215,7 +235,9 @@ export default function Page({ params }: { params: { groupId: string } }) {
                                     value === 4 ? "default" : "defaultoutline"
                                   }
                                   size="sm"
-                                  onClick={() => onChange(4)}
+                                  onClick={() => {
+                                    onChange(4);
+                                  }}
                                 >
                                   다소 그렇다
                                 </Button>
@@ -225,7 +247,9 @@ export default function Page({ params }: { params: { groupId: string } }) {
                                     value === 5 ? "default" : "defaultoutline"
                                   }
                                   size="sm"
-                                  onClick={() => onChange(5)}
+                                  onClick={() => {
+                                    onChange(5);
+                                  }}
                                 >
                                   매우 그렇다
                                 </Button>
@@ -257,11 +281,13 @@ export default function Page({ params }: { params: { groupId: string } }) {
             <p>설문을 완료 하였습니다.</p>
 
             <ViewResultSurveyStudent resultSurvey={resultSurveyData} />
-            <EditSurveyStudent
-              livesurveytitle={livesurvey.title}
-              resultSurvey={resultSurveyData}
-              getData={getData}
-            />
+            {!resultSurveyData.isSend && (
+              <EditSurveyStudent
+                livesurveytitle={livesurvey.title}
+                resultSurvey={resultSurveyData}
+                getData={getData}
+              />
+            )}
           </div>
         </div>
       )}

@@ -64,16 +64,18 @@ export default function ViewFeedBack({
                 {lessonResult.feedBack.description}
               </p>
             </div>
-            <div className="py-3 border-b w-full">
-              <p>첨부파일</p>
-              <a
-                href={lessonResult.feedBack.contentdownloadURL}
-                download={lessonResult.feedBack.contenFileName}
-                target="_blank"
-              >
-                {lessonResult.feedBack.contenFileName}
-              </a>
-            </div>
+            {lessonResult.feedBack.contentdownloadURL && (
+              <div className="py-3 border-b w-full">
+                <p>첨부파일</p>
+                <a
+                  href={lessonResult.feedBack.contentdownloadURL}
+                  download={lessonResult.feedBack.contenFileName}
+                  target="_blank"
+                >
+                  {lessonResult.feedBack.contenFileName}
+                </a>
+              </div>
+            )}
           </div>
         </DialogContent>
       </Dialog>

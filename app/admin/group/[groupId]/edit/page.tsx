@@ -92,19 +92,7 @@ export default function Page({ params }: { params: { groupId: string } }) {
   const [loading, setLoading] = React.useState(false);
 
   const router = useRouter();
-  // const getSelectData = async () => {
-  //   //
-  //   let readers = await getSelectInitData();
-  //   if (readers.data) {
-  //     let reader = JSON.parse(readers.data.reader);
-  //     let participants = JSON.parse(readers.data.participants);
-  //     let courseProfile = JSON.parse(readers.data.courseProfile);
-  //     console.log("reader", reader, participants, courseProfile);
-  //     setReaderArray(reader);
-  //     setCourseProfile(courseProfile);
-  //     setParticipant(participants);
-  //   }
-  // };
+
   //
   const fetchDataOptions = {
     groupId: params.groupId,
@@ -155,10 +143,6 @@ export default function Page({ params }: { params: { groupId: string } }) {
     refetchOnMount: true,
   });
 
-  //
-  // React.useEffect(() => {
-  //   getSelectData();
-  // }, []);
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {

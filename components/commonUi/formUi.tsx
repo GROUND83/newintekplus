@@ -17,7 +17,7 @@ export function FormSubmitButton({
       type="submit"
       disabled={!form.formState.isDirty || loading || disabled}
     >
-      {loading ? <Loader2 className="size-4" /> : <p>{title}</p>}
+      {loading ? <Loader2 className="size-4 animate-spin" /> : <p>{title}</p>}
     </Button>
   );
 }

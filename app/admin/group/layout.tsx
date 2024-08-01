@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import React from "react";
 import Link from "next/link";
 import { PlusIcon } from "lucide-react";
-import { useParams, usePathname } from "next/navigation";
+import { usePathname } from "next/navigation";
 import GroupData from "@/components/commonUi/groupData";
 import { MainTitleWrap, SubWrap } from "@/components/commonUi/mainTitleWrap";
 
@@ -13,12 +13,11 @@ export default function Layout({
   children: React.ReactNode;
 }>) {
   const pathname = usePathname();
-  const params = useParams<{ groupId: string }>();
 
   return (
     <SubWrap>
       <MainTitleWrap>
-        {<GroupData groupId={params.groupId} />}
+        <GroupData />
 
         {pathname === "/admin/group" && (
           <Button asChild size={"sm"}>

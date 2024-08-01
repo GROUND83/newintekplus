@@ -49,7 +49,7 @@ import { useSession } from "next-auth/react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 const FormSchema = z.object({
   title: z.string({
-    required_error: "과정명을 입력하세요.",
+    required_error: "제목을 입력하세요.",
   }),
   description: z.string(),
   sendTo: z.string(),
@@ -81,12 +81,6 @@ export default function Page() {
   });
 
   async function onSubmit(values: z.infer<typeof FormSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    // values.lessonDirective.file.name = Buffer.from(
-    //   values.lessonDirective.file.name,
-    //   "ascii"
-    // ).toString("utf8");
     console.log("values", values, session);
     const formData = new FormData();
     let newContentFile = [];

@@ -1,53 +1,18 @@
 "use client";
 
 import React from "react";
-import { getGroupDetail } from "./_component/actions";
-import { Button } from "@/components/ui/button";
-import { CircleCheckIcon, Loader2 } from "lucide-react";
+import { getGroupDetail, settingResult } from "./_component/actions";
+
+import { Loader2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import ViewResultSurvey from "./_component/viewResultSurvey";
 import SendVertification from "./_component/sendVertification";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useQuery } from "@tanstack/react-query";
 import ViewTotalResultSurvey from "./_component/viewTotalResultSurvey";
+import { Button } from "@/components/ui/button";
 
 export default function Page({ params }: { params: { groupId: string } }) {
-  // console.log("groupId", params.groupId);
-  // const [livesurvey, setLiveSurvey] = React.useState<any>();
-  // //
-  // const [group, setGroup] = React.useState<any>();
-
-  // const getData = async () => {
-  //   let res = await getGroupDetail(params.groupId);
-  //   if (res.data) {
-  //     let data = JSON.parse(res.data);
-  //     console.log("data", data);
-  //     if (data.liveSurvey) {
-  //       setLiveSurvey(data.liveSurvey);
-  //     }
-  //     let resultSurvey = JSON.parse(res.resultSurvey);
-  //     console.log("resultSurvey", resultSurvey);
-  //     for (let participant of data?.participants) {
-  //       for (let resultSur of data.resultSurvey) {
-  //         console.log("rest");
-  //         if (
-  //           JSON.stringify(resultSur.onwer) === JSON.stringify(participant._id)
-  //         ) {
-  //           console.log("findData", resultSur);
-  //           participant.resultSur = resultSur;
-  //         }
-  //       }
-  //     }
-  //     // setResultData(resultSurvey);
-  //     console.log("data", data);
-  //     setGroup(data);
-  //   }
-  // };
-
-  // React.useEffect(() => {
-  //   getData();
-  // }, []);
-
   const fetchDataOptions = {
     groupId: params.groupId,
   };
@@ -63,20 +28,15 @@ export default function Page({ params }: { params: { groupId: string } }) {
       let res = await getGroupDetail(params.groupId);
       if (res.data) {
         let data = JSON.parse(res.data);
-        console.log("data", data);
-        // if (data.liveSurvey) {
-        //   setLiveSurvey(data.liveSurvey);
-        // }
-        let resultSurvey = JSON.parse(res.resultSurvey);
-        console.log("resultSurvey", resultSurvey);
+
+        // let resultSurvey = JSON.parse(res.resultSurvey);
+
         for (let participant of data?.participants) {
           for (let resultSur of data.resultSurvey) {
-            console.log("rest");
             if (
               JSON.stringify(resultSur.onwer) ===
               JSON.stringify(participant._id)
             ) {
-              console.log("findData", resultSur);
               participant.resultSur = resultSur;
             }
           }
@@ -87,6 +47,7 @@ export default function Page({ params }: { params: { groupId: string } }) {
         return {
           group: data,
           livesurvey: data.liveSurvey,
+          resultSurvey: data.resultSurvey,
         };
       }
     },
@@ -100,6 +61,12 @@ export default function Page({ params }: { params: { groupId: string } }) {
       </div>
     );
   }
+
+  const clickSetting = async () => {
+    //
+    let res = await settingResult(params.groupId);
+    console.log(res);
+  };
   return (
     <div className="w-full flex flex-col   ">
       <div className=" flex flex-col  w-full">
@@ -125,12 +92,14 @@ export default function Page({ params }: { params: { groupId: string } }) {
           )}
           {data.group && (
             <div className="bg-white border  w-full p-6 flex flex-col items-start gap-2 h-[calc(100vh-170px)] flex-1">
-              <div className="h-[30px]">
+              <div className="h-[30px] flex flex-row items-center gap-2">
                 <p className=" font-bold">설문 결과</p>
+                {/* <Button onClick={() => clickSetting()}>세팅</Button> */}
               </div>
               <ScrollArea className="w-full h-[calc(100vh-200px)] flex flex-col">
                 <div className="w-full flex flex-col gap-1 mt-2">
-                  {data.group?.participants.map((item: any, index: any) => {
+                  {data?.resultSurvey.map((item: any, index: any) => {
+                    console.log("iten", item);
                     return (
                       <div
                         key={item._id}
@@ -138,10 +107,10 @@ export default function Page({ params }: { params: { groupId: string } }) {
                       >
                         <div className="flex flex-row items-center gap-2">
                           <p>
-                            {index + 1}. {item.username}
+                            {index + 1}. {item.onwer?.username}
                           </p>
 
-                          {item.resultSur ? (
+                          {item.isDone ? (
                             <Badge
                               className=" text-xs font-normal"
                               variant="defaultOutline"
@@ -158,27 +127,28 @@ export default function Page({ params }: { params: { groupId: string } }) {
                           )}
                         </div>
                         <div className="flex flex-row items-center gap-2">
-                          {item.resultSur && (
-                            <ViewResultSurvey resultSurvey={item.resultSur} />
+                          {item.isDone ? (
+                            <ViewResultSurvey resultSurvey={item} />
+                          ) : (
+                            <Button
+                              size="xs"
+                              disabled
+                              variant="outline"
+                              className="flex flex-row items-center gap-2"
+                            >
+                              <Loader2 className="size-3" />
+                              <p>설문 대기</p>
+                            </Button>
                           )}
 
-                          {item.resultSur?.isSend ? (
-                            <div className="flex flex-row items-center gap-2">
-                              <SendVertification
-                                group={data.group}
-                                participants={item}
-                                resultSurveyId={item.resultSur?._id || ""}
-                                isSend={item.resultSur?.isSend}
-                              />
-                            </div>
-                          ) : (
+                          <div className="flex flex-row items-center gap-2">
                             <SendVertification
                               group={data.group}
                               participants={item}
-                              resultSurveyId={item.resultSur?._id || ""}
-                              isSend={item.resultSur?.isSend}
+                              resultSurveyId={item._id || ""}
+                              isSend={item.isSend}
                             />
-                          )}
+                          </div>
                         </div>
                       </div>
                     );

@@ -131,62 +131,87 @@ export async function createFeedBack(formData: FormData) {
   let description = formData.get("description") as string;
   let lessonResultId = formData.get("lessonResultId") as string;
   let participants = formData.get("participants") as string;
-  let file = formData.get("file") as File;
   let group = await Group.findOne({ _id: groupId });
   let teacherId = group.teacher;
   let participant = await Participant.findOne({ _id: participants });
   let teacher = await Teacher.findOne({ _id: teacherId });
+  let feedBackFile = formData.get("feedBackFile") as string;
+
   console.log("participant", participant);
   try {
-    if (file) {
-      let filename = Buffer.from(file.name, "latin1").toString("utf8");
-      let newFormData = new FormData();
-      newFormData.append("file", file);
-      newFormData.append("folderName", "lessonPerform");
-      const upload = await UploadFile(newFormData);
-      console.log("uplaod", upload);
-      if (upload) {
-        let { location } = upload as UploadResponse;
-        let feedback = await FeedBack.create({
-          groupId,
+    if (feedBackFile) {
+      let feedBackParser = JSON.parse(feedBackFile);
+      let feedback = await FeedBack.create({
+        groupId,
+        title: title,
+        description: description,
+        lessonResultId: lessonResultId,
+        contentdownloadURL: feedBackParser.contentdownloadURL,
+        contenFileName: feedBackParser.contenFileName,
+        contentSize: feedBackParser.contentSize,
+        participants: participant,
+        auth: teacher,
+      });
+      //
+      let lessonResult = await LessonResult.findOneAndUpdate(
+        { _id: lessonResultId },
+        { feedBack: feedback }
+      );
+      // sendMail
+      let to = `${participant.email}`;
+      const mailData: any = {
+        to: to,
+        subject: "살롱캔버스 피드백 메일입니다.",
+        from: "noreply@saloncanvas.kr",
+        html: feedbackTemplate({
           title: title,
           description: description,
-          lessonResultId: lessonResultId,
-          contentdownloadURL: location,
-          contenFileName: filename,
-          contentSize: file.size,
-          participants: participant,
-          auth: teacher,
-        });
-        //
-        let lessonResult = await LessonResult.findOneAndUpdate(
-          { _id: lessonResultId },
-          { feedBack: feedback }
-        );
-        // sendMail
-        let to = `${participant.email}`;
-        const mailData: any = {
-          to: to,
-          subject: "살롱캔버스 피드백 메일입니다.",
-          from: "noreply@saloncanvas.kr",
-          html: feedbackTemplate({
-            title: title,
-            description: description,
-          }),
-          attachments: [
-            {
-              filename: filename, // the file name
-              path: location, // link your file
-              contentType: file.type, //type of file
-            },
-          ],
-        };
+        }),
+        attachments: [
+          {
+            filename: feedBackParser.contenFileName, // the file name
+            path: feedBackParser.contentdownloadURL, // link your file
+            contentType: feedBackParser.type, //type of file
+          },
+        ],
+      };
 
-        let sendResult = await sendMail(mailData);
-        console.log("sendResult", sendResult);
+      let sendResult = await sendMail(mailData);
+      console.log("sendResult", sendResult);
 
-        return { data: JSON.stringify(lessonResult) };
-      }
+      return { data: JSON.stringify(lessonResult) };
+    } else {
+      //
+      let feedback = await FeedBack.create({
+        groupId,
+        title: title,
+        description: description,
+        lessonResultId: lessonResultId,
+
+        participants: participant,
+        auth: teacher,
+      });
+      //
+      let lessonResult = await LessonResult.findOneAndUpdate(
+        { _id: lessonResultId },
+        { feedBack: feedback }
+      );
+      // sendMail
+      let to = `${participant.email}`;
+      const mailData: any = {
+        to: to,
+        subject: "살롱캔버스 피드백 메일입니다.",
+        from: "noreply@saloncanvas.kr",
+        html: feedbackTemplate({
+          title: title,
+          description: description,
+        }),
+      };
+
+      let sendResult = await sendMail(mailData);
+      console.log("sendResult", sendResult);
+
+      return { data: JSON.stringify(lessonResult) };
     }
   } catch (e) {
     return { message: JSON.stringify(e) };

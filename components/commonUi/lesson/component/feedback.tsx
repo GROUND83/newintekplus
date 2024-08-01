@@ -30,6 +30,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 //
 import { createFeedBack } from "../../../commonActions/commonActions";
+import { UploadFileClient } from "@/lib/fileUploaderClient";
+import { FormSubmitButton } from "../../formUi";
 const FormSchema = z.object({
   title: z.string({
     required_error: "과정명을 입력하세요.",
@@ -46,33 +48,44 @@ export default function FeedbackSend({
   getLessonData: () => void;
 }) {
   const [evaluationOepn, setEvaluationOepn] = React.useState(false);
+  const [loading, setLoading] = React.useState(false);
+
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {},
   });
   console.log("lessonResult", lessonResult);
   async function onSubmit(values: z.infer<typeof FormSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    // values.lessonDirective.file.name = Buffer.from(
-    //   values.lessonDirective.file.name,
-    //   "ascii"
-    // ).toString("utf8");
     console.log("values", values);
-    const formData = new FormData();
-    formData.append("groupId", lessonResult.groupId);
-    formData.append("title", values.title);
-    formData.append("description", values.description);
-    formData.append("lessonResultId", lessonResult._id);
-    formData.append("participants", lessonResult.onwer._id);
-    // formData.append("auth", lessonResult.onwer._id);
-
-    if (values.file) {
-      //
-      formData.append("file", values.file);
-    }
-
     try {
+      setLoading(true);
+
+      const formData = new FormData();
+      formData.append("groupId", lessonResult.groupId);
+      formData.append("title", values.title);
+      formData.append("description", values.description);
+      formData.append("lessonResultId", lessonResult._id);
+      formData.append("participants", lessonResult.onwer._id);
+      // formData.append("auth", lessonResult.onwer._id);
+
+      if (values.file) {
+        //
+        const upload = await UploadFileClient({
+          folderName: "feedBack",
+          file: values.file,
+        });
+        if (upload.location) {
+          let feedBackFile = {
+            contentdownloadURL: upload.location,
+            contenFileName: values.file.name,
+            contentSize: values.file.size,
+            contentType: values.file.type,
+          };
+
+          formData.append("feedBackFile", JSON.stringify(feedBackFile));
+        }
+      }
+
       let res = await createFeedBack(formData);
       if (res.data) {
         //
@@ -86,6 +99,8 @@ export default function FeedbackSend({
       //
       console.log("message", e);
       toast.error(e);
+    } finally {
+      setLoading(false);
     }
   }
   return (
@@ -192,7 +207,13 @@ export default function FeedbackSend({
                 )}
               />
               <div>
-                <Button type="submit">전송</Button>
+                <FormSubmitButton
+                  title="전송"
+                  form={form}
+                  loading={loading}
+                  disabled={false}
+                />
+                {/* <Button type="submit">전송</Button> */}
               </div>
             </form>
           </Form>
