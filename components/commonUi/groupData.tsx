@@ -21,6 +21,7 @@ import { useQuery } from "@tanstack/react-query";
 import { detailGroup } from "../commonActions/commonActions";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useParams } from "next/navigation";
+import { ScrollArea } from "../ui/scroll-area";
 
 export default function GroupData() {
   //
@@ -60,7 +61,7 @@ export default function GroupData() {
       )}
       {groupdata && (
         <Sheet>
-          <SheetTrigger asChild>
+          <SheetTrigger asChild className="">
             <Button
               variant="ghost"
               className="flex flex-row items-center gap-2 "
@@ -71,8 +72,8 @@ export default function GroupData() {
               <p>{groupdata.name}</p> <ArrowRightIcon className="size-4" />
             </Button>
           </SheetTrigger>
-          <SheetContent className="">
-            <SheetHeader className="mt-6 flex flex-col">
+          <SheetContent className="p-0">
+            <SheetHeader className=" flex flex-col h-[120px] p-6">
               <div>
                 <Badge variant="defaultOutline">
                   {groupdata?.courseProfile?.eduForm}
@@ -84,27 +85,31 @@ export default function GroupData() {
                 {groupdata.courseProfile.title}
               </SheetDescription>
             </SheetHeader>
-            <div className="flex mt-6">
-              <PeriodWrap
-                startDate={groupdata?.startDate}
-                endDate={groupdata?.endDate}
-              />
-            </div>
-            <div className="flex mt-6">
-              <LeaderWrap teacher={groupdata?.teacher} />
-            </div>
-            <div className="flex mt-6">
-              <StudentWrap
-                participants={groupdata?.participants}
-                height="h-[300px]"
-              />
-            </div>
-            <div className="flex mt-6">
-              <CourseProfileDataWrap courseProfile={groupdata?.courseProfile} />
-            </div>
-            <div className="flex mt-6">
-              <SurveyDataWrap liveSurvey={groupdata?.liveSurvey} />
-            </div>
+            <ScrollArea className="w-full h-[calc(100vh-120px)]  p-6">
+              <div className="flex mt-6">
+                <PeriodWrap
+                  startDate={groupdata?.startDate}
+                  endDate={groupdata?.endDate}
+                />
+              </div>
+              <div className="flex mt-6">
+                <LeaderWrap teacher={groupdata?.teacher} />
+              </div>
+              <div className="flex mt-6">
+                <StudentWrap
+                  participants={groupdata?.participants}
+                  height="h-[300px]"
+                />
+              </div>
+              <div className="flex mt-6">
+                <CourseProfileDataWrap
+                  courseProfile={groupdata?.courseProfile}
+                />
+              </div>
+              <div className="flex mt-6">
+                <SurveyDataWrap liveSurvey={groupdata?.liveSurvey} />
+              </div>
+            </ScrollArea>
           </SheetContent>
         </Sheet>
       )}
