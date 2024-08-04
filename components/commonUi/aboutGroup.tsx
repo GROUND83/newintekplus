@@ -92,7 +92,7 @@ export function CourseProfileDataWrap({
             <p className="text-neutral-500">학습목표</p>
             <p className=" whitespace-pre-wrap"> {courseProfile?.eduTarget}</p>
           </div>
-          {courseProfile.courseDirective.LessonDirectiveURL && (
+          {courseProfile.courseDirective?.LessonDirectiveURL && (
             <div className="border p-3 flex flex-col gap-2">
               <p className="text-neutral-500">과정 안내서</p>
               <a
@@ -108,7 +108,7 @@ export function CourseProfileDataWrap({
               </a>
             </div>
           )}
-          {courseProfile.courseWholeDirective.LessonDirectiveURL && (
+          {courseProfile.courseWholeDirective?.LessonDirectiveURL && (
             <div className="border p-3 flex flex-col gap-2">
               <p className="text-neutral-500">교안 전체 파일</p>
               <a

@@ -18,7 +18,6 @@ export default function Layout({
     <div className="w-full flex flex-col items-stretch flex-1  ">
       <div className="w-full bg-white py-3 border-b px-6 flex flex-row items-center justify-between h-[70px]">
         <div className="flex flex-row items-center gap-2">
-          <p>학습그룹</p>
           <GroupData />
         </div>
       </div>
