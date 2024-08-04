@@ -14,6 +14,7 @@ import Lesson from "@/models/lesson";
 
 import LessonContent from "@/models/lessonContents";
 import LessonDirective from "@/models/lessonDirective";
+import LessonPerform from "@/models/lessonPerform";
 import LessonResult from "@/models/lessonResult";
 import LiveSurvey from "@/models/liveSurvey";
 import Module from "@/models/module";
@@ -126,7 +127,8 @@ export async function getLessonDetail({
     groupId: groupId,
   })
     .populate({ path: "onwer", model: Participant })
-    .populate({ path: "feedBack", model: FeedBack });
+    .populate({ path: "feedBack", model: FeedBack })
+    .populate({ path: "newPerform", model: LessonPerform });
   // console.log("lessonResult", lessonId, lessonResult, participant);
   return {
     data: JSON.stringify(res),

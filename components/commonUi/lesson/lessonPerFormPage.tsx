@@ -79,16 +79,16 @@ export default function LessonPerFormPage() {
                     <p>{item.onwer.username}</p>
                   </div>
                   <div className=" col-span-5 bg-white border p-2 flex flex-row items-center">
-                    {item.perform.downUrl ? (
+                    {item.newPerform?.lessonPerformdownloadURL ? (
                       <a
-                        href={item.perform.downUrl}
+                        href={item.newPerform.lessonPerformdownloadURL}
                         download
                         target="_blank"
                         rel="noreferrer"
                         className="flex flex-row items-center justify-between flex-1 w-full "
                       >
                         <p className="flex-1 w-full  text-xs line-clamp-1">
-                          {item.perform.fileName}
+                          {item.newPerform.lessonPerformFileName}
                         </p>
                       </a>
                     ) : (

@@ -38,9 +38,13 @@ export const UploadFileClient = async ({
         secretAccessKey: process.env.NEXT_PUBLIC_AWS_SECRET_ID as string,
       },
     });
+    let date = new Date().getTime();
+    const encodedName = Buffer.from(file.name).toString("base64");
+    const ext = file.type.split("/")[1];
+    const key = `${folderName}/${date}/${file.name}`; // 경로(path)는 버킷이름!
     const uploadToS3 = new PutObjectCommand({
-      Bucket,
-      Key: file.name,
+      Bucket: Bucket,
+      Key: key,
       Body: file,
     });
     let res = await s3.send(uploadToS3);
@@ -57,7 +61,9 @@ export const UploadFileClient = async ({
     if (res?.$metadata?.httpStatusCode === 200) {
       console.log("Success");
       return {
-        location: `https://${Bucket}.s3.${process.env.NEXT_PUBLIC_AWS_REGION}.amazonaws.com/${file.name}`,
+        location: `https://${Bucket}.s3.${
+          process.env.NEXT_PUBLIC_AWS_REGION
+        }.amazonaws.com/${folderName}/${date}/${encodeURIComponent(file.name)}`,
       };
     } else {
       return {
