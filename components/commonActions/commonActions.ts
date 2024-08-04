@@ -5,6 +5,7 @@ import { connectToMongoDB } from "@/lib/db";
 import { UploadFile } from "@/lib/fileUploader";
 import feedbackTemplate from "@/lib/mailtemplate/feedbackTemplate";
 import sendMail from "@/lib/sendMail/sendMail";
+import CourseDirective from "@/models/courseDirective";
 import CourseProfile from "@/models/courseProfile";
 import FeedBack from "@/models/feedback";
 import Group from "@/models/group";
@@ -50,15 +51,24 @@ export async function detailGroup(groupId: string) {
         model: CourseProfile,
         select:
           "_id title eduForm eduPlace eduTarget eduAbilitys competency courseDirective courseWholeDirective jobGroup jobPosition jobSubGroup modules status train",
-        populate: {
-          path: "modules",
-          model: Module,
-
-          populate: {
-            path: "lessons",
-            model: Lesson,
+        populate: [
+          {
+            path: "modules",
+            model: Module,
+            populate: {
+              path: "lessons",
+              model: Lesson,
+            },
           },
-        },
+          {
+            path: "courseWholeDirective",
+            model: CourseDirective,
+          },
+          {
+            path: "courseDirective",
+            model: CourseDirective,
+          },
+        ],
       });
     // console.log("data", groups);
     return { data: JSON.stringify(groups) };

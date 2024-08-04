@@ -7,8 +7,16 @@ export default function Page() {
         <p>대쉬보드</p>
         {/* <Button size={"sm"}>생성버튼</Button> */}
       </div>
-      <div className="p-3 flex-1 grid grid-cols-12 gap-3  w-full">
-        <div className="bg-white border flex-1 w-full p-6 col-span-4">
+      <div className="p-6 gap-3  w-full grid grid-cols-12  bg-white ">
+        <div className=" col-span-12">
+          <p className="text-lg font-bold">안녕하세요?</p>
+          <p>관리자 대쉬보드입니다.</p>
+        </div>
+        <div className="border p-6 col-span-4 flex flex-col items-center justify-center h-[200px]">
+          <p>6/12</p>
+          <p>진행중인 학습그룹</p>
+        </div>
+        {/* <div className="bg-white border flex-1 w-full p-6 col-span-4">
           <p>대쉬보드</p>
         </div>
         <div className="bg-white border flex-1 w-full p-6 col-span-4">
@@ -34,7 +42,7 @@ export default function Page() {
         </div>
         <div className="bg-white border flex-1 w-full p-6 col-span-4">
           <p>대쉬보드</p>
-        </div>
+        </div> */}
       </div>
     </div>
   );

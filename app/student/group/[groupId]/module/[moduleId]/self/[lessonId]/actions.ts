@@ -45,7 +45,7 @@ export async function getLessonDetail({
 
 export async function updateLessonPerform(formData: FormData) {
   //
-  let file = formData.get("file") as File;
+  let lessonPerform = formData.get("lessonPerform") as string;
   let lessonResultId = formData.get("lessonResultId") as String;
   let groupId = formData.get("groupId") as String;
   let lessonId = formData.get("lessonId") as String;
@@ -55,22 +55,16 @@ export async function updateLessonPerform(formData: FormData) {
     let session = await auth();
     let onwer = await Participant.findOne({ email: session.user.email });
     console.log("onwer", onwer);
-    if (file) {
-      let filename = Buffer.from(file.name, "latin1").toString("utf8");
-      let newFormData = new FormData();
-      newFormData.append("file", file);
-      newFormData.append("folderName", "lessonPerform");
-      const upload = await UploadFile(newFormData);
-      console.log("uplaod", upload);
-      if (upload) {
-        let { location } = upload as UploadResponse;
+    if (lessonPerform) {
+      let newLessonPerForm = JSON.parse(lessonPerform);
+      if (newLessonPerForm) {
         let newPerform = await LessonPerform.create({
           groupId: groupId,
           lessonId: lessonId,
           lessonResultId: lessonResultId,
-          lessonPerformdownloadURL: location,
-          lessonPerformFileName: filename,
-          lessonPerformSize: file.size,
+          lessonPerformdownloadURL: newLessonPerForm.lessonPerformdownloadURL,
+          lessonPerformFileName: newLessonPerForm.lessonPerformFileName,
+          lessonPerformSize: newLessonPerForm.lessonPerformSize,
           onwer: onwer,
         });
         let lessonResultUpdate = await LessonResult.findOneAndUpdate(
@@ -80,9 +74,9 @@ export async function updateLessonPerform(formData: FormData) {
           {
             newPerform: newPerform,
             perform: {
-              downUrl: location,
-              fileName: filename,
-              size: file.size,
+              downUrl: newLessonPerForm.lessonPerformdownloadURL,
+              fileName: newLessonPerForm.lessonPerformFileName,
+              size: newLessonPerForm.lessonPerformSize,
             },
             isLessonDone: true,
           }

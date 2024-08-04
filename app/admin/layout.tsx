@@ -61,10 +61,13 @@ export default function Layout({
           >
             <div className="p-2">
               {menuExpend ? (
-                <div className={"flex flex-col items-start"}>
+                <Link
+                  href={"/admin"}
+                  className="flex flex-col items-center cursor-pointer"
+                >
                   <p className=" text-lg font-semibold">관리자</p>
                   <p>대쉬보드</p>
-                </div>
+                </Link>
               ) : (
                 <Link href={"/admin"}>
                   <Home strokeWidth={1.25} />

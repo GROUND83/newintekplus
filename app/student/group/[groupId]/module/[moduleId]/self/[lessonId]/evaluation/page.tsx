@@ -27,6 +27,7 @@ import { useQuery } from "@tanstack/react-query";
 import { updateLessonPerform } from "../actions";
 import { Input } from "@/components/ui/input";
 import { FormSubmitButton } from "@/components/commonUi/formUi";
+import { UploadFileClient } from "@/lib/fileUploaderClient";
 const FormSchema = z.object({
   downUrl: z.string().optional(), //레슨다운로드
   fileName: z.string().optional(), // 레슨파일이름
@@ -91,16 +92,35 @@ export default function Page({
     console.log("values", values);
     const formData = new FormData();
     formData.append("lessonResultId", lessonResult._id);
-    formData.append("file", values.file);
+
     formData.append("groupId", params.groupId);
     formData.append("lessonId", params.lessonId);
+    // formData.append("file", values.file);
+    if (values.file) {
+      const upload = await UploadFileClient({
+        folderName: "perform",
+        file: values.file,
+      });
+      if (upload.location) {
+        let contentdata = {
+          lessonPerformdownloadURL: upload.location,
+          lessonPerformFileName: values.file.name,
+          lessonPerformSize: values.file.size,
+        };
+        formData.append("lessonPerform", JSON.stringify(contentdata));
+      } else {
+        toast.error("파일 업로드에 실폐하였습니다.");
+        return;
+      }
+    }
+
     try {
       let res = await updateLessonPerform(formData);
       let resdat = await JSON.parse(res);
       console.log("resdat", resdat);
       if (resdat.data) {
         //
-        toast.success("레슨 생성에 성공하였습니다.");
+        toast.success("과제 업로드에 성공하였습니다.");
         refetch();
         // router.push("/admin/courseprofile");
       }

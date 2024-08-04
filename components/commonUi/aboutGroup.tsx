@@ -1,7 +1,7 @@
 import dayjs from "dayjs";
 import { ScrollArea } from "../ui/scroll-area";
 import Link from "next/link";
-import { SquareArrowOutDownRight } from "lucide-react";
+import { Download, SquareArrowOutDownRight } from "lucide-react";
 import { Badge } from "../ui/badge";
 
 export function StudentWrap({
@@ -76,20 +76,54 @@ export function CourseProfileDataWrap({
 }: {
   courseProfile: any;
 }) {
+  console.log("courseProfile", courseProfile);
   return (
     <div className=" w-full flex flex-col gap-2">
       <p className="text-neutral-500">코스프로파일</p>
       {courseProfile ? (
         <div className=" w-full   flex flex-col gap-2">
-          <Link
-            href={`/admin/courseprofile/${courseProfile?._id}`}
-            className="flex flex-row items-center gap-2 hover:text-primary underline"
-          >
-            <SquareArrowOutDownRight className="size-4" />
+          <div className="flex flex-row items-center gap-2 ">
+            {/* <SquareArrowOutDownRight className="size-4" /> */}
             <p>
               {courseProfile?.eduForm} -{courseProfile?.title}
             </p>
-          </Link>
+          </div>
+          <div className="border p-3 flex flex-col gap-2">
+            <p className="text-neutral-500">학습목표</p>
+            <p className=" whitespace-pre-wrap"> {courseProfile?.eduTarget}</p>
+          </div>
+          {courseProfile.courseDirective.LessonDirectiveURL && (
+            <div className="border p-3 flex flex-col gap-2">
+              <p className="text-neutral-500">과정 안내서</p>
+              <a
+                href={courseProfile.courseDirective.LessonDirectiveURL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className=" border px-3 py-2 text-primary border-primary flex-1 flex flex-row items-center gap-3 hover:bg-primary/30 transition-all"
+              >
+                <Download className="size-5" />
+                <p className=" line-clamp-1">
+                  {courseProfile.courseDirective.contentfileName}
+                </p>
+              </a>
+            </div>
+          )}
+          {courseProfile.courseWholeDirective.LessonDirectiveURL && (
+            <div className="border p-3 flex flex-col gap-2">
+              <p className="text-neutral-500">교안 전체 파일</p>
+              <a
+                href={courseProfile.courseWholeDirective.LessonDirectiveURL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className=" border px-3 py-2 text-primary border-primary flex-1 flex flex-row items-center gap-3 hover:bg-primary/30 transition-all"
+              >
+                <Download className="size-5" />
+                <p className=" line-clamp-1">
+                  {courseProfile.courseWholeDirective.contentfileName}
+                </p>
+              </a>
+            </div>
+          )}
         </div>
       ) : (
         <div className=" w-full   flex flex-col gap-2 bg-neutral-100 p-2 border rounded-sm">
@@ -108,13 +142,10 @@ export function SurveyDataWrap({ liveSurvey }: { liveSurvey: any }) {
       <p className="text-neutral-500">설문</p>
       {liveSurvey ? (
         <div className=" w-full   flex flex-col gap-2">
-          <Link
-            href={`/admin/evaluation/${liveSurvey?._id}`}
-            className="flex flex-row items-center gap-2 hover:text-primary underline"
-          >
-            <SquareArrowOutDownRight className="size-4" />
+          <div className="flex flex-row items-center gap-2  ">
+            {/* <SquareArrowOutDownRight className="size-4" /> */}
             <p>{liveSurvey?.title}</p>
-          </Link>
+          </div>
         </div>
       ) : (
         <div className=" w-full   flex flex-col gap-2 bg-neutral-100 p-2 border rounded-sm">
