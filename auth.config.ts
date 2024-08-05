@@ -21,7 +21,7 @@ export const authConfig = {
       return isAuthenticated;
     },
 
-    jwt: async ({ token, user }) => {
+    jwt: ({ token, user }) => {
       console.log("tokendata", token, user);
       return { ...token, ...user };
     },
