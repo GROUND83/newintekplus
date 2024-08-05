@@ -83,7 +83,6 @@ export function CourseProfileDataWrap({
       {courseProfile ? (
         <div className=" w-full   flex flex-col gap-2">
           <div className="flex flex-row items-center gap-2 ">
-            {/* <SquareArrowOutDownRight className="size-4" /> */}
             <p>
               {courseProfile?.eduForm} -{courseProfile?.title}
             </p>
