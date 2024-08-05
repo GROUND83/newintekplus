@@ -21,9 +21,13 @@ export const authConfig = {
       return isAuthenticated;
     },
 
-    jwt: ({ token, user }) => {
+    jwt: async ({ token, user }) => {
       console.log("tokendata", token, user);
-      return { ...token, ...user };
+      if (user) {
+        token.user = user as any;
+        // session.user._id = token._id;
+      }
+      return token;
     },
     session: async ({ session, token }) => {
       // console.log("sessiondata", session, token);
