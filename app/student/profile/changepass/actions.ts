@@ -1,15 +1,9 @@
 "use server";
 
-import resetPassTemplate from "@/lib/mailtemplate/resetPassTemplate";
-import sendMail from "@/lib/sendMail/sendMail";
 import Participant from "@/models/participant";
-import Token from "@/models/token";
-import crypto from "crypto";
-import dayjs from "dayjs";
+
 import bcrypt from "bcrypt";
-import Teacher from "@/models/teacher";
-import User from "@/models/user";
-//
+
 export async function chagePass(formdata: FormData) {
   let password = formdata.get("password") as string;
   let email = formdata.get("email") as string;

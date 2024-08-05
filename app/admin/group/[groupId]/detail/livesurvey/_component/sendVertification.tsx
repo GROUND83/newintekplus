@@ -167,8 +167,8 @@ export default function SendVertification({
           },
         ],
       };
-      let result = await sendMail(mailData);
-      console.log("result", result);
+      sendMail(mailData);
+
       if (resultSurveyId) {
         await resultSurveyUpdate(resultSurveyId);
       }

@@ -25,7 +25,6 @@ export default async function sendMail(mailData: any) {
         console.error(error);
         reject(error);
       }
-
       console.log("Email sent: ", info);
       resolve("success");
     });

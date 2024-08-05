@@ -86,8 +86,8 @@ export async function createGroupNotice(formData: FormData) {
           }),
           attachments: attachments,
         };
-        let res = await sendMail(mailData);
-        console.log("res", res);
+        sendMail(mailData);
+
         revalidatePath(`/admin/group/${groupId}/detail/notice`);
       }
     }

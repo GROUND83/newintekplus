@@ -123,8 +123,7 @@ export async function createFeedBack(formData: FormData) {
           ],
         };
 
-        let sendResult = await sendMail(mailData);
-        console.log("sendResult", sendResult);
+        sendMail(mailData);
 
         return { data: JSON.stringify(lessonResult) };
       }

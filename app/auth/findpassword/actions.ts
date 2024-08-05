@@ -42,7 +42,7 @@ export async function findPass(formdata: FormData) {
           }),
         };
 
-        let res = await sendMail(mailData);
+        sendMail(mailData);
         return { data: JSON.stringify(updateuser) };
       } else {
         return { message: "계정이 없습니다." };

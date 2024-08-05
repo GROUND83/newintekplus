@@ -21,7 +21,7 @@ import Module from "@/models/module";
 
 import Participant from "@/models/participant";
 import Teacher from "@/models/teacher";
-import { UploadResponse } from "nodejs-s3-typescript/dist/cjs/types";
+
 export const getSession = async () => {
   let session = await auth();
   console.log("session", session);
@@ -147,12 +147,15 @@ export async function createFeedBack(formData: FormData) {
   let teacherId = group.teacher;
   let participant = await Participant.findOne({ _id: participants });
   let teacher = await Teacher.findOne({ _id: teacherId });
+
+  //
   let feedBackFile = formData.get("feedBackFile") as string;
 
-  console.log("participant", participant);
+  console.log("participant", feedBackFile, participant);
   try {
     if (feedBackFile) {
       let feedBackParser = JSON.parse(feedBackFile);
+      console.log("feedBackParser", feedBackParser);
       let feedback = await FeedBack.create({
         groupId,
         title: title,
@@ -188,8 +191,7 @@ export async function createFeedBack(formData: FormData) {
         ],
       };
 
-      let sendResult = await sendMail(mailData);
-      console.log("sendResult", sendResult);
+      sendMail(mailData);
 
       return { data: JSON.stringify(lessonResult) };
     } else {
@@ -220,8 +222,7 @@ export async function createFeedBack(formData: FormData) {
         }),
       };
 
-      let sendResult = await sendMail(mailData);
-      console.log("sendResult", sendResult);
+      sendMail(mailData);
 
       return { data: JSON.stringify(lessonResult) };
     }
