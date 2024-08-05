@@ -27,7 +27,7 @@ export async function authenticate(formData: FormData) {
       callbackUrl: callbackUrl,
       redirect: false,
     });
-    return res;
+    // return res;
     // revalidatePath(callbackUrl);
     // redirect(callbackUrl);
   } catch (error) {

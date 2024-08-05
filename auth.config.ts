@@ -24,17 +24,20 @@ export const authConfig = {
     jwt: async ({ token, user }) => {
       console.log("tokendata", token, user);
       if (user) {
-        token.user = user as any;
+        token.email = user.email as any;
+        token.role = user.role as any;
+        token._id = user._id as any;
         // session.user._id = token._id;
       }
       return token;
     },
     session: async ({ session, token }) => {
-      // console.log("sessiondata", session, token);
-      if (session?.user) {
-        session.user = token as any;
-        // session.user._id = token._id;
-      }
+      console.log("sessiondata", session, token);
+
+      session.user = token as any;
+      // session.email = token.email as any;
+      // session.role = token.role as any;
+      // session._id = token._id as any;
       console.log("sessionsession", session);
 
       return session;

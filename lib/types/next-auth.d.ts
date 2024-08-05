@@ -15,6 +15,12 @@ declare module "next-auth" {
     email: string | null;
     role: string | null;
   }
+  interface User extends AdapterUser {
+    _id: string;
+    username: string | null;
+    email: string | null;
+    role: string | null;
+  }
 }
 
 import { JWT } from "@auth/core/jwt";
