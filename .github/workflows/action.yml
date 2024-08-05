@@ -24,7 +24,30 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
-
+      - name: Generate Environment Variables File for Production
+        run: |
+          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> .env
+          echo "NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET }}" >> .env
+          echo "AWS_BUCKET_NAME=${{ secrets.AWS_BUCKET_NAME }}" >> .env
+          echo "AWS_REGION=${{ secrets.AWS_REGION }}" >> .env
+          echo "AWS_ACCESS_ID=${{ secrets.AWS_ACCESS_ID }}" >> .env
+          echo "AWS_SECRET_ID=${{ secrets.AWS_SECRET_ID }}" >> .env
+          echo "AUTH_USER=${{ secrets.AUTH_USER }}" >> .env
+          echo "AUTH_PASS=${{ secrets.AUTH_PASS }}" >> .env
+          echo "AUTH_SECRET=${{ secrets.AUTH_SECRET }}" >> .env
+          echo "MAILING_SERVICE_CLIENT_ID=${{ secrets.MAILING_SERVICE_CLIENT_ID }}" >> .env
+          echo "MAILING_SERVICE_CLIENT_SECRET=${{ secrets.MAILING_SERVICE_CLIENT_SECRET }}" >> .env
+          echo "MAILING_SERVICE_REFRESH_TOKEN=${{ secrets.MAILING_SERVICE_REFRESH_TOKEN }}" >> .env
+          echo "SENDER_EMAIL_ADDRESS=${{ secrets.SENDER_EMAIL_ADDRESS }}" >> .env
+          echo "SMTP_SERVER_ADDRESS=${{ secrets.SMTP_SERVER_ADDRESS }}" >> .env
+          echo "AUTH_URL=${{ secrets.AUTH_URL }}" >> .env
+          echo "NEXTAUTH_URL=${{ secrets.NEXTAUTH_URL }}" >> .env
+          echo "NEXT_PUBLIC_AWS_BUCKET_NAME=${{ secrets.NEXT_PUBLIC_AWS_BUCKET_NAME }}" >> .env
+          echo "NEXT_PUBLIC_AWS_REGION=${{ secrets.NEXT_PUBLIC_AWS_REGION }}" >> .env
+          echo "NEXT_PUBLIC_AWS_ACCESS_ID=${{ secrets.NEXT_PUBLIC_AWS_ACCESS_ID }}" >> .env
+          echo "NEXT_PUBLIC_AWS_SECRET_ID=${{ secrets.NEXT_PUBLIC_AWS_SECRET_ID }}" >> .env
+                    
+          cat .env
       - name: Install dependencies
         run: npm install
 
