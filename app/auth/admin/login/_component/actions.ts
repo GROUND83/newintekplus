@@ -20,14 +20,15 @@ export async function authenticate(formData: FormData) {
       callbackUrl: callbackUrl,
       redirect: false,
     });
-    await signIn("credentials", {
+    let res = await signIn("credentials", {
       email: email,
       password: password,
       role: role,
       callbackUrl: callbackUrl,
       redirect: false,
     });
-    revalidatePath(callbackUrl);
+    return res;
+    // revalidatePath(callbackUrl);
     // redirect(callbackUrl);
   } catch (error) {
     console.log("errorerror", error);
