@@ -23,7 +23,7 @@ export const authConfig = {
 
     jwt: async ({ token, user }) => {
       console.log("tokendata", token, user);
-      return { ...token, ...user };
+      return { ...token, user };
     },
     session: async ({ session, token }) => {
       // console.log("sessiondata", session, token);
