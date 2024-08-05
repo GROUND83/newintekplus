@@ -103,7 +103,7 @@ export default function Page({ params }: { params: { groupId: string } }) {
               </div>
               <ScrollArea className="w-full h-[calc(100vh-200px)] flex flex-col">
                 <div className="w-full flex flex-col gap-1 mt-2">
-                  {data?.resultSurvey.map((item: any, index: any) => {
+                  {data?.group.resultSurvey.map((item: any, index: any) => {
                     console.log("iten", item);
                     return (
                       <div
@@ -149,7 +149,7 @@ export default function Page({ params }: { params: { groupId: string } }) {
                           <div className="flex flex-row items-center gap-2">
                             <SendVertification
                               group={data.group}
-                              participants={item}
+                              participants={item.onwer}
                               resultSurveyId={item._id || ""}
                               isSend={item.isSend}
                             />

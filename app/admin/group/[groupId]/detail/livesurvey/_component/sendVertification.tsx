@@ -27,6 +27,7 @@ import { Loader, Loader2, RotateCw, Send } from "lucide-react";
 import sendMail from "@/lib/sendMail/sendMail";
 import { logobinary } from "@/lib/logoBunary";
 import ActionModal from "@/components/commonUi/ActionModal";
+import { UploadFileClient } from "@/lib/fileUploaderClient";
 
 const blobToFile = (theBlob: Blob, fileName: string): File => {
   return new File(
@@ -138,13 +139,15 @@ export default function SendVertification({
       console.log(file);
       let formData = new FormData();
       formData.append("file", file);
-      let filedata = formData.get("file");
+      let filedata = formData.get("file") as File;
 
       let newformData = new FormData();
       newformData.append("file", filedata);
       newformData.append("folderName", "certification");
-      let upload = await UploadFile(newformData);
-      let { location } = upload as UploadResponse;
+      const upload = await UploadFileClient({
+        folderName: "feedBack",
+        file: filedata,
+      });
 
       // console.log("location", location);
       // let fileUrl = location;
@@ -162,8 +165,8 @@ export default function SendVertification({
         attachments: [
           {
             filename: `${participants._id}.pdf`, // the file name
-            path: location, // link your file
-            contentType: file.type, //type of file
+            path: upload.location, // link your file
+            contentType: filedata.type, //type of file
           },
         ],
       };
