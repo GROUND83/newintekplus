@@ -17,18 +17,20 @@ export const authConfig = {
   callbacks: {
     authorized({ auth }) {
       const isAuthenticated = !!auth?.user;
-      console.log("auth authorized", auth, isAuthenticated);
+      // console.log("auth authorized", auth, isAuthenticated);
       return isAuthenticated;
     },
 
     jwt: async ({ token, user }) => {
       console.log("tokendata", token, user);
       if (user) {
+        token.username = (user.username as any) || "";
         token.email = user.email as any;
         token.role = user.role as any;
         token._id = user._id as any;
         // session.user._id = token._id;
       }
+      console.log("!tokendata", token);
       return token;
     },
     session: async ({ session, token }) => {

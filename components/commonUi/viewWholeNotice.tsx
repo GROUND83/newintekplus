@@ -57,7 +57,7 @@ export default function ViewWholeNotice({ notice }: { notice: any }) {
 contentSize: 623900
 ​
 contentdownloadURL */}
-        <div className="w-full border-b pb-3">
+        <div className="w-full border-b pb-3 flex flex-col gap-2">
           {notice?.contents?.length > 0 &&
             notice?.contents.map((item: any, index: any) => {
               return (
@@ -68,12 +68,12 @@ contentdownloadURL */}
                 />
               );
             })}
-          {notice?.contentdownloadURL && (
+          {/* {notice?.contentdownloadURL && (
             <DownLoadButton
               downLoadUrl={notice?.contentdownloadURL}
               fileName={notice?.contenFileName}
             />
-          )}
+          )} */}
         </div>
         <DialogFooter className="  justify-end">
           <DialogClose asChild>

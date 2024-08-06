@@ -4,6 +4,7 @@ import { auth } from "@/auth";
 import { connectToMongoDB } from "@/lib/db";
 import CourseProfile from "@/models/courseProfile";
 import Lesson from "@/models/lesson";
+import NoticeContent from "@/models/noticeContent";
 import Participant from "@/models/participant";
 import Teacher from "@/models/teacher";
 import WholeNotice from "@/models/wholenotice";
@@ -29,6 +30,7 @@ export const getMoreData = async ({
       sendTo: { $ne: "student" },
     }).countDocuments();
     const courseProfile = await WholeNotice.find({ sendTo: { $ne: "student" } })
+      .populate({ path: "contents", model: NoticeContent })
       // .select("property title createdAt lessonHour evaluation")
       .limit(pageSize)
       .skip(pageSize * (pageIndex - 1))

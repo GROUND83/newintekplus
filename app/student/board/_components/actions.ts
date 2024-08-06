@@ -4,6 +4,7 @@ import { auth } from "@/auth";
 import { connectToMongoDB } from "@/lib/db";
 import CourseProfile from "@/models/courseProfile";
 import Lesson from "@/models/lesson";
+import NoticeContent from "@/models/noticeContent";
 import Participant from "@/models/participant";
 import WholeNotice from "@/models/wholenotice";
 
@@ -34,10 +35,11 @@ export const getMoreData = async ({
     //       participants: { $in: [{ _id: participant._id }] },
     //       status: "개설완료",
     //     };
-    const courseProfileCount = await WholeNotice.find({
-      sendTo: { $ne: "student" },
+    const wholeNoticeCount = await WholeNotice.find({
+      sendTo: { $ne: "teacher" },
     }).countDocuments();
-    const courseProfile = await WholeNotice.find({ sendTo: { $ne: "student" } })
+    const wholeNotice = await WholeNotice.find({ sendTo: { $ne: "teacher" } })
+      .populate({ path: "contents", model: NoticeContent })
       // .select("property title createdAt lessonHour evaluation")
       .limit(pageSize)
       .skip(pageSize * (pageIndex - 1))
@@ -47,9 +49,9 @@ export const getMoreData = async ({
     console.log(pageIndex, pageSize);
     // console.log("courseProfile", courseProfile);
     return {
-      rows: JSON.stringify(courseProfile),
-      pageCount: Math.ceil(courseProfileCount / pageSize),
-      totalCount: courseProfileCount,
+      rows: JSON.stringify(wholeNotice),
+      pageCount: Math.ceil(wholeNoticeCount / pageSize),
+      totalCount: wholeNoticeCount,
     };
   } catch (e) {
     console.log(e);

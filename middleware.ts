@@ -38,26 +38,18 @@ export default auth((req) => {
   if (pathname.startsWith("/admin")) {
     if (isAuthenticated) {
       if (req.auth.user.role === "admin") {
-        console.log("session admin", req.auth);
-        console.log("check");
-        // const response = NextResponse.next();
-        // const response = NextResponse.next({
-        //   request: {
-        //     headers: requestHeaders,
-        //   },
-        // });
-        // response.headers.set(
-        //   "Content-Security-Policy",
-        //   contentSecurityPolicyHeaderValue
-        // );
+        console.log("session admin", req.auth, isAuthenticated);
+
         return NextResponse.next();
         //
       } else {
         // console.log("session", session);
-        return NextResponse.redirect(new URL("/auth/admin/login", nextUrl));
+        return NextResponse.redirect(
+          new URL("/auth/login?type=admin", nextUrl)
+        );
       }
     } else {
-      return NextResponse.redirect(new URL("/auth/admin/login", nextUrl));
+      return NextResponse.redirect(new URL("/auth/login?type=admin", nextUrl));
     }
   }
   if (pathname.startsWith("/student")) {
@@ -81,11 +73,13 @@ export default auth((req) => {
       } else {
         // console.log("session", session);
         return NextResponse.redirect(
-          new URL("/auth/participant/login", nextUrl)
+          new URL("/auth/login?type=student", nextUrl)
         );
       }
     } else {
-      return NextResponse.redirect(new URL("/auth/participant/login", nextUrl));
+      return NextResponse.redirect(
+        new URL("/auth/login?type=student", nextUrl)
+      );
     }
   }
   if (pathname.startsWith("/teacher")) {
@@ -93,25 +87,19 @@ export default auth((req) => {
       // console.log("session teacher", req.auth);
       if (req.auth.user.role === "teacher") {
         console.log("check");
-        // // const response = NextResponse.next();
-        // const response = NextResponse.next({
-        //   request: {
-        //     headers: requestHeaders,
-        //   },
-        // });
-        // response.headers.set(
-        //   "Content-Security-Policy",
-        //   contentSecurityPolicyHeaderValue
-        // );
-        // return response;
+
         return NextResponse.next();
         //
       } else {
         // console.log("session", session);
-        return NextResponse.redirect(new URL("/auth/teacher/login", nextUrl));
+        return NextResponse.redirect(
+          new URL("/auth/login?type=teacher", nextUrl)
+        );
       }
     } else {
-      return NextResponse.redirect(new URL("/auth/teacher/login", nextUrl));
+      return NextResponse.redirect(
+        new URL("/auth/login?type=teacher", nextUrl)
+      );
     }
   }
 });

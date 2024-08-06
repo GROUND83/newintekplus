@@ -25,35 +25,35 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       },
       authorize: async (credentials: any) => {
         let user = null;
-        console.log("credentials", credentials);
+        // console.log("credentials", credentials);
 
         if (!credentials?.email || !credentials?.password) {
           return null;
         }
 
-        console.log("credentials.role", credentials.role);
+        // console.log("credentials.role", credentials.role);
         if (credentials.role === "admin") {
           await connectToMongoDB();
 
           let findUser = await User.findOne({ email: credentials.email })
             .select("username email  role _id password")
             .lean();
-          console.log("findUser", findUser);
+          // console.log("findUser", findUser);
           if (findUser) {
             user = findUser;
           } else {
             throw new Error("계정이 없습니다.");
           }
-          console.log("user", user);
+          // console.log("user", user);
           if (Object.keys(user).length > 0) {
             const ok = await bcrypt.compare(
               credentials.password,
               user!.password ?? ""
             );
-            console.log("ok", ok);
+            // console.log("ok", ok);
             if (ok) {
               let userdata = exclude(user, ["password"]);
-              console.log("userdata", userdata);
+              // console.log("userdata", userdata);
 
               return userdata;
             } else {
@@ -70,22 +70,22 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           let findUser = await Teacher.findOne({ email: credentials.email })
             .select("username email  role _id password")
             .lean();
-          console.log("findUser", findUser);
+          // console.log("findUser", findUser);
           if (findUser) {
             user = findUser;
           } else {
             throw new Error("계정이 없습니다.");
           }
-          console.log("user", user);
+          // console.log("user", user);
           if (Object.keys(user).length > 0) {
             const ok = await bcrypt.compare(
               credentials.password,
               user!.password ?? ""
             );
-            console.log("ok", ok);
+            // console.log("ok", ok);
             if (ok) {
               let userdata = exclude(user, ["password"]);
-              console.log("userdata", userdata);
+              // console.log("userdata", userdata);
 
               return userdata;
             } else {
@@ -102,7 +102,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           let findUser = await Participant.findOne({ email: credentials.email })
             .select("username email  role _id password")
             .lean();
-          console.log("findUser", findUser);
+          // console.log("findUser", findUser);
           if (findUser) {
             user = findUser;
           } else {
@@ -114,10 +114,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
               credentials.password,
               user!.password ?? ""
             );
-            console.log("ok", ok);
+            // console.log("ok", ok);
             if (ok) {
               let userdata = exclude(user, ["password"]);
-              console.log("userdata", userdata);
+              // console.log("userdata", userdata);
 
               return userdata;
             } else {

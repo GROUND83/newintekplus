@@ -69,7 +69,7 @@ export default function Page() {
     }
   }
   return (
-    <div className="w-full  flex flex-col items-start justify-center bg-white p-12">
+    <div className="w-1/2 border rounded-md flex flex-col items-start justify-center bg-white p-12">
       <p className="text-lg font-bold">비밀번호 변경</p>
       <p className="mt-3">변경할 비밀번호를 입력하세요.</p>
       <div className="w-full mt-6">

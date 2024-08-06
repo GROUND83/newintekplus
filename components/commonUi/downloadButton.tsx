@@ -9,7 +9,7 @@ export default function DownLoadButton({
   fileName: string;
 }) {
   return (
-    <Button asChild size="xs" variant="defaultoutline">
+    <Button asChild size="xs" variant="defaultoutline" type="button">
       <a
         href={downLoadUrl}
         download={fileName}

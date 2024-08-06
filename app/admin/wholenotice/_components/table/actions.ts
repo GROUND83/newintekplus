@@ -37,6 +37,7 @@ export const getMoreData = async ({
   try {
     const wholeNoticeCount = await WholeNotice.find(query).countDocuments();
     const wholeNotice = await WholeNotice.find(query)
+      .populate({ path: "contents", model: NoticeContent })
       // .select("property title createdAt lessonHour evaluation")
       .limit(pageSize)
       .skip(pageSize * (pageIndex - 1))

@@ -12,6 +12,42 @@ dayjs.locale("ko");
 
 export const columns: ColumnDef<any>[] = [
   {
+    accessorKey: "sendTo",
+    header: ({ column }) => {
+      return (
+        <div className="flex flex-col items-start justify-center text-left  ">
+          <Button
+            variant="ghost"
+            className="p-0 "
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            대상
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+        </div>
+      );
+    },
+    cell: ({ row }) => {
+      return (
+        <div className=" text-left">
+          {row.getValue("sendTo") === "all" ? (
+            <Badge variant="defaultOutline" className="font-normal">
+              전체
+            </Badge>
+          ) : row.getValue("sendTo") === "teacher" ? (
+            <Badge variant="secondaryOutline" className="font-normal">
+              리더
+            </Badge>
+          ) : row.getValue("sendTo") === "student" ? (
+            <Badge variant="secondaryOutline" className="font-normal">
+              교육생
+            </Badge>
+          ) : null}
+        </div>
+      );
+    },
+  },
+  {
     accessorKey: "title",
     header: ({ column }) => {
       return (

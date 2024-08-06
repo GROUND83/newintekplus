@@ -7,7 +7,8 @@ import Teacher from "@/models/teacher";
 import Token from "@/models/token";
 import User from "@/models/user";
 import crypto from "crypto";
-
+import { signIn } from "@/auth";
+import { AuthError } from "next-auth";
 import bcrypt from "bcrypt";
 import temp_pw_issuance from "@/lib/generatePassword";
 
@@ -112,4 +113,44 @@ export async function findPass(formdata: FormData) {
     return { message: e };
   }
   //
+}
+
+export async function authenticate(formData: FormData) {
+  try {
+    let email = formData.get("email");
+    let password = formData.get("password");
+    let role = formData.get("role");
+    let callbackUrl = formData.get("callbackUrl") as string;
+    console.log({
+      email: email,
+      password: password,
+      role: role,
+      callbackUrl: callbackUrl,
+      redirect: false,
+    });
+    await signIn("credentials", {
+      email: email,
+      password: password,
+      role: role,
+      callbackUrl: callbackUrl,
+      redirect: false,
+    });
+    return false;
+  } catch (error) {
+    console.log("errorerror", error);
+    if (error instanceof AuthError) {
+      switch (error.type) {
+        case "CredentialsSignin":
+          return "Invalid credentials.";
+        default:
+          console.log(
+            "error.message",
+
+            error.cause.err.message
+          );
+          return JSON.stringify({ passwrod: error.cause.err.message });
+      }
+    }
+    throw error;
+  }
 }
