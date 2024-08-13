@@ -245,7 +245,7 @@ export default function Page({
                       <FormItem className="flex flex-col col-span-12 gap-2">
                         <FormLabelWrap title="내용" required />
                         <Textarea
-                          rows={10}
+                          rows={20}
                           value={value || ""}
                           onChange={onChange}
                           placeholder="내용을 입력하세요."

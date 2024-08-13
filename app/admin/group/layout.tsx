@@ -18,7 +18,6 @@ export default function Layout({
     <SubWrap>
       <MainTitleWrap>
         <GroupData />
-
         {pathname === "/admin/group" && (
           <Button asChild size={"sm"}>
             <Link

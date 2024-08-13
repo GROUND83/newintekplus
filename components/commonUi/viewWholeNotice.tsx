@@ -25,7 +25,7 @@ export default function ViewWholeNotice({ notice }: { notice: any }) {
           <Search className="size-4" />
         </Button>
       </DialogTrigger>
-      <DialogContent className="w-[600px]">
+      <DialogContent className="w-[50vw]">
         <DialogHeader className="w-full border-b py-3">
           <DialogTitle className="flex flex-col items-start gap-2 ">
             {notice?.sendTo === "all" ? (
@@ -47,19 +47,15 @@ export default function ViewWholeNotice({ notice }: { notice: any }) {
             {dayjs(notice.updatedAt).format("YYYY-MM-DD")}
           </DialogDescription>
         </DialogHeader>
-        <ScrollArea className="h-[300px] w-full border-b">
-          <div className="flex items-center  w-full">
+        <ScrollArea className="h-[500px] w-full border-b">
+          <div className="flex items-center  w-full py-6">
             <p className=" whitespace-pre-wrap">{notice?.description}</p>
           </div>
         </ScrollArea>
-        {/* contenFileName: "과정안내서(신입SOJT)_프로그래밍기초.pdf"
-​
-contentSize: 623900
-​
-contentdownloadURL */}
-        <div className="w-full border-b pb-3 flex flex-col gap-2">
-          {notice?.contents?.length > 0 &&
-            notice?.contents.map((item: any, index: any) => {
+
+        {notice?.contents?.length > 0 && (
+          <div className="w-full border-b pb-3 flex flex-col gap-2">
+            {notice?.contents.map((item: any, index: any) => {
               return (
                 <DownLoadButton
                   key={index}
@@ -68,13 +64,8 @@ contentdownloadURL */}
                 />
               );
             })}
-          {/* {notice?.contentdownloadURL && (
-            <DownLoadButton
-              downLoadUrl={notice?.contentdownloadURL}
-              fileName={notice?.contenFileName}
-            />
-          )} */}
-        </div>
+          </div>
+        )}
         <DialogFooter className="  justify-end">
           <DialogClose asChild>
             <Button type="button" variant="secondary">

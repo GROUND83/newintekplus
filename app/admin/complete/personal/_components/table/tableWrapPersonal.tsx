@@ -34,8 +34,20 @@ import {
   useRouter,
   useSearchParams,
 } from "next/navigation";
+import Search from "@/components/commonUi/Search";
+import { addDays, format, subDays } from "date-fns";
+import { Calendar as CalendarIcon } from "lucide-react";
+import { DateRange } from "react-day-picker";
+import { ko } from "date-fns/locale";
+import { cn } from "@/lib/utils";
 
-import Search from "./Search";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import dayjs from "dayjs";
 
 function TableWrapData({
   columns,
@@ -52,6 +64,11 @@ function TableWrapData({
   searchShow: boolean;
   height: string | undefined;
 }) {
+  const [date, setDate] = React.useState<DateRange | undefined>();
+  // const [date, setDate] = React.useState<DateRange | undefined>({
+  //   from: subDays(new Date(), 30),
+  //   to: new Date(),
+  // });
   const router = useRouter();
   const pathname = usePathname();
   const params = useParams<{ groupId: string }>();
@@ -83,7 +100,7 @@ function TableWrapData({
       let reponse = await getMoreData(fetchDataOptions);
       if (reponse.rows) {
         let groups = JSON.parse(reponse.rows);
-        console.log("groups", groups);
+        // console.log("groups", groups);
         setPageCount(reponse.pageCount);
         setTotal(reponse.totaCount);
         return { rows: groups, pageCount: reponse.totalCount };
@@ -107,55 +124,6 @@ function TableWrapData({
     debugTable: false,
   });
 
-  // const setSearchDAta = () => {
-  //   const params = new URLSearchParams(searchParams.toString());
-  //   if (currentPage.current) {
-  //     params.set("page", "1");
-  //     router.replace(`${pathname}?page=1`);
-  //     setPageNumber(1);
-  //   }
-  //   // currentPage.current = e.selected + 1;
-  // };
-  // React.useEffect(() => {
-  //   if (search) {
-  //     setSearchDAta();
-  //   }
-  // }, [search]);
-  //
-  const clickPrev = () => {
-    const params = new URLSearchParams(searchParams.toString());
-    if (currentPage.current) {
-      params.set("page", (pageNumber - 1).toString());
-      router.replace(`${pathname}?page=${(pageNumber - 1).toString()}`);
-      setPageNumber((prev) => prev - 1);
-    }
-    // currentPage.current = e.selected + 1;
-  };
-  const clickNext = () => {
-    const params = new URLSearchParams(searchParams.toString());
-    console.log("pathnameparams", params, pageNumber, pathname);
-    if (currentPage.current) {
-      params.set("page", (pageNumber + 1).toString());
-      router.replace(`${pathname}?page=${(pageNumber + 1).toString()}`);
-      setPageNumber((prev) => prev + 1);
-    }
-    // currentPage.current = e.selected + 1;
-  };
-
-  const selectPageSize = (value: number) => {
-    setPageSize(value);
-    const params = new URLSearchParams(searchParams.toString());
-    if (currentPage.current) {
-      params.set("page", "1");
-      router.replace(`${pathname}?page=1`);
-      setPageNumber(1);
-    }
-    // currentPage.current = e.selected + 1;
-  };
-
-  //
-
-  //
   if (isLoading) {
     return (
       <div
@@ -175,9 +143,15 @@ function TableWrapData({
 
   return (
     <div className="w-full ">
-      {searchShow && <Search placeHolder={placeHolder} />}
+      {searchShow && (
+        <div className="flex flex-row items-center w-full gap-1 ">
+          <div className="flex-1 ">
+            <Search placeHolder={placeHolder} />
+          </div>
+        </div>
+      )}
 
-      <ScrollArea className={` bg-white  w-full ${height} `}>
+      <ScrollArea className={` bg-white  w-full h-[calc(100vh-170px)]`}>
         <Table className="" wrapperClassName="overflow-clip">
           <TableHeader className="">
             {table.getHeaderGroups().map((headerGroup) => (
@@ -227,68 +201,11 @@ function TableWrapData({
           </TableBody>
         </Table>
       </ScrollArea>
-
-      <div className="flex flex-row items-center justify-between space-x-2  h-[50px] bg-neutral-100 border-b px-3 border-t">
-        <div className=" text-sm text-neutral-500   flex-1">
-          <p className="text-xs">총 {data?.pageCount}개의 데이터가 있습니다.</p>
-        </div>
-        {data?.pageCount && data?.pageCount > 10 ? (
-          <div className="space-x-2 flex flex-row items-center justify-center gap-2 flex-1">
-            <Button
-              type="button"
-              variant={pageNumber <= 1 ? "outline" : "default"}
-              size="sm"
-              onClick={() => clickPrev()}
-              disabled={pageNumber <= 1 ? true : false}
-            >
-              <ChevronLeft />
-            </Button>
-
-            <p className="border px-6 py-2 rounded-md text-sm text-neutral-500 bg-white">
-              {pageNumber} / {pageCount}
-            </p>
-
-            <Button
-              type="button"
-              variant={pageNumber >= pageCount ? `outline` : "default"}
-              size="sm"
-              onClick={() => clickNext()}
-              disabled={pageNumber >= pageCount ? true : false}
-            >
-              <ChevronRight />
-            </Button>
-          </div>
-        ) : null}
-
-        <div className="flex flex-row items-center justify-center flex-1 gap-2">
-          <p>테이블 출력</p>
-          <Select
-            value={pageSize.toString()}
-            onValueChange={(value) => {
-              selectPageSize(Number(value));
-            }}
-          >
-            <SelectTrigger className="w-[80px]">
-              <SelectValue placeholder="테이블 출력" />
-            </SelectTrigger>
-            <SelectContent>
-              {[10, 20, 30, 40, 50, 100, 200, 300, 400].map((pageSizevalue) => (
-                <SelectItem
-                  key={pageSizevalue}
-                  value={pageSizevalue.toString()}
-                >
-                  {pageSizevalue}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
     </div>
   );
 }
 
-const TableWrap = ({
+const TableWrapPersonal = ({
   columns,
   getMoreData,
   subMenu,
@@ -316,4 +233,4 @@ const TableWrap = ({
     </React.Suspense>
   );
 };
-export default TableWrap;
+export default TableWrapPersonal;

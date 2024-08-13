@@ -268,7 +268,7 @@ export async function getSelectInitData() {
         createdAt: -1,
       });
     let participants = await Participant.find({ aproved: true })
-      .select("_id username email jobPosition")
+      .select("_id username email jobPosition jobGroup jobSubGroup")
       .sort({
         username: 1,
       });

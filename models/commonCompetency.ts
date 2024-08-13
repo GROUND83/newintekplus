@@ -1,5 +1,4 @@
 import mongoose, { Document, Model, Types } from "mongoose";
-import passportLocalMongoose from "passport-local-mongoose";
 
 export interface ICommonCompetency {
   competencys: [

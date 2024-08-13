@@ -31,6 +31,8 @@ export default function Search({ placeHolder }: { placeHolder: string }) {
     }
     router.replace(`${pathname}?${params.toString()}`);
   }, 1000);
+
+  //
   React.useEffect(() => {
     debouncedhandelSearchSumbit();
   }, [search]);

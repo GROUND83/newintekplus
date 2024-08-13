@@ -92,7 +92,23 @@ export default function LessonPerFormPage() {
                         </p>
                       </a>
                     ) : (
-                      <p className="text-xs">미제출</p>
+                      <>
+                        {item.perform.downUrl ? (
+                          <a
+                            href={item.perform.downUrl}
+                            download
+                            target="_blank"
+                            rel="noreferrer"
+                            className="flex flex-row items-center justify-between flex-1 w-full "
+                          >
+                            <p className="flex-1 w-full  text-xs line-clamp-1">
+                              {item.perform.fileName}
+                            </p>
+                          </a>
+                        ) : (
+                          <p className="text-xs">미제출</p>
+                        )}
+                      </>
                     )}
                   </div>
                   <div className=" col-span-3 bg-white border p-2">
