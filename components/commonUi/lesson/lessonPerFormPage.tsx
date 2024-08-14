@@ -10,6 +10,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import ViewFeedBack from "./component/viewfeedBack";
+import dayjs from "dayjs";
 
 export default function LessonPerFormPage() {
   const params = useParams<{ groupId: string; lessonId: string }>();
@@ -85,10 +86,15 @@ export default function LessonPerFormPage() {
                         download
                         target="_blank"
                         rel="noreferrer"
-                        className="flex flex-row items-center justify-between flex-1 w-full "
+                        className="flex flex-col items-start justify-between flex-1 w-full "
                       >
-                        <p className="flex-1 w-full  text-xs line-clamp-1">
+                        <p className=" w-full  text-xs line-clamp-1">
                           {item.newPerform.lessonPerformFileName}
+                        </p>
+                        <p className=" w-full  text-xs ">
+                          {dayjs(item.newPerform.createdAt).format(
+                            "YYYY/MM/DD"
+                          )}
                         </p>
                       </a>
                     ) : (
@@ -99,10 +105,15 @@ export default function LessonPerFormPage() {
                             download
                             target="_blank"
                             rel="noreferrer"
-                            className="flex flex-row items-center justify-between flex-1 w-full "
+                            className="flex flex-col items-start justify-between flex-1 w-full "
                           >
-                            <p className="flex-1 w-full  text-xs line-clamp-1">
+                            <p className=" w-full  text-xs line-clamp-1">
                               {item.perform.fileName}
+                            </p>
+                            <p className=" w-full  text-xs ">
+                              {dayjs(item.perform.createdAt).format(
+                                "YYYY/MM/DD"
+                              )}
                             </p>
                           </a>
                         ) : (
