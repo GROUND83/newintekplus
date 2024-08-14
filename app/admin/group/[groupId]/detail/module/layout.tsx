@@ -51,6 +51,28 @@ export default function Layout({
       </div>
     );
   }
+
+  const checkEvaluation = (lessonId: string) => {
+    let isDone = 0;
+    let total = 0;
+    if (group.lessonResults.length > 0) {
+      //
+      let findResult = group.lessonResults.filter(
+        (item: any) => item.lessonId === lessonId
+      );
+      if (findResult.length > 0) {
+        let isDoneData = findResult.filter(
+          (result: any) => result.isEvaluationDone
+        );
+        console.log("isDone", isDone);
+        isDone = isDoneData.length;
+      }
+      console.log("findResult", findResult);
+      total = findResult.length;
+    }
+    //
+    return { isDone: isDone, total: total };
+  };
   return (
     <div className="w-full grid grid-cols-12 gap-1 ">
       <div className="col-span-6 flex flex-col items-start  justify-start border-r">
@@ -79,10 +101,17 @@ export default function Layout({
                                   key={lesson._id}
                                   className={`px-3 py-1 flex flex-row items-center justify-between  border  gap-2 bg-white`}
                                 >
-                                  <div className="flex flex-row items-center gap-2">
+                                  <div className="flex flex-col items-start gap-2">
                                     <p className=" line-clamp-1">
                                       {lesson.title}
                                     </p>
+                                    <div className="flex flex-row items-center gap-2">
+                                      <p>
+                                        {checkEvaluation(lesson._id).isDone}
+                                      </p>
+                                      <p>/</p>
+                                      <p>{checkEvaluation(lesson._id).total}</p>
+                                    </div>
                                   </div>
                                   <div className="flex flex-row items-center gap-3">
                                     {group.courseProfile.eduForm ===
