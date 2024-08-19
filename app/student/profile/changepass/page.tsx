@@ -38,7 +38,7 @@ export default function Page() {
     console.log("values", values);
     setLoading(true);
     try {
-      if (session.data?.user.email) {
+      if (values.password) {
         const formData = new FormData();
         formData.append("password", values.password);
         formData.append("email", session.data?.user.email);
@@ -72,52 +72,46 @@ export default function Page() {
   }
   return (
     <div className="w-full  flex flex-col items-start justify-center bg-white p-12">
-      {session.status === "authenticated" ? (
-        <>
-          <div>
-            <p className="text-lg font-bold">비밀번호 변경</p>
-            <p className="mt-3">변경할 비밀번호를 입력하세요.</p>
-          </div>
-          <div className="w-full mt-6">
-            <Form {...form}>
-              <form
-                onSubmit={form.handleSubmit(onSubmit)}
-                className="space-y-8 w-full"
-              >
-                <FormField
-                  control={form.control}
-                  name="password"
-                  render={({ field: { value, onChange } }) => (
-                    <FormItem className="flex flex-col col-span-12 gap-2">
-                      <FormLabelWrap title="비밀번호" required />
-                      <Input
-                        type="password"
-                        value={value || ""}
-                        onChange={onChange}
-                        placeholder="변경할 비밀번호을 입력하세요."
-                      />
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <div className=" w-full flex flex-col items-end">
-                  <Button type="submit" className="mt-6" disabled={loading}>
-                    {loading ? (
-                      <Loader2 className=" animate-spin" />
-                    ) : (
-                      <p>비밀번호 재설정</p>
-                    )}
-                  </Button>
-                </div>
-              </form>
-            </Form>
-          </div>
-        </>
-      ) : (
-        <div className="w-full   bg-white flex flex-col  items-center justify-center h-[calc(100vh-180px)] ">
-          <Loader2 className=" animate-spin size-4" />
+      <>
+        <div>
+          <p className="text-lg font-bold">비밀번호 변경</p>
+          <p className="mt-3">변경할 비밀번호를 입력하세요.</p>
         </div>
-      )}
+        <div className="w-full mt-6">
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="space-y-8 w-full"
+            >
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field: { value, onChange } }) => (
+                  <FormItem className="flex flex-col col-span-12 gap-2">
+                    <FormLabelWrap title="비밀번호" required />
+                    <Input
+                      type="password"
+                      value={value || ""}
+                      onChange={onChange}
+                      placeholder="변경할 비밀번호을 입력하세요."
+                    />
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <div className=" w-full flex flex-col items-end">
+                <Button type="submit" className="mt-6" disabled={loading}>
+                  {loading ? (
+                    <Loader2 className=" animate-spin" />
+                  ) : (
+                    <p>비밀번호 재설정</p>
+                  )}
+                </Button>
+              </div>
+            </form>
+          </Form>
+        </div>
+      </>
     </div>
   );
 }
