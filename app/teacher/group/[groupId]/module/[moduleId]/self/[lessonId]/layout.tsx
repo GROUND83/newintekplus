@@ -2,14 +2,6 @@
 
 import React from "react";
 import Link from "next/link";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
 import { useParams, usePathname } from "next/navigation";
 import { getModuleDetail } from "@/components/commonActions/commonActions";
 
@@ -18,10 +10,6 @@ export default function Layout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  //
-  // const [moduleData, setModuleData] = React.useState<any>();
-  // const [lesson, setLesson] = React.useState<any>();
-
   const params = useParams<{
     groupId: string;
     moduleId: string;

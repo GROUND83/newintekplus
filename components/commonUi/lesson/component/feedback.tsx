@@ -105,7 +105,7 @@ export default function FeedbackSend({
   }
   return (
     <div>
-      {lessonResult.isEvaluationDone ? (
+      {lessonResult?.isEvaluationDone ? (
         <div className="flex flex-row items-center justify-between w-full gap-3">
           <Button
             onClick={() => setEvaluationOepn(true)}
@@ -127,98 +127,99 @@ export default function FeedbackSend({
           평가대기
         </Button>
       )}
-
-      <Dialog open={evaluationOepn}>
-        <DialogContent className="w-[400px] flex flex-col">
-          <div className="self-end">
-            <Button
-              onClick={() => setEvaluationOepn(false)}
-              variant="outline"
-              color="primary"
-              size="xs"
-            >
-              <XIcon className="size-4" />
-            </Button>
-          </div>
-          <DialogHeader>
-            <DialogTitle>피드백 보내기</DialogTitle>
-            <DialogDescription>
-              해당 참여자에게 피드백을 보냅니다.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="flex flex-row items-center gap-3 mt-3">
-            <p>대상</p>
-            <p>{lessonResult.onwer.username}</p>
-          </div>
-          <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit(onSubmit)}
-              className="space-y-8 w-full"
-            >
-              <FormField
-                control={form.control}
-                name="title"
-                render={({ field: { value, onChange } }) => (
-                  <FormItem className="flex flex-col col-span-12 gap-2">
-                    <FormLabelWrap title="피드백 명" required />
-                    <Input
-                      value={value || ""}
-                      onChange={onChange}
-                      placeholder="피드백 명을 입력하세요."
-                    />
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem className="flex flex-col col-span-6 gap-2">
-                    <FormLabelWrap title="피드백 내용" required={true} />
-
-                    <Textarea
-                      placeholder="피드백 내용을 입력하세요."
-                      className="resize-none"
-                      {...field}
-                      rows={7}
-                    />
-
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="file"
-                render={({ field: { ref, name, onBlur, onChange } }) => (
-                  <FormItem className="flex flex-col">
-                    <FormLabelWrap title="첨부파일" required={false} />
-                    <Input
-                      type="file"
-                      ref={ref}
-                      name={name}
-                      onBlur={onBlur}
-                      onChange={(e) => onChange(e.target.files?.[0])}
-                    />
-
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <div>
-                <FormSubmitButton
-                  title="전송"
-                  form={form}
-                  loading={loading}
-                  disabled={false}
+      {lessonResult && (
+        <Dialog open={evaluationOepn}>
+          <DialogContent className="w-[400px] flex flex-col">
+            <div className="self-end">
+              <Button
+                onClick={() => setEvaluationOepn(false)}
+                variant="outline"
+                color="primary"
+                size="xs"
+              >
+                <XIcon className="size-4" />
+              </Button>
+            </div>
+            <DialogHeader>
+              <DialogTitle>피드백 보내기</DialogTitle>
+              <DialogDescription>
+                해당 참여자에게 피드백을 보냅니다.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="flex flex-row items-center gap-3 mt-3">
+              <p>대상</p>
+              <p>{lessonResult.onwer.username}</p>
+            </div>
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-8 w-full"
+              >
+                <FormField
+                  control={form.control}
+                  name="title"
+                  render={({ field: { value, onChange } }) => (
+                    <FormItem className="flex flex-col col-span-12 gap-2">
+                      <FormLabelWrap title="피드백 명" required />
+                      <Input
+                        value={value || ""}
+                        onChange={onChange}
+                        placeholder="피드백 명을 입력하세요."
+                      />
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-                {/* <Button type="submit">전송</Button> */}
-              </div>
-            </form>
-          </Form>
-        </DialogContent>
-      </Dialog>
+                <FormField
+                  control={form.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col col-span-6 gap-2">
+                      <FormLabelWrap title="피드백 내용" required={true} />
+
+                      <Textarea
+                        placeholder="피드백 내용을 입력하세요."
+                        className="resize-none"
+                        {...field}
+                        rows={7}
+                      />
+
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="file"
+                  render={({ field: { ref, name, onBlur, onChange } }) => (
+                    <FormItem className="flex flex-col">
+                      <FormLabelWrap title="첨부파일" required={false} />
+                      <Input
+                        type="file"
+                        ref={ref}
+                        name={name}
+                        onBlur={onBlur}
+                        onChange={(e) => onChange(e.target.files?.[0])}
+                      />
+
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <div>
+                  <FormSubmitButton
+                    title="전송"
+                    form={form}
+                    loading={loading}
+                    disabled={false}
+                  />
+                  {/* <Button type="submit">전송</Button> */}
+                </div>
+              </form>
+            </Form>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 }

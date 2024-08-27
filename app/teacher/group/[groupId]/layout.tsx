@@ -39,6 +39,16 @@ export default function Layout({
           학습리스트
         </Link>
         <Link
+          href={`/teacher/group/${params.groupId}/participantmonitor`}
+          className={`px-3 py-2 text-xs ${
+            pathname.includes("/participantmonitor")
+              ? "bg-primary text-white"
+              : "bg-neutral-100 text-black border"
+          } rounded-md`}
+        >
+          학습자 모니터링
+        </Link>
+        <Link
           href={`/teacher/group/${params.groupId}/message`}
           className={`px-3 py-2 text-xs ${
             pathname.includes("/message")
