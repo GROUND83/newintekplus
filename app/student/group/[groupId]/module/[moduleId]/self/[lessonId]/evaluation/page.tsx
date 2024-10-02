@@ -41,24 +41,46 @@ export default function Page({
 }) {
   const [updateLoading, setUpdateLoading] = React.useState(false);
   const [show, setShow] = React.useState(false);
+  const [lessonResult, setLessonResult] = React.useState<any>();
+  const [isLoading, setIsLoading] = React.useState(false);
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {},
   });
-  const fetchDataOptions = {
-    lessonId: params.lessonId,
-    groupId: params.groupId,
-  };
-  const {
-    data: lessonResult,
-    isLoading,
-    isError,
-    refetch,
-  } = useQuery({
-    //
-    queryKey: ["evauation", fetchDataOptions],
-    queryFn: async () => {
-      let res = await getLessonDetail(fetchDataOptions);
+  // const fetchDataOptions = {
+  //   lessonId: params.lessonId,
+  //   groupId: params.groupId,
+  // };
+  // const {
+  //   data: lessonResult,
+  //   isLoading,
+  //   isError,
+  //   refetch,
+  // } = useQuery({
+  //   //
+  //   queryKey: ["evauation", fetchDataOptions],
+  //   queryFn: async () => {
+  //     let res = await getLessonDetail(fetchDataOptions);
+  //     if (res.lessonResult) {
+  //       let lessonResult = JSON.parse(res.lessonResult);
+  //       console.log("lessonResult", lessonResult);
+  //       if (lessonResult.newPerform) {
+  //         form.reset({
+  //           downUrl: lessonResult.newPerform.lessonPerformdownloadURL, //레슨다운로드
+  //           fileName: lessonResult.newPerform.lessonPerformFileName, // 레슨파일이름
+  //         });
+  //       }
+  //       return lessonResult;
+  //     }
+  //   },
+  // });
+  const getData = async () => {
+    try {
+      setIsLoading(true);
+      let res = await getLessonDetail({
+        lessonId: params.lessonId,
+        groupId: params.groupId,
+      });
       if (res.lessonResult) {
         let lessonResult = JSON.parse(res.lessonResult);
         console.log("lessonResult", lessonResult);
@@ -68,19 +90,14 @@ export default function Page({
             fileName: lessonResult.newPerform.lessonPerformFileName, // 레슨파일이름
           });
         }
-        return lessonResult;
+        setLessonResult(lessonResult);
       }
-    },
-  });
-  if (isLoading) {
-    return (
-      <div
-        className={`w-full  h-[calc(100vh-170px)]  flex flex-col items-center justify-center`}
-      >
-        <Loader2 className=" animate-spin size-8 text-primary" />
-      </div>
-    );
-  }
+    } catch (e) {
+      console.log(e);
+    } finally {
+      setIsLoading(false);
+    }
+  };
   async function onSubmit(values: z.infer<typeof FormSchema>) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
@@ -121,7 +138,8 @@ export default function Page({
       if (resdat.data) {
         //
         toast.success("과제 업로드에 성공하였습니다.");
-        refetch();
+        getData();
+        // refetch();
         // router.push("/admin/courseprofile");
       }
     } catch (e) {
@@ -131,6 +149,21 @@ export default function Page({
     } finally {
       setUpdateLoading(false);
     }
+  }
+
+  React.useEffect(() => {
+    //
+    getData();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div
+        className={`w-full  h-[calc(100vh-170px)]  flex flex-col items-center justify-center`}
+      >
+        <Loader2 className=" animate-spin size-8 text-primary" />
+      </div>
+    );
   }
   return (
     <div className="bg-white border flex-1 w-full flex flex-col items-start ">
