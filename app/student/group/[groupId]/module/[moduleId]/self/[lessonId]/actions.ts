@@ -79,6 +79,7 @@ export async function updateLessonPerform(formData: FormData) {
               size: newLessonPerForm.lessonPerformSize,
             },
             isLessonDone: true,
+            isNewdata: true,
           }
         );
         return JSON.stringify({ data: lessonResultUpdate });

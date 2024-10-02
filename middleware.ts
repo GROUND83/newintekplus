@@ -2,43 +2,24 @@ import { NextRequest, NextResponse } from "next/server";
 
 import NextAuth from "next-auth";
 import { authConfig } from "./auth.config";
-
-const { auth } = NextAuth(authConfig);
-
-export default auth((req) => {
-  // const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
-  // const cspHeader = `
-  //     default-src 'self';
-  //     script-src 'self' 'nonce-${nonce}' 'strict-dynamic' https: http: 'unsafe-inline' 'unsafe-eval';
-  //     style-src 'self' 'unsafe-inline';
-  //     img-src 'self' blob: data:;
-  //     font-src 'self';
-  //     object-src 'none';
-  //     base-uri 'self';
-  //     form-action 'self';
-  //     frame-ancestors 'none';
-  //     upgrade-insecure-requests;
-  // `;
-  // // Replace newline characters and spaces
-  // const contentSecurityPolicyHeaderValue = cspHeader
-  //   .replace(/\s{2,}/g, " ")
-  //   .trim();
-  // const requestHeaders = new Headers(req.headers);
-  // requestHeaders.set("x-nonce", nonce);
-  // requestHeaders.set(
-  //   "Content-Security-Policy",
-  //   contentSecurityPolicyHeaderValue
-  // );
-
+import { auth } from "./auth";
+import { getToken } from "next-auth/jwt";
+const secret = process.env.NEXTAUTH_SECRET;
+// export { auth as middleware } from "@/auth";
+// import { auth } from "@/auth";
+// const { auth } = NextAuth(authConfig);
+export async function middleware(req: any) {
   const { nextUrl } = req;
   const isAuthenticated = !!req.auth;
   const pathname = nextUrl.pathname;
-  // console.log("pathname", pathname, req.auth);
+  const session = await getToken({ req, secret, raw: false });
+  //
+  console.log("isAuthenticated", session, isAuthenticated);
 
   if (pathname.startsWith("/admin")) {
-    if (isAuthenticated) {
-      if (req.auth.user.role === "admin") {
-        console.log("session admin", req.auth, isAuthenticated);
+    if (session) {
+      if (session.role === "admin") {
+        console.log("session admin", session);
 
         return NextResponse.next();
         //
@@ -53,9 +34,9 @@ export default auth((req) => {
     }
   }
   if (pathname.startsWith("/student")) {
-    if (isAuthenticated) {
-      if (req.auth.user.role === "participant") {
-        console.log("session participant", req.auth);
+    if (session) {
+      if (session.role === "participant") {
+        console.log("session participant", session);
         console.log("check");
         // const response = NextResponse.next();
         // const response = NextResponse.next({
@@ -83,9 +64,9 @@ export default auth((req) => {
     }
   }
   if (pathname.startsWith("/teacher")) {
-    if (isAuthenticated) {
+    if (session) {
       // console.log("session teacher", req.auth);
-      if (req.auth.user.role === "teacher") {
+      if (session.role === "teacher") {
         console.log("check");
 
         return NextResponse.next();
@@ -102,7 +83,7 @@ export default auth((req) => {
       );
     }
   }
-});
+}
 
 export const config = {
   //   matcher: ["/", "/profile", "auth/:path*"], // 미들웨어 실행할 path

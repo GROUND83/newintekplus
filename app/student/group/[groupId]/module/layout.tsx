@@ -36,7 +36,7 @@ export default function Layout({
       let res = await getModuleList(params.groupId);
       if (res.data) {
         let group = JSON.parse(res.data);
-        console.log("group", group);
+        console.log("getModuleList_layout", group);
         // setGroup(group);
         return group;
       }

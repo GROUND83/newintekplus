@@ -18,7 +18,8 @@ export const authConfig = {
     authorized({ auth }) {
       const isAuthenticated = !!auth?.user;
       // console.log("auth authorized", auth, isAuthenticated);
-      return isAuthenticated;
+      // return isAuthenticated;
+      return !!auth;
     },
 
     jwt: async ({ token, user }) => {

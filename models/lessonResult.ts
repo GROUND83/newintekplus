@@ -1,5 +1,4 @@
 import mongoose, { Document, Model, now, Types } from "mongoose";
-import { string } from "zod";
 
 export interface ILessonResult {
   groupId: string;
@@ -17,6 +16,7 @@ export interface ILessonResult {
   onwer: { type: mongoose.Schema.Types.ObjectId; ref: "Participant" };
   isPass: string;
   isEvaluationDone: boolean;
+  isNewdata: boolean;
   perform: {
     downUrl: string; //레슨다운로드
     fileName: string; // 레슨파일이름
@@ -45,14 +45,6 @@ export interface ILessonResult {
     type: Boolean;
   };
   certipicationUrl: string;
-  // eduevaluation: {
-  //   type: mongoose.Schema.Types.ObjectId;
-  //   ref: "EduEvaluation";
-  // };
-  // abilityEvaluation: {
-  //   type: mongoose.Schema.Types.ObjectId;
-  //   ref: "AbilityEvaluation";
-  // };
 }
 export interface ILessonResultDocument extends ILessonResult, Document {
   createdAt: Date;
@@ -85,7 +77,8 @@ const lessonResult = new mongoose.Schema<ILessonResultDocument>(
       enum: ["ready", "failed", "passed"], // 과제수행 평가 완료시 또는 라이브 교육 완료시 강사가
       default: "ready",
     },
-    isEvaluationDone: { type: Boolean, default: false }, // 평가 완료
+    isEvaluationDone: { type: Boolean, default: false },
+    isNewdata: { type: Boolean, default: false },
     perform: {
       downUrl: { type: String, default: null }, //레슨다운로드
       fileName: { type: String, default: null }, // 레슨파일이름
@@ -118,16 +111,6 @@ const lessonResult = new mongoose.Schema<ILessonResultDocument>(
       default: false,
     },
     certipicationUrl: { type: String },
-    // eduevaluation: {
-    //   type: mongoose.Schema.Types.ObjectId,
-    //   ref: "EduEvaluation",
-    //   default: null,
-    // },
-    // abilityEvaluation: {
-    //   type: mongoose.Schema.Types.ObjectId,
-    //   ref: "AbilityEvaluation",
-    //   default: null,
-    // },
   },
   {
     timestamps: true,

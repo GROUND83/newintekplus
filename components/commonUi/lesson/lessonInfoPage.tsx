@@ -1,7 +1,6 @@
 "use client";
 import React from "react";
 import { getLessonDetail } from "../../commonActions/commonActions";
-import { useSession } from "next-auth/react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import ContentWrap from "@/components/commonUi/contentWrap";
 import DownLoadButton from "@/components/commonUi/downloadButton";
@@ -11,8 +10,6 @@ import { Loader2 } from "lucide-react";
 
 export default function LessonInfoPage() {
   const params = useParams<{ groupId: string; lessonId: string }>();
-
-  const session = useSession();
 
   const fetchDataOptions = {
     lessonId: params.lessonId,
@@ -25,12 +22,12 @@ export default function LessonInfoPage() {
     refetch,
   } = useQuery({
     //
-    queryKey: ["lessonInfo", fetchDataOptions],
+    queryKey: ["lessonInfo1", fetchDataOptions],
     queryFn: async () => {
       let res = await getLessonDetail(fetchDataOptions);
       if (res.data) {
         let lesson = JSON.parse(res.data);
-        console.log("lesson", lesson);
+        console.log("lessonInfoPage", lesson);
         return lesson;
       }
     },

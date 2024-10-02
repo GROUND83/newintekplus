@@ -247,6 +247,7 @@ export async function updataLessonResultPoint({
         point: point,
         isPass: point > 0 ? "passed" : "failed",
         isEvaluationDone: true,
+        isNew: false,
       }
     );
     return { data: JSON.stringify(lessonResult) };

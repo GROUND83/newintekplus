@@ -1,107 +1,14 @@
 "use client";
 import React from "react";
-import { getLessonDetail, updateLessonPerform } from "./actions";
-import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Controller, useFieldArray, useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import FormLabelWrap from "@/components/formLabel";
-import { DownloadIcon } from "lucide-react";
-import { useSession } from "next-auth/react";
-import { toast } from "sonner";
 
-const FormSchema = z.object({
-  downUrl: z.string().optional(), //레슨다운로드
-  fileName: z.string().optional(), // 레슨파일이름
-  size: z.number().optional(), // 레슨 파일 크기
-  file: z.instanceof(File).optional(),
-});
 export default function Page({
   params,
 }: {
   params: { groupId: string; lessonId: string };
 }) {
-  const [show, setShow] = React.useState(false);
-  const [lesson, setlesson] = React.useState<any>();
-  const [lessonResult, setlessonResult] = React.useState<any>();
-  const session = useSession();
-  const form = useForm<z.infer<typeof FormSchema>>({
-    resolver: zodResolver(FormSchema),
-    defaultValues: {},
-  });
-  //
-  const getLessonData = async () => {
-    console.log("session", session);
-    if (session.data?.user?.email) {
-      let res = await getLessonDetail({
-        lessonId: params.lessonId,
-        participantEmail: session.data?.user?.email,
-        groupId: params.groupId,
-      });
-      if (res.data) {
-        let lesson = JSON.parse(res.data);
-        console.log("lesson", lesson);
-        setlesson(lesson);
-      }
-      if (res.lessonResult) {
-        let lessonResult = JSON.parse(res.lessonResult);
-        console.log("lessonResult", lessonResult);
-        setlessonResult(lessonResult);
-        form.reset({
-          downUrl: lessonResult.perform.downUrl || "", //레슨다운로드
-          fileName: lessonResult.perform.fileName || "", // 레슨파일이름
-          size: lessonResult.perform.size || undefined, // 레슨 파일 크기
-          file: undefined,
-        });
-      }
-    }
-  };
-  React.useEffect(() => {
-    getLessonData();
-  }, [params.lessonId, session.data]);
-  //
-
-  async function onSubmit(values: z.infer<typeof FormSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    // values.lessonDirective.file.name = Buffer.from(
-    //   values.lessonDirective.file.name,
-    //   "ascii"
-    // ).toString("utf8");
-    console.log("values", values);
-    const formData = new FormData();
-    formData.append("lessonResultId", lessonResult._id);
-    formData.append("file", values.file);
-
-    try {
-      let res = await updateLessonPerform(formData);
-      let resdat = await JSON.parse(res);
-      console.log("resdat", resdat);
-      if (resdat.data) {
-        //
-        toast.success("레슨 생성에 성공하였습니다.");
-        getLessonData();
-        // router.push("/admin/courseprofile");
-      }
-    } catch (e) {
-      //
-      console.log("message", e);
-      toast.error(e);
-    }
-  }
   return (
     <div className="w-full flex flex-col items-stretch flex-1  ">
-      <div className="flex-1 flex flex-col  w-full gap-2">
+      {/* <div className="flex-1 flex flex-col  w-full gap-2">
         <div className="bg-white  w-full flex flex-col items-start p-6 h-[calc(100vh-120px)]">
           {lesson && (
             <div className="grid grid-cols-12 gap-3 w-full">
@@ -181,12 +88,12 @@ export default function Page({
                       <p>학습컨텐츠가 없습니다.</p>
                     </div>
                   </div> */}
-                </div>
+      {/* </div>
               )}
             </div>
           )}
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }

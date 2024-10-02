@@ -66,6 +66,16 @@ const LoginWrap = () => {
       //
       let res = await authenticate(formData);
       console.log("res", res);
+      if (type === "admin") {
+        console.log("이동");
+        router.push("/admin");
+      }
+      if (type === "student") {
+        router.push("/student");
+      }
+      if (type === "teacher") {
+        router.push("/teacher");
+      }
       if (res) {
         console.log("res", res);
         let resdata = JSON.parse(res);
@@ -74,16 +84,6 @@ const LoginWrap = () => {
         }
       } else {
         console.log("res", res, type);
-        if (type === "admin") {
-          console.log("이동");
-          router.push("/admin");
-        }
-        if (type === "student") {
-          router.push("/student");
-        }
-        if (type === "teacher") {
-          router.push("/teacher");
-        }
       }
     } catch (e) {
       console.log("ee,", e);

@@ -80,6 +80,7 @@ export default function LessonPerFormPage() {
                     <p>{item.onwer.username}</p>
                   </div>
                   <div className=" col-span-5 bg-white border p-2 flex flex-row items-center">
+                    {item.isNewdata ? <p className=" text-primary">N</p> : null}
                     {item.newPerform?.lessonPerformdownloadURL ? (
                       <a
                         href={item.newPerform.lessonPerformdownloadURL}

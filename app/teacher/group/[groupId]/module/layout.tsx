@@ -55,6 +55,7 @@ export default function Layout({
   const checkEvaluation = (lessonId: string) => {
     let isDone = 0;
     let total = 0;
+    let isNew = 0;
     if (group.lessonResults.length > 0) {
       //
       let findResult = group.lessonResults.filter(
@@ -66,12 +67,15 @@ export default function Layout({
         );
         console.log("isDone", isDone);
         isDone = isDoneData.length;
+
+        let isNewData = findResult.filter((result: any) => result.isNewdata);
+        isNew = isNewData.length;
       }
       console.log("findResult", findResult);
       total = findResult.length;
     }
     //
-    return { isDone: isDone, total: total };
+    return { isDone: isDone, total: total, isNew: isNew };
   };
   return (
     <div className="w-full grid grid-cols-12 gap-1 ">
@@ -106,11 +110,26 @@ export default function Layout({
                                       {lesson.title}
                                     </p>
                                     <div className="flex flex-row items-center gap-2">
-                                      <p>
-                                        {checkEvaluation(lesson._id).isDone}
-                                      </p>
+                                      <div className="flex flex-row items-center gap-1">
+                                        <p>new</p>
+                                        <p>
+                                          {checkEvaluation(lesson._id).isNew}
+                                        </p>
+                                      </div>
                                       <p>/</p>
-                                      <p>{checkEvaluation(lesson._id).total}</p>
+                                      <div className="flex flex-row items-center gap-1">
+                                        <p>완료</p>
+                                        <p>
+                                          {checkEvaluation(lesson._id).isDone}
+                                        </p>
+                                      </div>
+                                      <p>/</p>
+                                      <div className="flex flex-row items-center gap-1">
+                                        <p>총</p>
+                                        <p>
+                                          {checkEvaluation(lesson._id).total}
+                                        </p>
+                                      </div>
                                     </div>
                                   </div>
                                   <div className="flex flex-row items-center gap-3">

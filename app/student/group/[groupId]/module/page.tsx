@@ -4,18 +4,18 @@ import React from "react";
 import { getModuleList } from "./actions";
 
 export default function Page({ params }: { params: { groupId: string } }) {
-  //
-  const getModuleListdata = async () => {
-    let res = await getModuleList({ groupId: params.groupId });
-    if (res.data) {
-      let group = JSON.parse(res.data);
-      console.log("group", group);
-    }
-  };
-  React.useEffect(() => {
-    getModuleListdata();
-  }, [params.groupId]);
-  //
+  // //
+  // const getModuleListdata = async () => {
+  //   let res = await getModuleList({ groupId: params.groupId });
+  //   if (res.data) {
+  //     let group = JSON.parse(res.data);
+  //     console.log("getModuleList", group);
+  //   }
+  // };
+  // React.useEffect(() => {
+  //   getModuleListdata();
+  // }, [params.groupId]);
+  // //
 
   return (
     <div className="w-full flex flex-col items-stretch flex-1  ">
