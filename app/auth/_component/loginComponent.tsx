@@ -65,7 +65,7 @@ const LoginWrap = () => {
       }
       //
       let res = await authenticate(formData);
-      console.log("res", res);
+      // console.log("res", res);
       if (type === "admin") {
         console.log("이동");
         return router.push("/admin");
@@ -77,7 +77,7 @@ const LoginWrap = () => {
         return router.push("/teacher");
       }
       if (res) {
-        console.log("res", res);
+        // console.log("res", res);
         let resdata = JSON.parse(res);
         if (resdata.passwrod) {
           toast.error(resdata.passwrod);
