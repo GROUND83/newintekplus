@@ -2,24 +2,26 @@ import { NextRequest, NextResponse } from "next/server";
 
 import NextAuth from "next-auth";
 import { authConfig } from "./auth.config";
-import { auth } from "./auth";
+
 import { getToken } from "next-auth/jwt";
+
+const { auth } = NextAuth(authConfig);
+
 const secret = process.env.NEXTAUTH_SECRET;
 // export { auth as middleware } from "@/auth";
 // import { auth } from "@/auth";
 // const { auth } = NextAuth(authConfig);
-export async function middleware(req: any) {
+export default auth(async (req) => {
   const { nextUrl } = req;
   const isAuthenticated = !!req.auth;
   const pathname = nextUrl.pathname;
-  const session = await getToken({ req, secret, raw: false });
   //
-  console.log("isAuthenticated", session, isAuthenticated);
+  console.log("isAuthenticated", isAuthenticated);
 
   if (pathname.startsWith("/admin")) {
-    if (session) {
-      if (session.role === "admin") {
-        console.log("session admin", session);
+    if (isAuthenticated) {
+      if (req?.auth?.user.role === "admin") {
+        console.log("session admin", isAuthenticated);
 
         return NextResponse.next();
         //
@@ -34,9 +36,9 @@ export async function middleware(req: any) {
     }
   }
   if (pathname.startsWith("/student")) {
-    if (session) {
-      if (session.role === "participant") {
-        console.log("session participant", session);
+    if (isAuthenticated) {
+      if (req?.auth?.user.role === "participant") {
+        console.log("session participant", isAuthenticated);
         console.log("check");
         // const response = NextResponse.next();
         // const response = NextResponse.next({
@@ -64,9 +66,9 @@ export async function middleware(req: any) {
     }
   }
   if (pathname.startsWith("/teacher")) {
-    if (session) {
+    if (isAuthenticated) {
       // console.log("session teacher", req.auth);
-      if (session.role === "teacher") {
+      if (req?.auth?.user.role === "teacher") {
         console.log("check");
 
         return NextResponse.next();
@@ -83,7 +85,7 @@ export async function middleware(req: any) {
       );
     }
   }
-}
+});
 
 export const config = {
   //   matcher: ["/", "/profile", "auth/:path*"], // 미들웨어 실행할 path
