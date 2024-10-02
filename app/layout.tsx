@@ -45,10 +45,10 @@ export default function RootLayout({ children }: React.PropsWithChildren) {
           className={cn(notoSansKr.className, roboto.variable)}
           style={{ fontSize: 14 }}
         >
-          <ReactQueryClientProvider>
-            {children}
-            <Toaster richColors />
-          </ReactQueryClientProvider>
+          {/* <ReactQueryClientProvider> */}
+          {children}
+          <Toaster richColors />
+          {/* </ReactQueryClientProvider> */}
         </body>
       </AuthProvider>
     </html>
