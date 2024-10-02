@@ -135,6 +135,25 @@ export async function getLessonDetail({
     lessonResult: JSON.stringify(lessonResult),
   };
 }
+export async function getLessonDetailInfo({
+  lessonId,
+  groupId,
+}: {
+  groupId: string;
+  lessonId: string;
+}) {
+  //
+  // console.log("lessonResult", lessonId, participantEmail);
+  let res = await Lesson.findOne({
+    _id: lessonId,
+  })
+    .populate({ path: "lessonDirective", model: LessonDirective })
+    .populate({ path: "lessonContents", model: LessonContent });
+
+  return {
+    data: JSON.stringify(res),
+  };
+}
 
 export async function createFeedBack(formData: FormData) {
   //

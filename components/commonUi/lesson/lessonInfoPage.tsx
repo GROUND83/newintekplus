@@ -1,6 +1,9 @@
 "use client";
 import React from "react";
-import { getLessonDetail } from "../../commonActions/commonActions";
+import {
+  getLessonDetail,
+  getLessonDetailInfo,
+} from "../../commonActions/commonActions";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import ContentWrap from "@/components/commonUi/contentWrap";
 import DownLoadButton from "@/components/commonUi/downloadButton";
@@ -10,30 +13,52 @@ import { Loader2 } from "lucide-react";
 
 export default function LessonInfoPage() {
   const params = useParams<{ groupId: string; lessonId: string }>();
-
-  const fetchDataOptions = {
-    lessonId: params.lessonId,
-    groupId: params.groupId,
-  };
-  const {
-    data: lesson,
-    isLoading,
-    isError,
-    refetch,
-  } = useQuery({
-    //
-    queryKey: ["lessonInfo1", fetchDataOptions],
-    queryFn: async () => {
-      let res = await getLessonDetail(fetchDataOptions);
-      if (res.data) {
-        let lesson = JSON.parse(res.data);
-        console.log("lessonInfoPage", lesson);
-        return lesson;
-      }
-    },
-  });
+  const [lesson, setLesson] = React.useState<any>();
+  const [isLoading, setLoading] = React.useState(false);
+  // const fetchDataOptions = {
+  //   lessonId: params.lessonId,
+  //   groupId: params.groupId,
+  // };
+  // const {
+  //   data: lesson,
+  //   isLoading,
+  //   isError,
+  //   refetch,
+  // } = useQuery({
+  //   //
+  //   queryKey: ["lessonInfo1", fetchDataOptions],
+  //   queryFn: async () => {
+  //     let res = await getLessonDetail(fetchDataOptions);
+  //     if (res.data) {
+  //       let lesson = JSON.parse(res.data);
+  //       console.log("lessonInfoPage", lesson);
+  //       return lesson;
+  //     }
+  //   },
+  //   refetchOnMount: true,
+  //   refetchOnWindowFocus: true,
+  // });
 
   //
+
+  const getData = async () => {
+    setLoading(true);
+    let res = await getLessonDetailInfo({
+      lessonId: params.lessonId,
+      groupId: params.groupId,
+    });
+    if (res.data) {
+      let lesson = JSON.parse(res.data);
+      console.log("lessonInfoPage", lesson);
+      setLesson(lesson);
+      // return lesson;
+    }
+    setLoading(false);
+  };
+  React.useEffect(() => {
+    getData();
+  }, []);
+
   if (isLoading) {
     return (
       <div
