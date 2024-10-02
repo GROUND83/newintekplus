@@ -19,29 +19,53 @@ export default function Layout({
 
   const pathname = usePathname();
   const params = useParams<{ groupId: string }>();
-  console.log("groupId", params.groupId);
+  const [group, setGroup] = React.useState<any>();
+  const [isLoading, setLoading] = React.useState(false);
+  // console.log("groupId", params.groupId);
 
-  const fetchDataOptions = {
-    groupId: params.groupId,
-  };
-  const {
-    data: group,
-    isLoading,
-    isError,
-    refetch,
-  } = useQuery({
-    //
-    queryKey: ["data", fetchDataOptions],
-    queryFn: async () => {
-      let res = await getModuleList(fetchDataOptions);
+  // const fetchDataOptions = {
+  //   groupId: params.groupId,
+  // };
+  // const {
+  //   data: group,
+  //   isLoading,
+  //   isError,
+  //   refetch,
+  // } = useQuery({
+  //   //
+  //   queryKey: ["data", fetchDataOptions],
+  //   queryFn: async () => {
+  //     let res = await getModuleList(fetchDataOptions);
+  //     if (res.data) {
+  //       let group = JSON.parse(res.data);
+  //       console.log("group", group);
+  //       // setGroup(group);
+  //       return group;
+  //     }
+  //   },
+  // });
+  const getData = async () => {
+    try {
+      setLoading(true);
+      let res = await getModuleList({
+        groupId: params.groupId,
+      });
       if (res.data) {
         let group = JSON.parse(res.data);
         console.log("group", group);
         // setGroup(group);
-        return group;
+        setGroup(group);
       }
-    },
-  });
+    } catch (e) {
+      console.log(e);
+    } finally {
+      setLoading(false);
+    }
+  };
+  React.useEffect(() => {
+    getData();
+  }, []);
+  //
   if (isLoading) {
     return (
       <div
@@ -66,11 +90,11 @@ export default function Layout({
           (result: any) => result.isEvaluationDone
         );
         let isNewData = findResult.filter((result: any) => result.isNewdata);
-        console.log("isDone", isDone);
+        // console.log("isDone", isDone);
         isDone = isDoneData.length;
         isNew = isNewData.length;
       }
-      console.log("findResult", findResult);
+      // console.log("findResult", findResult);
       total = findResult.length;
     }
     //

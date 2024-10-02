@@ -42,18 +42,23 @@ export default function LessonInfoPage() {
   //
 
   const getData = async () => {
-    setLoading(true);
-    let res = await getLessonDetailInfo({
-      lessonId: params.lessonId,
-      groupId: params.groupId,
-    });
-    if (res.data) {
-      let lesson = JSON.parse(res.data);
-      console.log("lessonInfoPage", lesson);
-      setLesson(lesson);
-      // return lesson;
+    try {
+      setLoading(true);
+      let res = await getLessonDetailInfo({
+        lessonId: params.lessonId,
+        groupId: params.groupId,
+      });
+      if (res.data) {
+        let lesson = JSON.parse(res.data);
+        console.log("lessonInfoPage", lesson);
+        setLesson(lesson);
+        // return lesson;
+      }
+    } catch (e) {
+      console.log(e);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
   React.useEffect(() => {
     getData();
@@ -90,12 +95,14 @@ export default function LessonInfoPage() {
                   <p className="text-md  whitespace-pre-wrap">
                     {lesson.lessonDirective?.contentdescription}
                   </p>
-                  <div className="mt-3">
-                    <DownLoadButton
-                      downLoadUrl={lesson.lessonDirective?.LessonDirectiveURL}
-                      fileName={lesson.lessonDirective?.contentfileName}
-                    />
-                  </div>
+                  {lesson.lessonDirective?.LessonDirectiveURL && (
+                    <div className="mt-3">
+                      <DownLoadButton
+                        downLoadUrl={lesson.lessonDirective?.LessonDirectiveURL}
+                        fileName={lesson.lessonDirective?.contentfileName}
+                      />
+                    </div>
+                  )}
                 </div>
               )}
               {lesson?.lessonContents.length > 0 ? (

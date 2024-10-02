@@ -30,10 +30,10 @@ export default function ContentWrap({ data }: { data: any }) {
                 href={data.lessonContentdownloadURL}
                 download={data.lessonContenFileName}
                 target="_blank"
-                className="flex flex-row items-center gap-2"
+                className="flex flex-row items-center gap-2 w-full truncate "
               >
                 <DownloadIcon className=" size-3" />
-                {data.lessonContenFileName}
+                <p className="w-full truncate ">{data.lessonContenFileName}</p>
               </a>
             </Button>
           )}

@@ -35,42 +35,42 @@ export default function Layout({
   }>();
   const pathname = usePathname();
 
-  const getModuleDetaildata = async () => {
-    //
-    console.log(" params.lessonId", params.lessonId);
-    let res = await getModuleDetail({
-      lessonId: params.lessonId,
-      moduleId: params.moduleId,
-    });
-    if (res.data) {
-      let data = JSON.parse(res.data);
-      console.log("data", data);
-      setModuleData(data.module);
-      setLesson(data.lesson);
-    }
-  };
-  React.useEffect(() => {
-    getModuleDetaildata();
-  }, [params.moduleId]);
+  // const getModuleDetaildata = async () => {
+  //   //
+  //   console.log(" params.lessonId", params.lessonId);
+  //   let res = await getModuleDetail({
+  //     lessonId: params.lessonId,
+  //     moduleId: params.moduleId,
+  //   });
+  //   if (res.data) {
+  //     let data = JSON.parse(res.data);
+  //     console.log("data", data);
+  //     setModuleData(data.module);
+  //     setLesson(data.lesson);
+  //   }
+  // };
+  // React.useEffect(() => {
+  //   getModuleDetaildata();
+  // }, [params.moduleId]);
 
-  const wholeDelete = async () => {
-    //
-    let res = await whoeLessonResultDelete(params.groupId);
-    console.log(res);
+  // const wholeDelete = async () => {
+  //   //
+  //   let res = await whoeLessonResultDelete(params.groupId);
+  //   console.log(res);
 
-    if (res.data) {
-      toast.success("레슨 결과를 전부 삭제 하였습니다.");
-    }
-  };
-  const resetGroup = async () => {
-    //
-    let res = await resetGroupdata(params.groupId);
-    console.log(res);
+  //   if (res.data) {
+  //     toast.success("레슨 결과를 전부 삭제 하였습니다.");
+  //   }
+  // };
+  // const resetGroup = async () => {
+  //   //
+  //   let res = await resetGroupdata(params.groupId);
+  //   console.log(res);
 
-    if (res.data) {
-      toast.success("그룹을 초기화 하였습니다.");
-    }
-  };
+  //   if (res.data) {
+  //     toast.success("그룹을 초기화 하였습니다.");
+  //   }
+  // };
   return (
     <div className="w-full flex flex-col items-stretch   ">
       <div className="w-full bg-white  border-b px-6 flex flex-row items-center gap-2 h-[50px] justify-start">

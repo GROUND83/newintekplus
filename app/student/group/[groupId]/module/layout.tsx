@@ -19,29 +19,50 @@ export default function Layout({
 
   const pathname = usePathname();
   const params = useParams<{ groupId: string }>();
-  console.log("groupId", params.groupId);
+  // console.log("groupId", params.groupId);
+  const [group, setGroup] = React.useState<any>();
+  const [isLoading, setLoading] = React.useState(false);
+  // const fetchDataOptions = {
+  //   groupId: params.groupId,
+  // };
+  // const {
+  //   data: group,
+  //   isLoading,
+  //   isError,
+  //   refetch,
+  // } = useQuery({
+  //   //
+  //   queryKey: ["data", fetchDataOptions],
+  //   queryFn: async () => {
+  //     let res = await getModuleList(params.groupId);
+  //     if (res.data) {
+  //       let group = JSON.parse(res.data);
+  //       console.log("getModuleList_layout", group);
+  //       // setGroup(group);
+  //       return group;
+  //     }
+  //   },
+  // });
 
-  const fetchDataOptions = {
-    groupId: params.groupId,
-  };
-  const {
-    data: group,
-    isLoading,
-    isError,
-    refetch,
-  } = useQuery({
-    //
-    queryKey: ["data", fetchDataOptions],
-    queryFn: async () => {
+  const getData = async () => {
+    try {
+      setLoading(true);
       let res = await getModuleList(params.groupId);
       if (res.data) {
         let group = JSON.parse(res.data);
-        console.log("getModuleList_layout", group);
+        console.log("group", group);
         // setGroup(group);
-        return group;
+        setGroup(group);
       }
-    },
-  });
+    } catch (e) {
+      console.log(e);
+    } finally {
+      setLoading(false);
+    }
+  };
+  React.useEffect(() => {
+    getData();
+  }, []);
   if (isLoading) {
     return (
       <div
