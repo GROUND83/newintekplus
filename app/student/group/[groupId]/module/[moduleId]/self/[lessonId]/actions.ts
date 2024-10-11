@@ -1,5 +1,6 @@
 "use server";
 import { auth } from "@/auth";
+import { connectToMongoDB } from "@/lib/db";
 import { UploadFile } from "@/lib/fileUploader";
 import CourseProfile from "@/models/courseProfile";
 import Group from "@/models/group";
@@ -20,6 +21,7 @@ export async function getLessonDetail({
   groupId: string;
 }) {
   //
+  await connectToMongoDB();
   // console.log("lessonResult", lessonId, participantEmail);
   let session = await auth();
   let res = await Lesson.findOne({
@@ -52,6 +54,7 @@ export async function updateLessonPerform(formData: FormData) {
   //
   console.log("groupId", groupId, lessonId);
   try {
+    await connectToMongoDB();
     let session = await auth();
     let onwer = await Participant.findOne({ email: session.user.email });
     console.log("onwer", onwer);

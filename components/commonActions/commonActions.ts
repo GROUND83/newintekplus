@@ -87,6 +87,7 @@ export async function getModuleDetail({
 }) {
   //
   try {
+    await connectToMongoDB();
     let lesson = await Lesson.findOne({
       _id: lessonId,
     });
@@ -115,6 +116,7 @@ export async function getLessonDetail({
   lessonId: string;
 }) {
   //
+  await connectToMongoDB();
   // console.log("lessonResult", lessonId, participantEmail);
   let res = await Lesson.findOne({
     _id: lessonId,
@@ -142,6 +144,7 @@ export async function getLessonDetailInfo({
   groupId: string;
   lessonId: string;
 }) {
+  await connectToMongoDB();
   //
   // console.log("lessonResult", lessonId, participantEmail);
   let res = await Lesson.findOne({
@@ -172,6 +175,7 @@ export async function createFeedBack(formData: FormData) {
 
   console.log("participant", feedBackFile, participant);
   try {
+    await connectToMongoDB();
     if (feedBackFile) {
       let feedBackParser = JSON.parse(feedBackFile);
       console.log("feedBackParser", feedBackParser);
@@ -260,6 +264,7 @@ export async function updataLessonResultPoint({
 }) {
   //
   try {
+    await connectToMongoDB();
     let lessonResult = await LessonResult.findOneAndUpdate(
       { _id: lessonResultId },
       {
@@ -284,6 +289,7 @@ export async function updataLessonResultPointLive({
 }) {
   //
   try {
+    await connectToMongoDB();
     let lessonResult = await LessonResult.findOneAndUpdate(
       { _id: lessonResultId },
       {

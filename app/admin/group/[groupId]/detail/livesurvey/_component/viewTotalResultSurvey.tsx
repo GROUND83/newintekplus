@@ -19,8 +19,10 @@ import {
   DialogFooter,
   DialogClose,
 } from "@/components/ui/dialog";
-import { getTotalResultSurvey } from "./actions";
+import { getTotalResultSurvey, newgetTotalResultSurvey } from "./actions";
 import pixelWidth from "string-pixel-width";
+
+//
 export default function ViewTotalResultSurvey({
   groupId,
 }: {
@@ -32,41 +34,114 @@ export default function ViewTotalResultSurvey({
   const [dataExcel, setDataExcel] = React.useState([]);
 
   const getResult = async () => {
-    let res = await getTotalResultSurvey(groupId);
-    console.log("res", res);
-    if (res.data) {
-      let data = JSON.parse(res.data);
-      console.log("data", data);
-      let newArray = [];
-      for (const index in data) {
-        if (data[index].type === "객관식") {
-          let newdata = {
-            순서: Number(index) + 1,
-            타입: data[index].type,
-            설문명: data[index].title,
-            점수: data[index].totalPoint,
-            만점: data[index].total,
-            응답자: data[index].resultsurveyslength,
-            총설문자: data[index].participantsLength,
-          };
-          newArray.push(newdata);
-        } else {
-          for (const answer of data[index].answer) {
-            let newdata = {
-              순서: Number(index) + 1,
-              타입: data[index].type,
-              설문명: data[index].title,
-              주관식답변: answer,
-              응답자: data[index].resultsurveyslength,
-              총설문자: data[index].participantsLength,
-            };
-            newArray.push(newdata);
+    let resdata = await getTotalResultSurvey(groupId);
+    let res = await newgetTotalResultSurvey(groupId);
+    let data = JSON.parse(res.data);
+    let newdataone = JSON.parse(resdata.data);
+    console.log("data", data);
+    let resultSurvey = data.resultSurvey;
+    let liveSurvey = data.liveSurvey.surveys;
+    let title = data.liveSurvey.title;
+    let newliveSurvey = [];
+    //
+    let resultArrya = [];
+    let newobj = {
+      title: "123",
+      onwer: [{ username: "", point: "" }],
+    };
+    for (const liveSurveyElement of liveSurvey) {
+      let _id = liveSurveyElement._id;
+      liveSurveyElement.result = [];
+      for (const resultSurveyElement of resultSurvey) {
+        let results = resultSurveyElement.results;
+        //
+        if (results.length > 0) {
+          for (const result of results) {
+            if (_id === result.surveyId) {
+              //
+              liveSurveyElement.result.push({
+                ...resultSurveyElement.onwer,
+                point: result.point,
+                answer: result.answer ? result.answer : "",
+              });
+            }
           }
+        } else {
+          liveSurveyElement.result.push({
+            ...resultSurveyElement.onwer,
+            point: 0,
+            answer: "",
+          });
+          //
+          // liveSurveyElement.onwer.push({
+          //   ...resultSurveyElement.onwer,
+          //   point: 0,
+          //   answer: null,
+          // });
         }
       }
-      setDataExcel(newArray);
-      setData(data);
     }
+    let newDataArray = [];
+    if (liveSurvey.length > 0) {
+      for (const element of resultSurvey) {
+        let newData = {
+          onwer: element.onwer,
+          result: element.results,
+        };
+        newDataArray.push(newData);
+      }
+    }
+    console.log("liveSurvey", liveSurvey);
+    let excelarray = [];
+    if (liveSurvey.length > 0) {
+      for (const index in liveSurvey) {
+        let newtitle = {
+          순서: Number(index) + 1,
+          설문명: liveSurvey[index].title,
+        };
+        for (const resultElement of liveSurvey[index].result) {
+          newtitle[`${resultElement.username}[${resultElement.email}]`] =
+            !resultElement.answer ? resultElement.point : resultElement.answer;
+        }
+        excelarray.push(newtitle);
+      }
+    }
+
+    console.log("excelarray", excelarray);
+    // if (data) {
+    //   let data = JSON.parse(res.data);
+    //   console.log("data", data);
+    //   let newArray = [];
+    //   for (const index in data) {
+    //     if (data[index].answer.length === 0) {
+    //       let newdata = {
+    //         순서: Number(index) + 1,
+    //         타입: data[index].type,
+    //         설문명: data[index].title,
+    //         점수: data[index].totalPoint,
+    //         만점: data[index].total,
+    //         응답자: data[index].resultsurveyslength,
+    //         총설문자: data[index].participantsLength,
+    //       };
+    //       newArray.push(newdata);
+    //     } else {
+    //       for (const answer of data[index].answer) {
+    //         let newdata = {
+    //           순서: Number(index) + 1,
+    //           타입: data[index].type,
+    //           설문명: data[index].title,
+    //           주관식답변: answer,
+    //           응답자: data[index].resultsurveyslength,
+    //           총설문자: data[index].participantsLength,
+    //         };
+    //         newArray.push(newdata);
+    //       }
+    //     }
+    //   }
+    //   console.log("newdata", newArray);
+    setDataExcel(excelarray);
+    setData(newdataone);
+    // }
   };
   React.useEffect(() => {
     getResult();
@@ -101,7 +176,9 @@ export default function ViewTotalResultSurvey({
     });
   };
   const exportToExcel = () => {
-    let fileName = `${data[0].name}_설문결과`;
+    console.log("dataExcel", dataExcel);
+    // let fileName = `${data[0].name}_설문결과`;
+    let fileName = `설문결과`;
     let worksheetname = "Sheet1";
     const workbook = XLSX.utils.book_new();
     const worksheet = XLSX.utils?.json_to_sheet(dataExcel);

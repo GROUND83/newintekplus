@@ -16,12 +16,11 @@ export default auth(async (req) => {
   const isAuthenticated = !!req.auth;
   const pathname = nextUrl.pathname;
   //
-  console.log("isAuthenticated", isAuthenticated);
 
   if (pathname.startsWith("/admin")) {
     if (isAuthenticated) {
       if (req?.auth?.user.role === "admin") {
-        console.log("session admin", isAuthenticated);
+        console.log("middleware admin", isAuthenticated);
 
         return NextResponse.next();
         //
@@ -38,19 +37,8 @@ export default auth(async (req) => {
   if (pathname.startsWith("/student")) {
     if (isAuthenticated) {
       if (req?.auth?.user.role === "participant") {
-        console.log("session participant", isAuthenticated);
-        console.log("check");
-        // const response = NextResponse.next();
-        // const response = NextResponse.next({
-        //   request: {
-        //     headers: requestHeaders,
-        //   },
-        // });
-        // response.headers.set(
-        //   "Content-Security-Policy",
-        //   contentSecurityPolicyHeaderValue
-        // );
-        // return response;
+        console.log("middleware participant", isAuthenticated);
+
         return NextResponse.next();
         //
       } else {
@@ -69,7 +57,8 @@ export default auth(async (req) => {
     if (isAuthenticated) {
       // console.log("session teacher", req.auth);
       if (req?.auth?.user.role === "teacher") {
-        console.log("check");
+        // console.log("check");
+        console.log("middleware teacher", isAuthenticated);
 
         return NextResponse.next();
         //

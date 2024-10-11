@@ -42,7 +42,7 @@ export default function ViewResultSurveyt({
                   <p>
                     {index + 1}. {item.title}
                   </p>
-                  {item.type === "객관식" ? (
+                  {!item.answer ? (
                     <p>{item.point}점</p>
                   ) : (
                     <p className=" whitespace-pre-wrap">{item.answer}</p>

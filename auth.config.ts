@@ -22,7 +22,7 @@ export const authConfig = {
     },
 
     jwt: async ({ token, user }) => {
-      console.log("tokendata", token, user);
+      // console.log("tokendata", token, user);
       if (user) {
         token.username = (user.username as any) || "";
         token.email = user.email as any;
@@ -30,7 +30,7 @@ export const authConfig = {
         token._id = user._id as any;
         // session.user._id = token._id;
       }
-      console.log("!tokendata", token);
+      // console.log("!tokendata", token);
       return token;
     },
     session: async ({ session, token }) => {
@@ -40,7 +40,7 @@ export const authConfig = {
       // session.email = token.email as any;
       // session.role = token.role as any;
       // session._id = token._id as any;
-      console.log("sessionsession", session);
+      // console.log("sessionsession", session);
 
       return session;
     },

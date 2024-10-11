@@ -167,6 +167,49 @@ export async function getTotalResultSurvey(groupId: string) {
 
   return { data: JSON.stringify(res) };
 }
+export async function newgetTotalResultSurvey(groupId: string) {
+  let groupData = await Group.findOne({ _id: groupId })
+    .populate({
+      path: "teacher",
+      model: Teacher,
+    })
+    .populate({
+      path: "liveSurvey",
+      model: LiveSurvey,
+      populate: {
+        path: "surveys",
+        model: Survey,
+      },
+    })
+    .populate({
+      path: "participants",
+      model: Participant,
+      select: "_id username email department",
+    })
+    .populate({
+      path: "courseProfile",
+      model: CourseProfile,
+      populate: {
+        path: "modules",
+        model: Module,
+        populate: {
+          path: "lessons",
+          model: Lesson,
+        },
+      },
+    })
+    .populate({
+      path: "resultSurvey",
+      model: ResultSurvey,
+      populate: {
+        path: "onwer",
+        model: Participant,
+        select: "_id username email",
+      },
+    });
+
+  return { data: JSON.stringify(groupData) };
+}
 
 export async function settingResult(groupId: string) {
   let groupData = await Group.findOne({ _id: groupId })

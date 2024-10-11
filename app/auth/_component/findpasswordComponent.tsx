@@ -62,8 +62,8 @@ const PageWrap = () => {
       }
     } catch (e) {
       //
-      console.log("message", e);
-      toast.error(e);
+      console.log("message", e.message);
+      // toast.error(e);
     } finally {
       setLoading(false);
     }
