@@ -68,13 +68,13 @@ const LoginWrap = () => {
       // console.log("res", res);
       if (type === "admin") {
         console.log("이동");
-        router.push("/admin");
+        // router.push("/admin");
       }
       if (type === "student") {
-        router.push("/student");
+        // router.push("/student");
       }
       if (type === "teacher") {
-        router.push("/teacher");
+        // router.push("/teacher");
       }
       if (res) {
         // console.log("res", res);

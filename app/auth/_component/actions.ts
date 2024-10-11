@@ -139,8 +139,8 @@ export async function authenticate(formData: FormData) {
       email: email,
       password: password,
       role: role,
-      callbackUrl: callbackUrl,
-      redirect: false,
+      redirectTo: callbackUrl,
+      redirect: true,
     });
     return false;
   } catch (error) {

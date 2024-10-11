@@ -16,7 +16,7 @@ export default function Layout({
       <div className="w-full bg-white py-3 border-b px-6 flex flex-row items-center justify-between h-[70px]">
         <p>프로필</p>
       </div>
-      <div className=" flex-1 flex flex-col items-stretch bg-white ">
+      <div className=" flex-1 flex flex-col items-center justify-center bg-white ">
         {children}
       </div>
     </div>
