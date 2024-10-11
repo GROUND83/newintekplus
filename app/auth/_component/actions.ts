@@ -4,18 +4,21 @@ import resetPassTemplate from "@/lib/mailtemplate/resetPassTemplate";
 import sendMail from "@/lib/sendMail/sendMail";
 import Participant from "@/models/participant";
 import Teacher from "@/models/teacher";
-import Token from "@/models/token";
+
 import User from "@/models/user";
 import crypto from "crypto";
 import { signIn } from "@/auth";
 import { AuthError } from "next-auth";
 import bcrypt from "bcrypt";
 import temp_pw_issuance from "@/lib/generatePassword";
+import { connectToMongoDB } from "@/lib/db";
 
 export async function findPass(formdata: FormData) {
-  let email = formdata.get("email");
-  let type = formdata.get("type");
+  let email = formdata.get("email") as string;
+  let type = formdata.get("type") as string;
   //
+  await connectToMongoDB();
+  console.log(email, type);
   try {
     if (type === "student") {
       const exUser = await Participant.findOne({ email });
@@ -80,7 +83,9 @@ export async function findPass(formdata: FormData) {
       }
     } else if (type === "admin") {
       const exUser = await User.findOne({ email });
+      console.log("exUser", exUser);
       if (exUser) {
+        // console.log(exUser);
         let temppasswrd = temp_pw_issuance();
         const hashedPasswrod = await bcrypt.hash(temppasswrd, 12);
 
@@ -104,12 +109,14 @@ export async function findPass(formdata: FormData) {
         };
 
         let res = await sendMail(mailData);
+        console.log(res);
         return { data: JSON.stringify(updateuser) };
       } else {
         return { message: "계정이 없습니다." };
       }
     }
   } catch (e) {
+    console.log(e);
     return { message: e };
   }
   //

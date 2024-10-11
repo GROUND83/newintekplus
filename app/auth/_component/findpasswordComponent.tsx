@@ -51,6 +51,7 @@ const PageWrap = () => {
     formData.append("type", type);
     try {
       let res = await findPass(formData);
+      console.log("res", res);
       if (res.data) {
         //
         console.log(res.data);
