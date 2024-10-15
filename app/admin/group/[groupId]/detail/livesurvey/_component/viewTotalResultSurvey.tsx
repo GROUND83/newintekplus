@@ -192,7 +192,9 @@ export default function ViewTotalResultSurvey({
     newArray.push(title);
     for (const index in dataExcel) {
       let resultData = [];
-      resultData.push(index + 1);
+      let number = Number(index) + 1;
+      resultData.push(number);
+      console.log("number", number);
       resultData.push(dataExcel[index].onwer.username);
       console.log("dataExcel[index]", dataExcel[index]);
       if (dataExcel[index].results.length > 0) {
