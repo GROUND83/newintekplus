@@ -32,6 +32,7 @@ export default function ViewTotalResultSurvey({
   const [updataLoading, setUpdateLoading] = React.useState(false);
   const [data, setData] = React.useState([]);
   const [dataExcel, setDataExcel] = React.useState([]);
+  const [liveSurvey, setLiveSurvey] = React.useState([]);
 
   const getResult = async () => {
     let resdata = await getTotalResultSurvey(groupId);
@@ -40,74 +41,75 @@ export default function ViewTotalResultSurvey({
     let newdataone = JSON.parse(resdata.data);
     console.log("data", data);
     let resultSurvey = data.resultSurvey;
-    let liveSurvey = data.liveSurvey.surveys;
-    let title = data.liveSurvey.title;
+    console.log("resultSurvey", resultSurvey);
+    console.log("liveSurvey", data.liveSurvey);
+    setLiveSurvey(data.liveSurvey?.surveys);
+    let liveSurvey = data.liveSurvey?.surveys;
+
+    let title = data.liveSurvey?.title;
     let newliveSurvey = [];
     //
     let resultArrya = [];
-    let newobj = {
-      title: "123",
-      onwer: [{ username: "", point: "" }],
-    };
-    for (const liveSurveyElement of liveSurvey) {
-      let _id = liveSurveyElement._id;
-      liveSurveyElement.result = [];
-      for (const resultSurveyElement of resultSurvey) {
-        let results = resultSurveyElement.results;
-        //
-        if (results.length > 0) {
-          for (const result of results) {
-            if (_id === result.surveyId) {
-              //
-              liveSurveyElement.result.push({
-                ...resultSurveyElement.onwer,
-                point: result.point,
-                answer: result.answer ? result.answer : "",
-              });
-            }
-          }
-        } else {
-          liveSurveyElement.result.push({
-            ...resultSurveyElement.onwer,
-            point: 0,
-            answer: "",
-          });
-          //
-          // liveSurveyElement.onwer.push({
-          //   ...resultSurveyElement.onwer,
-          //   point: 0,
-          //   answer: null,
-          // });
-        }
-      }
-    }
-    let newDataArray = [];
-    if (liveSurvey.length > 0) {
-      for (const element of resultSurvey) {
-        let newData = {
-          onwer: element.onwer,
-          result: element.results,
-        };
-        newDataArray.push(newData);
-      }
-    }
-    console.log("liveSurvey", liveSurvey);
-    let excelarray = [];
-    if (liveSurvey.length > 0) {
-      for (const index in liveSurvey) {
-        let newtitle = {
-          순서: Number(index) + 1,
-          설문명: liveSurvey[index].title,
-        };
-        for (const resultElement of liveSurvey[index].result) {
-          newtitle[`${resultElement.username}[${resultElement.email}]`] =
-            !resultElement.answer ? resultElement.point : resultElement.answer;
-        }
-        excelarray.push(newtitle);
-      }
-    }
 
-    console.log("excelarray", excelarray);
+    // for (const liveSurveyElement of liveSurvey) {
+    //   let _id = liveSurveyElement._id;
+    //   liveSurveyElement.result = [];
+    //   for (const resultSurveyElement of resultSurvey) {
+    //     let results = resultSurveyElement.results;
+    //     //
+    //     if (results.length > 0) {
+    //       for (const result of results) {
+    //         if (_id === result.surveyId) {
+    //           //
+    //           liveSurveyElement.result.push({
+    //             ...resultSurveyElement.onwer,
+    //             point: result.point,
+    //             answer: result.answer ? result.answer : "",
+    //           });
+    //         }
+    //       }
+    //     } else {
+    //       liveSurveyElement.result.push({
+    //         ...resultSurveyElement.onwer,
+    //         point: 0,
+    //         answer: "",
+    //       });
+    //     }
+    //   }
+    // }
+    // let newDataArray = [];
+    // if (liveSurvey.length > 0) {
+    //   for (const element of resultSurvey) {
+    //     let newData = {
+    //       onwer: element.onwer,
+    //       result: element.results,
+    //     };
+    //     newDataArray.push(newData);
+    //   }
+    // }
+    console.log("liveSurvey", liveSurvey);
+    // for (const index in resultSurvey) {
+    //   let newtitle = {
+    //     순서: Number(index) + 1,
+    //     참여자: resultSurvey[index].onwer.username,
+    //   };
+    // }
+    // let excelarray = [];
+    // if (liveSurvey.length > 0) {
+    //   for (const index in liveSurvey) {
+    //     let newtitle = {
+    //       순서: Number(index) + 1,
+    //       설문명: liveSurvey[index].title,
+    //     };
+    //     for (const resultElement of liveSurvey[index].result) {
+    //       newtitle[`${resultElement.username}[${resultElement.email}]`] =
+    //         !resultElement.answer ? resultElement.point : resultElement.answer;
+    //     }
+    //     excelarray.push(newtitle);
+    //   }
+    // }
+
+    // console.log("excelarray", excelarray);
     // if (data) {
     //   let data = JSON.parse(res.data);
     //   console.log("data", data);
@@ -139,7 +141,7 @@ export default function ViewTotalResultSurvey({
     //     }
     //   }
     //   console.log("newdata", newArray);
-    setDataExcel(excelarray);
+    setDataExcel(resultSurvey);
     setData(newdataone);
     // }
   };
@@ -181,8 +183,41 @@ export default function ViewTotalResultSurvey({
     let fileName = `설문결과`;
     let worksheetname = "Sheet1";
     const workbook = XLSX.utils.book_new();
-    const worksheet = XLSX.utils?.json_to_sheet(dataExcel);
-    const wscols = _autoFitColumns(dataExcel, worksheet);
+    // const worksheet = XLSX.utils?.json_to_sheet(dataExcel);
+    let newArray = [];
+    let title = ["순번", "참여자"];
+    for (const live of liveSurvey) {
+      title.push(live.title);
+    }
+    newArray.push(title);
+    for (const index in dataExcel) {
+      let resultData = [];
+      resultData.push(index + 1);
+      resultData.push(dataExcel[index].onwer.username);
+      console.log("dataExcel[index]", dataExcel[index]);
+      if (dataExcel[index].results.length > 0) {
+        //
+        for (const result of dataExcel[index].results) {
+          if (result.type === "객관식") {
+            resultData.push(result.point);
+          } else {
+            resultData.push(result.answer);
+          }
+        }
+      } else {
+        //
+        for (const live of liveSurvey) {
+          if (live.type === "객관식") {
+            resultData.push(live.point);
+          } else {
+            resultData.push(live.answer);
+          }
+        }
+      }
+      newArray.push(resultData);
+    }
+    const worksheet = XLSX.utils?.aoa_to_sheet(newArray);
+    const wscols = _autoFitColumns(newArray, worksheet);
     worksheet["!cols"] = wscols;
     XLSX.utils.book_append_sheet(workbook, worksheet, worksheetname);
     // Save the workbook as an Excel file
