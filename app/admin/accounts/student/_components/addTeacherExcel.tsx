@@ -22,6 +22,8 @@ import {
 } from "./table/actions";
 import { XIcon } from "lucide-react";
 import { toast } from "sonner";
+
+//
 export default function AddTeacherExcel() {
   const pdfinput = React.useRef<any>();
   const [open, setOpen] = React.useState(false);
@@ -29,6 +31,7 @@ export default function AddTeacherExcel() {
   const [teacherData, setTeachers] = React.useState([]);
   const [exelData, setExelData] = React.useState([]);
   const [loading, setLoading] = React.useState(false);
+  //
   const getData = async () => {
     let res = await getTeachers();
     if (res.data) {
@@ -118,7 +121,7 @@ export default function AddTeacherExcel() {
 
       reader.readAsArrayBuffer(file);
     } else {
-      alert("교육생 가져오기를 실폐하였습니다.");
+      alert("리더 가져오기를 실폐하였습니다.");
     }
   };
   const clickUpdate = async () => {
