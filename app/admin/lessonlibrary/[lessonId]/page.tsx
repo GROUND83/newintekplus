@@ -99,9 +99,11 @@ export default function Page({ params }: { params: { lessonId: string } }) {
       contentdescription: "",
       contentfileName: "",
       contentSize: 0,
-    };
+    } as any;
     if (values.lessonDirective._id) {
+      // 이미 학습지시문이 있을경우
       if (values.lessonDirective.file) {
+        // 파일이 있을경우(수정)
         const upload = await UploadFileClient({
           folderName: "lessonDirective",
           file: values.lessonDirective.file,
@@ -119,20 +121,22 @@ export default function Page({ params }: { params: { lessonId: string } }) {
           toast.error("파일 업로드에 실폐하였습니다.");
           return;
         }
-      } else if (
-        !values.lessonDirective.file &&
-        values.lessonDirective.contentdescription
-      ) {
+      } else if (!values.lessonDirective.file) {
+        // 파일이 없을경우
         lessonDirectivce._id = values.lessonDirective._id;
         lessonDirectivce.isDone = true;
-        lessonDirectivce.LessonDirectiveURL = "";
-        lessonDirectivce.contentfileName = "";
-        lessonDirectivce.contentSize = undefined;
+        lessonDirectivce.LessonDirectiveURL =
+          values.lessonDirective.LessonDirectiveURL;
+        lessonDirectivce.contentfileName =
+          values.lessonDirective.contentfileName;
+        lessonDirectivce.contentSize = values.lessonDirective.contentSize;
         lessonDirectivce.contentdescription =
-          values.lessonDirective.contentdescription;
+          values.lessonDirective.contentdescription || "";
       }
     } else {
+      // 학습지시문 없는경우
       if (values.lessonDirective.file) {
+        // 파일이 있는경우
         const upload = await UploadFileClient({
           folderName: "lessonDirective",
           file: values.lessonDirective.file,
@@ -149,18 +153,17 @@ export default function Page({ params }: { params: { lessonId: string } }) {
           toast.error("파일 업로드에 실폐하였습니다.");
           return;
         }
-      } else if (
-        !values.lessonDirective.file &&
-        values.lessonDirective.contentdescription
-      ) {
-        lessonDirectivce._id = "";
-        lessonDirectivce.isDone = true;
-        lessonDirectivce.LessonDirectiveURL = "";
-        lessonDirectivce.contentfileName = "";
-        lessonDirectivce.contentSize = undefined;
-        lessonDirectivce.contentdescription =
-          values.lessonDirective.contentdescription;
       }
+      // else if (!values.lessonDirective.file) {
+      //   // 파일이 없는경우
+      //   lessonDirectivce._id = "";
+      //   lessonDirectivce.isDone = true;
+      //   lessonDirectivce.LessonDirectiveURL = "";
+      //   lessonDirectivce.contentfileName = "";
+      //   lessonDirectivce.contentSize = undefined;
+      //   lessonDirectivce.contentdescription =
+      //     values.lessonDirective.contentdescription || "";
+      // }
     }
     formData.append("lessonDirectivce", JSON.stringify(lessonDirectivce));
 
@@ -255,17 +258,6 @@ export default function Page({ params }: { params: { lessonId: string } }) {
                       deleteLoading={deleteLoading}
                     />
                   </div>
-                  {/* <Button
-                    type="submit"
-                    className=" "
-                    disabled={editAvaliable.length > 0 ? true : false}
-                  >
-                    {updateLoading ? (
-                      <Loader2 className=" animate-spin" />
-                    ) : (
-                      <p>레슨삭제</p>
-                    )}
-                  </Button> */}
                 </div>
                 <div className=" col-span-12 grid grid-cols-12 gap-6 p-6 ">
                   <div className=" col-span-12">

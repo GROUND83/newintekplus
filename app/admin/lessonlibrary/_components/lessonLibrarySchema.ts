@@ -27,6 +27,8 @@ export const lessonLibrarybaseSchema = z.object({
     _id: z.string().optional(),
     LessonDirectiveURL: z.string().optional(),
     type: z.string().optional(),
+    contentfileName: z.string().optional(),
+    contentSize: z.any().optional(),
     contentdescription: z.string().optional(),
     file: z.any().optional(),
   }),

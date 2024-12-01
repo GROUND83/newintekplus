@@ -132,8 +132,8 @@ export default function Page({ params }: { params: { groupId: string } }) {
         participants: group.participants,
         name: group.name,
         dob: {
-          from: group.startDate,
-          to: group.endDate,
+          from: new Date(group.startDate),
+          to: new Date(group.endDate),
         },
       });
       if (group) {
@@ -147,8 +147,8 @@ export default function Page({ params }: { params: { groupId: string } }) {
     resolver: zodResolver(FormSchema),
     defaultValues: {
       dob: {
-        from: undefined,
-        to: undefined,
+        from: new Date(),
+        to: new Date(),
       },
       participants: [],
       teacher: undefined,
@@ -199,22 +199,12 @@ export default function Page({ params }: { params: { groupId: string } }) {
   }
 
   //
-  // React.useEffect(() => {
-  //   const subscription = form.watch((value, { name, type }) => {
-  //     console.log(value, name, type);
-  //     if (name === "courseProfile" && value.courseProfile) {
-  //       console.log(value.courseProfile);
-  //       let result = courseProfileArray.filter(
-  //         (item: any) => item._id === value.courseProfile._id
-  //       );
-  //       console.log("result", result);
-  //       if (result.length > 0) {
-  //         setCourseProfileData(result[0]);
-  //       }
-  //     }
-  //   });
-  //   return () => subscription.unsubscribe();
-  // }, [form.watch]);
+  React.useEffect(() => {
+    const subscription = form.watch((value, { name, type }) => {
+      console.log(value, name, type);
+    });
+    return () => subscription.unsubscribe();
+  }, [form.watch]);
   return (
     <div className="w-full flex flex-col items-stretch flex-1  ">
       <div className="flex-1 flex flex-col  w-full">
