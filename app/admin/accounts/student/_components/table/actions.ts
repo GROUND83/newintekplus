@@ -266,7 +266,11 @@ export const createTeacher = async (formdata: FormData) => {
         const hash = await bcrypt.hash("intekplus2024", 10);
         let createStudent = await Teacher.create({
           status: 1,
-          type: "사내",
+          type: teacher.type,
+
+          jobPosition: teacher.jobPosition,
+          jobGroup: teacher.jobGroup,
+          jobSubGroup: teacher.jobSubGroup,
           email: teacher.email,
           password: hash,
           username: teacher.username,

@@ -53,7 +53,7 @@ const teacher = new mongoose.Schema<ITeacherDocument>(
     jobGroup: {
       type: String,
     },
-    // 직군
+    // 그룹
     jobSubGroup: {
       type: String,
     },

@@ -39,16 +39,7 @@ const blobToFile = (theBlob: Blob, fileName: string): File => {
     }
   );
 };
-//
 
-// const content = ({ html }) => {
-//   const docRef = React.useRef<jsPDF>(null);
-//   return (
-//     <div>
-//       <p>테스트</p>
-//     </div>
-//   );
-// };
 export default function SendVertification({
   group,
   participants,
@@ -133,7 +124,7 @@ export default function SendVertification({
     // console.log(docRef.current);
     try {
       let data = await html2pdf();
-      console.log(data);
+      // console.log(data);
 
       const file = blobToFile(data, "my-image.png");
       console.log(file);
@@ -170,17 +161,19 @@ export default function SendVertification({
           },
         ],
       };
-      sendMail(mailData);
+      await sendMail(mailData);
 
       if (resultSurveyId) {
         await resultSurveyUpdate(resultSurveyId);
       }
-      toast.success("메일 발송에 성공하였습니다.");
 
+      toast.success("메일 발송에 성공하였습니다.");
+      //
+      setOpen(false);
+      setLoading(false);
       //
     } catch (e) {
       toast.error(e);
-    } finally {
       setOpen(false);
       setLoading(false);
     }
@@ -193,15 +186,27 @@ export default function SendVertification({
         desc={`${participants.username}(${participants.email})에게 수료증을 발급합니다.`}
         trigger={
           isSend ? (
-            <Button
-              size="xs"
-              type="button"
-              onClick={() => setOpen(true)}
-              variant="defaultoutline"
-              className="flex flex-row items-center gap-2"
-            >
-              <RotateCw className="size-3" />
-              <p>수료증 재발급</p>
+            loading ? (
+              <Button disabled className="gap-2" size="xs">
+                <Loader2 className="animate-spin size-3" />
+                sending
+              </Button>
+            ) : (
+              <Button
+                size="xs"
+                type="button"
+                onClick={() => setOpen(true)}
+                variant="defaultoutline"
+                className="flex flex-row items-center gap-2"
+              >
+                <RotateCw className="size-3" />
+                <p>수료증 재발급</p>
+              </Button>
+            )
+          ) : loading ? (
+            <Button disabled className="gap-2" size="xs">
+              <Loader2 className="animate-spin size-3" />
+              sending
             </Button>
           ) : (
             <Button
@@ -216,7 +221,7 @@ export default function SendVertification({
           )
         }
         btnText="발급"
-        onClick={handlePrint}
+        onClick={() => handlePrint()}
         open={open}
         setOpen={setOpen}
       >

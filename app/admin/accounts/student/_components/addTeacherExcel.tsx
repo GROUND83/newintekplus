@@ -88,28 +88,21 @@ export default function AddTeacherExcel() {
           let num = json["No."];
           let username = json["성명"];
           // let department = json["본부"];
-          // // let sector = json["부문명"];
-          // let jobSubGroup = json["파트명"]; //jobSubGroup
-          // // let part = json["파트명"]; //jobSubGroup
-          // let jobPosition = json["직위"]; //jobPosition !!
-          // // let train = json["직책"]; //train
-          // let jobGroup = json["부서명"]; //jobGroup   jobGroup == 개발직군
-          let email = json["이메일"];
+          let jobPosition = json["직위"];
+          let jobGroup = json["직군"];
+          let jobSubGroup = json["그룹"];
           let type = json["타입"];
 
-          // let phone = json["전화번호"];
-          // console.log("email", email);
-          //
+          let email = json["이메일"];
+
           let newobj = {
             num,
             username,
             type: type || "",
-            // department: department || "", // 본부
-            // //   part: part || "",
-            // jobSubGroup: jobSubGroup || "", // 부서명
-            // jobPosition: jobPosition || "", // 직책
-            //   train: train || "",
-            // jobGroup: jobGroup || "", //직군
+
+            jobSubGroup: jobSubGroup || "", // 부서명
+            jobPosition: jobPosition || "", // 직책
+            jobGroup: jobGroup || "", //직군
             email: email ? `${email.replace(/(\s*)/g, "").toLowerCase()}` : "",
             isExits: await checkExsit(email),
           };
@@ -216,14 +209,22 @@ export default function AddTeacherExcel() {
                 <div className="w-[60px]">
                   <p>성명</p>
                 </div>
+                <div className="w-[200px]">
+                  <p>이메일</p>
+                </div>
                 <div className="w-[100px]">
                   <p>타입</p>
                 </div>
 
-                <div className="w-[200px]">
-                  <p>이메일</p>
+                <div className="w-[100px]">
+                  <p>직위</p>
                 </div>
-
+                <div className="w-[100px]">
+                  <p>직군</p>
+                </div>
+                <div className="w-[100px]">
+                  <p>그룹</p>
+                </div>
                 <div className="w-[80px]">
                   <p>계정 유무</p>
                 </div>
@@ -243,11 +244,21 @@ export default function AddTeacherExcel() {
                           <div className="w-[60px]">
                             <p>{item.username}</p>
                           </div>
-                          <div className="w-[60px]">
-                            <p>{item.type}</p>
-                          </div>
                           <div className="w-[200px]">
                             <p>{item.email}</p>
+                          </div>
+                          <div className="w-[100px]">
+                            <p>{item.type}</p>
+                          </div>
+
+                          <div className="w-[100px]">
+                            <p>{item.jobPosition}</p>
+                          </div>
+                          <div className="w-[100px]">
+                            <p>{item.jobGroup}</p>
+                          </div>
+                          <div className="w-[100px]">
+                            <p>{item.jobSubGroup}</p>
                           </div>
 
                           <div className="w-[80px]">
