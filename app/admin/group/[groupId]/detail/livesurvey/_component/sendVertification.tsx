@@ -45,14 +45,18 @@ export default function SendVertification({
   participants,
   resultSurveyId,
   isSend,
+  getData,
 }: {
   group: any;
   participants: any;
   resultSurveyId: string;
   isSend: boolean;
+  getData: any;
 }) {
+  console.log("participants", participants, resultSurveyId);
   const [open, setOpen] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
+  //
   const html2pdf = async () => {
     let start = dayjs(group.startDate).format("YYYY.MM.DD");
     let end = dayjs(group.endDate).format("YYYY.MM.DD");
@@ -118,6 +122,7 @@ export default function SendVertification({
 
     return blob;
   };
+  //
   const handlePrint = async () => {
     //
     setLoading(true);
@@ -169,6 +174,7 @@ export default function SendVertification({
 
       toast.success("메일 발송에 성공하였습니다.");
       //
+      getData();
       setOpen(false);
       setLoading(false);
       //

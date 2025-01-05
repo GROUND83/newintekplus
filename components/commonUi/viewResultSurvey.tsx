@@ -10,7 +10,7 @@ export default function ViewResultSurveyt({
   resultSurvey: any;
 }) {
   const [open, setOpen] = React.useState(false);
-  console.log("resultSurveyresultSurvey", resultSurvey);
+  // console.log("resultSurveyresultSurvey", resultSurvey);
   return (
     <div className="">
       <ActionModal
