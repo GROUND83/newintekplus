@@ -12,6 +12,6 @@ permissions:
     mode: 755
 hooks:
   AfterInstall:
-    - location: /home/ubuntu/intekplus/deploy.sh
+    - location: deploy.sh
       timeout: 300
       runas: ubuntu
