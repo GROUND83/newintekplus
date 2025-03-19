@@ -2,7 +2,7 @@ import Logo from "@/components/Logo";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
-
+// test
 export default function Page() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center">
