@@ -5,6 +5,7 @@ files:
   - source: /
     destination: /home/ubuntu/intekplus
     overwrite: true
+file_exists_behavior: OVERWRITE
 permissions:
   - object: /home/ubuntu/intekplus
     owner: ubuntu
