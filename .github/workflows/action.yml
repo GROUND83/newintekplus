@@ -6,9 +6,9 @@ on:
       - main
 
 env:
-  S3_BUCKET_NAME: intekpluss3
-  CODE_DEPLOY_APPLICATION_NAME: newintekplus
-  CODE_DEPLOY_DEPLOYMENT_GROUP_NAME: newintekplus-group
+  S3_BUCKET_NAME: intekplusbucketnew
+  CODE_DEPLOY_APPLICATION_NAME: intekpluscodedeploy
+  CODE_DEPLOY_DEPLOYMENT_GROUP_NAME: intekplus-code-deploy
 
 jobs:
   build:
@@ -46,7 +46,7 @@ jobs:
           echo "NEXT_PUBLIC_AWS_REGION=${{ secrets.NEXT_PUBLIC_AWS_REGION }}" >> .env
           echo "NEXT_PUBLIC_AWS_ACCESS_ID=${{ secrets.NEXT_PUBLIC_AWS_ACCESS_ID }}" >> .env
           echo "NEXT_PUBLIC_AWS_SECRET_ID=${{ secrets.NEXT_PUBLIC_AWS_SECRET_ID }}" >> .env
-                    
+                 
           cat .env
       - name: Install dependencies
         run: npm install

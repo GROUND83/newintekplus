@@ -12,6 +12,6 @@ permissions:
     mode: 755
 hooks:
   AfterInstall:
-    - location: scripts/after-install.sh
+    - location: ./deploy.sh
       timeout: 300
-      runas: root
+      runas: ubuntu
