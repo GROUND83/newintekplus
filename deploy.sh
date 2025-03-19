@@ -17,4 +17,4 @@ if [ ! -f "node_modules/next/dist/bin/next" ]; then
 fi
 
 # PM2로 애플리케이션 시작
-yarn run pm2 start ecosystem.config.js --env production
+yarn run dev
